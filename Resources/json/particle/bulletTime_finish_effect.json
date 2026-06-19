@@ -1,0 +1,205 @@
+{
+    "deltaTimeType": 0,
+    "emitters": [
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 0,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "count": 1,
+                    "delay": 0.0,
+                    "interval": 0.0,
+                    "loops": 1,
+                    "type": "SpawnBurst"
+                },
+                {
+                    "max": 0.699999988079071,
+                    "min": 0.699999988079071,
+                    "type": "InitialLifetime"
+                },
+                {
+                    "end": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "start": {
+                        "x": 80.0,
+                        "y": 80.0,
+                        "z": 1.0
+                    },
+                    "type": "ScaleOverLifetime"
+                },
+                {
+                    "rotationSpeed": 360.0,
+                    "type": "RotationOverLifetime"
+                }
+            ],
+            "name": "e1",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "billboard": true,
+                "blendMode": 0,
+                "primitiveOptions": {
+                    "cubeFaceVisible": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                    ],
+                    "cubeSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "doubleSided": false,
+                    "innerRadius": 0.5,
+                    "outerRadius": 1.0,
+                    "points": 5,
+                    "rings": 8,
+                    "segments": 16,
+                    "tubeRadius": 0.30000001192092896,
+                    "turns": 2.0,
+                    "withCaps": true
+                },
+                "primitiveType": 0,
+                "scale": 1.0,
+                "texture": "resources/flameeye.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 0.0,
+                    "g": 0.0,
+                    "r": 0.0
+                },
+                "type": "Mesh"
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        },
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 0,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "count": 1,
+                    "delay": 0.0,
+                    "interval": 0.10000000149011612,
+                    "loops": 2,
+                    "type": "SpawnBurst"
+                },
+                {
+                    "max": 0.5,
+                    "min": 0.5,
+                    "type": "InitialLifetime"
+                },
+                {
+                    "end": {
+                        "x": 10.0,
+                        "y": 10.0,
+                        "z": 1.0
+                    },
+                    "start": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 1.0
+                    },
+                    "type": "ScaleOverLifetime"
+                },
+                {
+                    "end": {
+                        "a": 0.0,
+                        "b": 1.0,
+                        "g": 1.0,
+                        "r": 1.0
+                    },
+                    "start": {
+                        "a": 1.0,
+                        "b": 1.0,
+                        "g": 1.0,
+                        "r": 1.0
+                    },
+                    "type": "ColorFade",
+                    "useInitialColor": false
+                }
+            ],
+            "name": "e2",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "billboard": true,
+                "blendMode": 1,
+                "primitiveOptions": {
+                    "cubeFaceVisible": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                    ],
+                    "cubeSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "doubleSided": false,
+                    "innerRadius": 0.5,
+                    "outerRadius": 1.0,
+                    "points": 5,
+                    "rings": 8,
+                    "segments": 16,
+                    "tubeRadius": 0.30000001192092896,
+                    "turns": 2.0,
+                    "withCaps": true
+                },
+                "primitiveType": 1,
+                "scale": 1.0,
+                "texture": "resources/gradation.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "type": "Mesh"
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.699999988079071
+        }
+    ],
+    "name": "bulletTime_finish_effect",
+    "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    }
+}

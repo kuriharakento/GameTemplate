@@ -1,0 +1,39 @@
+{
+    "components": {
+        "OBBColliderComponent": {
+            "sizeOffset": {
+                "x": 4.199999809265137,
+                "y": 3.5,
+                "z": 0.0
+            },
+            "useSubstep": false
+        },
+        "StatusComponent": {
+            "attackPower": 27.899999618530273,
+            "fireRateMultiplier": 19.899999618530273,
+            "hp": 212.1999969482422,
+            "isAlive": true,
+            "maxHp": 200.39999389648438,
+            "moveSpeed": 26.5
+        }
+    },
+    "name_": "test_object",
+    "tag_": "test",
+    "transform_": {
+        "rotate": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "scale": {
+            "x": 3.0,
+            "y": 3.0,
+            "z": 3.0
+        },
+        "translate": {
+            "x": 0.0,
+            "y": 7.599999904632568,
+            "z": 0.0
+        }
+    }
+}

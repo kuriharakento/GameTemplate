@@ -1,0 +1,290 @@
+{
+    "deltaTimeType": 0,
+    "emitters": [
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 0,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "count": 50,
+                    "delay": 0.0,
+                    "interval": 0.0,
+                    "loops": 1,
+                    "type": "SpawnBurst"
+                },
+                {
+                    "max": 0.5,
+                    "min": 0.5,
+                    "type": "InitialLifetime"
+                },
+                {
+                    "max": {
+                        "x": 20.0,
+                        "y": 20.0,
+                        "z": 20.0
+                    },
+                    "min": {
+                        "x": -20.0,
+                        "y": -10.0,
+                        "z": -20.0
+                    },
+                    "type": "InitialVelocity"
+                },
+                {
+                    "max": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 4.0
+                    },
+                    "min": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 4.0
+                    },
+                    "type": "InitialScale"
+                },
+                {
+                    "easingType": 2,
+                    "end": {
+                        "a": 0.0,
+                        "b": 0.0,
+                        "g": 0.0,
+                        "r": 1.0
+                    },
+                    "start": {
+                        "a": 1.0,
+                        "b": 0.08823531866073608,
+                        "g": 1.0,
+                        "r": 0.7318339943885803
+                    },
+                    "type": "ColorFade",
+                    "useInitialColor": false
+                },
+                {
+                    "type": "FaceVelocity"
+                }
+            ],
+            "name": "e1",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "billboard": false,
+                "blendMode": 1,
+                "primitiveOptions": {
+                    "cubeFaceVisible": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                    ],
+                    "cubeSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "doubleSided": false,
+                    "innerRadius": 0.5,
+                    "outerRadius": 1.0,
+                    "points": 5,
+                    "rings": 8,
+                    "segments": 16,
+                    "tubeRadius": 0.30000001192092896,
+                    "turns": 2.0,
+                    "withCaps": true
+                },
+                "primitiveType": 3,
+                "scale": 10.0,
+                "texture": "resources/star.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 0.9656862616539001,
+                    "g": 0.9656862616539001,
+                    "r": 0.9656862616539001
+                },
+                "type": "Mesh"
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        },
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 0,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "count": 50,
+                    "delay": 0.0,
+                    "interval": 0.0,
+                    "loops": 1,
+                    "type": "SpawnBurst"
+                },
+                {
+                    "max": 0.4000000059604645,
+                    "min": 0.4000000059604645,
+                    "type": "InitialLifetime"
+                },
+                {
+                    "arcAngle": 360.0,
+                    "boxSize": {
+                        "x": 7.0,
+                        "y": 7.0,
+                        "z": 7.0
+                    },
+                    "coneHeight": 2.0,
+                    "emitFromSurface": false,
+                    "initialSpeed": 0.0,
+                    "innerRadius": 0.0,
+                    "lineEnd": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    },
+                    "lineStart": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "outerRadius": 1.0,
+                    "shapeType": 3,
+                    "spawnLocation": 0,
+                    "type": "SpawnShape"
+                },
+                {
+                    "max": {
+                        "x": 2.0,
+                        "y": 2.0,
+                        "z": 2.0
+                    },
+                    "min": {
+                        "x": -2.0,
+                        "y": -2.0,
+                        "z": -2.0
+                    },
+                    "type": "InitialVelocity"
+                },
+                {
+                    "maxAngle": 360.0,
+                    "maxAngle_v3": {
+                        "x": 360.0,
+                        "y": 360.0,
+                        "z": 360.0
+                    },
+                    "minAngle": 0.0,
+                    "minAngle_v3": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "type": "InitialRotation"
+                },
+                {
+                    "easingType": 2,
+                    "end": {
+                        "x": 2.0,
+                        "y": 2.0,
+                        "z": 2.0
+                    },
+                    "start": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "type": "ScaleOverLifetime"
+                },
+                {
+                    "easingType": 0,
+                    "end": {
+                        "a": 0.0,
+                        "b": 0.21780085563659668,
+                        "g": 0.21780085563659668,
+                        "r": 0.5049020051956177
+                    },
+                    "start": {
+                        "a": 0.43529412150382996,
+                        "b": 0.10588235408067703,
+                        "g": 0.3960784375667572,
+                        "r": 0.9960784316062927
+                    },
+                    "type": "ColorFade",
+                    "useInitialColor": false
+                }
+            ],
+            "name": "e2",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "billboard": false,
+                "blendMode": 0,
+                "primitiveOptions": {
+                    "cubeFaceVisible": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                    ],
+                    "cubeSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "doubleSided": false,
+                    "innerRadius": 0.9300000071525574,
+                    "outerRadius": 1.090000033378601,
+                    "points": 5,
+                    "rings": 8,
+                    "segments": 16,
+                    "tubeRadius": 0.30000001192092896,
+                    "turns": 2.0,
+                    "withCaps": true
+                },
+                "primitiveType": 9,
+                "scale": 1.649999976158142,
+                "texture": "resources/white1x1.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "type": "Mesh"
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        }
+    ],
+    "name": "E_explosion",
+    "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    }
+}

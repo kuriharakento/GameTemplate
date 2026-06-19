@@ -1,0 +1,78 @@
+{
+    "deltaTimeType": 1,
+    "emitters": [
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 1,
+            "loopCount": 1,
+            "maxParticles": 5000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "initialColor": {
+                        "a": 1.0,
+                        "b": 0.20000000298023224,
+                        "g": 0.800000011920929,
+                        "r": 1.0
+                    },
+                    "minMoveDistance": 0.05000000074505806,
+                    "particleLifetime": 0.20000000298023224,
+                    "spawnOnlyWhenMoving": true,
+                    "spawnRate": 60.0,
+                    "type": "MultiSourceRibbon"
+                },
+                {
+                    "end": {
+                        "a": 0.0,
+                        "b": 0.0,
+                        "g": 0.5,
+                        "r": 1.0
+                    },
+                    "start": {
+                        "a": 1.0,
+                        "b": 1.0,
+                        "g": 1.0,
+                        "r": 1.0
+                    },
+                    "type": "ColorFade",
+                    "useInitialColor": true
+                }
+            ],
+            "name": "BulletTrail",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "alphaFade": true,
+                "billboard": true,
+                "blendMode": 2,
+                "minSegmentDistance": 0.10000000149011612,
+                "recordInterval": 0.01600000075995922,
+                "texture": "./Resources/white.png",
+                "textureMode": 0,
+                "tileScale": 1.0,
+                "trailLifetime": 0.20000000298023224,
+                "trailWidth": 0.20000000298023224,
+                "type": "Ribbon",
+                "widthFade": true
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        }
+    ],
+    "name": "BulletTrailEffect",
+    "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    }
+}

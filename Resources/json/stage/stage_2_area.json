@@ -1,0 +1,631 @@
+{
+  "areas": [
+    {
+      "areaIndex": 0,
+      "areaTransform": {
+        "translate": {
+          "x": -2.02427077293396,
+          "y": 0.0,
+          "z": -66.64140319824219
+        },
+        "rotate": {
+          "x": 0.0,
+          "y": -3.156458616256714,
+          "z": -0.0
+        },
+        "scale": {
+          "x": 27.159032821655273,
+          "y": 5.0,
+          "z": 15.501102447509766
+        }
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-0",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 9.766387939453125,
+                  "y": 1.5390424728393555,
+                  "z": -76.85273742675781
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-1",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -12.250850677490234,
+                  "y": 1.086195945739746,
+                  "z": -75.48976135253906
+                }
+              }
+            }
+          ]
+        },
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-0.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -13.9939546585083,
+                  "y": 1.4475144147872925,
+                  "z": -63.40290451049805
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-1.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 11.330100059509277,
+                  "y": 0.970020592212677,
+                  "z": -63.08396911621094
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaIndex": 1,
+      "areaTransform": {
+        "translate": {
+          "x": -1.0199296474456787,
+          "y": 0.0,
+          "z": 0.9144821166992188
+        },
+        "rotate": {
+          "x": 0.0,
+          "y": -3.156458616256714,
+          "z": -0.0
+        },
+        "scale": {
+          "x": 28.71297836303711,
+          "y": 5.0,
+          "z": 13.182113647460938
+        }
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 9.823087692260742,
+                  "y": 1.2040090560913086,
+                  "z": 5.382105827331543
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-1",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -10.00373363494873,
+                  "y": 1.3703312873840332,
+                  "z": 6.413435459136963
+                }
+              }
+            }
+          ]
+        },
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0.001",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -1.4942781925201416,
+                  "y": 1.726853370666504,
+                  "z": -9.995710372924805
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-1.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 14.59158706665039,
+                  "y": 1.2803049087524414,
+                  "z": -5.5346479415893555
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-2",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -17.867305755615234,
+                  "y": 1.9402060508728027,
+                  "z": -5.517709732055664
+                }
+              }
+            }
+          ]
+        },
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0.002",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -9.097757214249214e-09,
+                  "y": 0.0,
+                  "z": 9.76864242553711
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-1.002",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 15.845664978027344,
+                  "y": 1.6591150760650635,
+                  "z": 7.0368781089782715
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-2.001",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -15.449019432067871,
+                  "y": 1.0680780410766602,
+                  "z": 7.093506813049316
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaIndex": 2,
+      "areaTransform": {
+        "translate": {
+          "x": 0.1288306713104248,
+          "y": 0.0,
+          "z": 78.1845703125
+        },
+        "rotate": {
+          "x": 0.0,
+          "y": -3.156458616256714,
+          "z": -0.0
+        },
+        "scale": {
+          "x": 28.306291580200195,
+          "y": 5.0,
+          "z": 21.30266571044922
+        }
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-0",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -8.239771887019742e-08,
+                  "y": 1.5994422435760498,
+                  "z": 88.47386932373047
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-1",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 9.476541519165039,
+                  "y": 1.74843168258667,
+                  "z": 78.7229232788086
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-2",
+              "disabled": false,
+              "fileName": "knife",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -13.981804847717285,
+                  "y": 1.1726183891296387,
+                  "z": 78.72467803955078
+                }
+              }
+            }
+          ]
+        },
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-0.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -6.096328775129223e-08,
+                  "y": 1.9091016054153442,
+                  "z": 65.45882415771484
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-1.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -10.087142944335938,
+                  "y": 1.4342892169952393,
+                  "z": 79.03616333007812
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-2.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 10.326461791992188,
+                  "y": 1.28490149974823,
+                  "z": 77.23159790039062
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-3",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -8.093253001106859e-08,
+                  "y": 1.459680199623108,
+                  "z": 86.900634765625
+                }
+              }
+            }
+          ]
+        },
+        {
+          "enemies": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-0.002",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 17.46368408203125,
+                  "y": 1.4534200429916382,
+                  "z": 88.61227416992188
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-1.002",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": 17.889333724975586,
+                  "y": 1.069678544998169,
+                  "z": 66.96847534179688
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-2.002",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -15.899656295776367,
+                  "y": 1.6216400861740112,
+                  "z": 86.09976959228516
+                }
+              }
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-3.001",
+              "disabled": false,
+              "fileName": "enemy",
+              "transform": {
+                "rotate": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "scale": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0
+                },
+                "translate": {
+                  "x": -15.884858131408691,
+                  "y": 1.867141604423523,
+                  "z": 66.05619049072266
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

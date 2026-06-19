@@ -1,0 +1,662 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="application">
+      <UniqueIdentifier>{7D26979E-9CF7-4228-A3BF-FC91BDCF08DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\animation">
+      <UniqueIdentifier>{DA6999A0-BED5-4B1A-AFF7-1841C09E3E6A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\carnage">
+      <UniqueIdentifier>{D7CA4733-2241-4BE8-99D1-A3CCADBF4A38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\combo">
+      <UniqueIdentifier>{9B127DC9-B8C9-41B5-BC5E-8D2B9BD4345E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\ecs">
+      <UniqueIdentifier>{191FC46B-A5A7-44A9-AD60-3914AC7CEF0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\ecs\components">
+      <UniqueIdentifier>{2C5FCBDF-2CDB-449D-89E3-41D505173E04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\ecs\systems">
+      <UniqueIdentifier>{46D101E4-C261-4D59-B036-CE800F35C2B5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\effect">
+      <UniqueIdentifier>{085AA916-4D06-4F0D-95C4-A6F6CA84EB1B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\game">
+      <UniqueIdentifier>{B8DF6484-45C5-4779-A68D-03B4F06BB6F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject">
+      <UniqueIdentifier>{A08A3DC8-9F54-4916-A298-AF0AE81FC9DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\base">
+      <UniqueIdentifier>{C84FC542-C767-4482-AE8E-9F3F0D511625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable">
+      <UniqueIdentifier>{E960AEA8-8B44-4070-833D-75BF5DDDBCBA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\base">
+      <UniqueIdentifier>{37F44631-A922-44A8-9E6B-32D3D3E3BFFA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character">
+      <UniqueIdentifier>{E2E89E9C-C3EA-4304-B60B-8B8AD84E4CCC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\base">
+      <UniqueIdentifier>{47F03A6F-8E52-4097-99E9-24FC62E1E393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\enemy">
+      <UniqueIdentifier>{85C34948-4385-42CC-B279-1BB2F2F68DF0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\enemy\base">
+      <UniqueIdentifier>{5B63A8B8-55A3-4A6E-AAD0-29D41E397DEB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\enemy\base\Node">
+      <UniqueIdentifier>{C5B55FC5-B261-4EC0-A823-BF646D17377E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\enemy\base\Node\BehaviorTree">
+      <UniqueIdentifier>{CC8CC016-C593-44B9-BF1B-CAA6D75C49AF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\character\player">
+      <UniqueIdentifier>{16FD32E1-6992-4BF4-A900-D5241B23F00C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\Combatable\weapon">
+      <UniqueIdentifier>{6577594B-EB63-4190-9449-D7545F4C5115}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\component">
+      <UniqueIdentifier>{8761A4BD-597F-4456-9B20-ED5EE2650AE5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\component\action">
+      <UniqueIdentifier>{CBE67904-DB78-4CB1-B66B-D085FA9A8BAE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\GameObject\obstacle">
+      <UniqueIdentifier>{8AB3DD06-5F32-492C-AB38-F816CC9D2160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\minimap">
+      <UniqueIdentifier>{1D0CA692-7EB5-4F8B-A374-710584D96852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\resources">
+      <UniqueIdentifier>{E7F36C00-EF42-4AE2-A8AB-C2D81F48E894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\scene">
+      <UniqueIdentifier>{6F7E76B3-7F14-4432-B7DB-D086AEB2EDA0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\scene\debug">
+      <UniqueIdentifier>{CD782416-BE6F-4956-9A40-4F0526B8FCBF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\scene\play">
+      <UniqueIdentifier>{6B78D9D0-ABBC-46BD-BE78-37035FECA0BD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\stage">
+      <UniqueIdentifier>{7C9EB8A4-51ED-4006-B3E0-1E4003E15822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\UI">
+      <UniqueIdentifier>{811E765E-6F18-4566-95F0-2BDBFFF21DB7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\weapon">
+      <UniqueIdentifier>{7CBB7A2B-7818-48FA-86C3-DA1FA5036BEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals">
+      <UniqueIdentifier>{DACF729F-9C7A-4869-A132-2E363D985BF1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\imgui">
+      <UniqueIdentifier>{F1058209-173F-49A1-8EFE-40D6B6A63FC3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{FCA0E5C7-6376-4456-8FB7-0C00D6658F63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\shaders">
+      <UniqueIdentifier>{31ABBC09-E636-4265-B9F5-1D745489E22B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="application\animation\Slide.cpp">
+      <Filter>application\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="application\carnage\CarnageMode.cpp">
+      <Filter>application\carnage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\combo\ComboManager.cpp">
+      <Filter>application\combo</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\AnnihilationSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\DecoySystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\EnemyBehaviorSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\EnemySpawnSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\PlayerActionSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\ProgressionSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\ProjectileSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\SprinklerSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ecs\systems\TurretSystem.cpp">
+      <Filter>application\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="application\effect\BulletTrailManager.cpp">
+      <Filter>application\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\effect\CinematicLetterbox.cpp">
+      <Filter>application\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\effect\HomingTrailManager.cpp">
+      <Filter>application\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\effect\SceneTransitionEffect.cpp">
+      <Filter>application\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\game\ScoreManager.cpp">
+      <Filter>application\game</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\base\StatusSystem.cpp">
+      <Filter>application\GameObject\Combatable\base</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\base\Character.cpp">
+      <Filter>application\GameObject\Combatable\character\base</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\ActionNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\BehaviorTree\BehaviorTree.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\BlackBoard.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\CompositeNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\ConditionNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\InverterNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\ParallelNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\SelectorNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\base\Node\SequenceNode.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\enemy\EnemyManager.cpp">
+      <Filter>application\GameObject\Combatable\character\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\character\player\Player.cpp">
+      <Filter>application\GameObject\Combatable\character\player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\weapon\Bullet.cpp">
+      <Filter>application\GameObject\Combatable\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Combatable\weapon\Knife.cpp">
+      <Filter>application\GameObject\Combatable\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\AssaultRifleComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\BulletComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\EnemyUIComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\GravityPhysicsComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\KnifeEnemyBehavior.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\MoveComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\PistolComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\PlayerUIComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\ShotgunComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\StatusComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\component\action\WeaponManagerComponent.cpp">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\obstacle\BarrierBlock.cpp">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\obstacle\Obstacle.cpp">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\obstacle\ObstacleData.cpp">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\obstacle\ObstacleManager.cpp">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\minimap\Minimap.cpp">
+      <Filter>application\minimap</Filter>
+    </ClCompile>
+    <ClCompile Include="application\resources\LoadGameResources.cpp">
+      <Filter>application\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\debug\ParticleTestScene.cpp">
+      <Filter>application\scene\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\debug\TestScene.cpp">
+      <Filter>application\scene\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\play\GamePlayScene.cpp">
+      <Filter>application\scene\play</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\play\ResultScene.cpp">
+      <Filter>application\scene\play</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\play\TitleScene.cpp">
+      <Filter>application\scene\play</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\Area.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\AreaManager.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\AreaWaveData.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\Stage.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\StageData.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\StageManager.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\Wave.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\WaveManager.cpp">
+      <Filter>application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\ControlsGuide.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\Cursor.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\GameUI.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\LevelUpUI.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\PoseMenu.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UI\SkillSelectionUI.cpp">
+      <Filter>application\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="application\weapon\WeaponManager.cpp">
+      <Filter>application\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_demo.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_draw.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_tables.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="application\animation\Slide.h">
+      <Filter>application\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="application\carnage\CarnageMode.h">
+      <Filter>application\carnage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\combo\ComboManager.h">
+      <Filter>application\combo</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\CollisionConfig.h">
+      <Filter>application\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\BulletComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\DamageStackComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\DecoyComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\DodgeComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\EnemyChargerComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\EnemyStateComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\EnemyTypeComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\ImpactChargeComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\InducedExplosionComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\ObstacleComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\PlayerComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\PlayerProgressionComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\ProjectileComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\SkillComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\SprinklerComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\StatusComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\components\TurretComponent.h">
+      <Filter>application\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\AnnihilationSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\DecoySystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\EnemyBehaviorSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\EnemySpawnSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\PlayerActionSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\ProgressionSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\ProjectileSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\SprinklerSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ecs\systems\TurretSystem.h">
+      <Filter>application\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="application\effect\BulletTrailManager.h">
+      <Filter>application\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\effect\CinematicLetterbox.h">
+      <Filter>application\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\effect\HomingTrailManager.h">
+      <Filter>application\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\effect\SceneTransitionEffect.h">
+      <Filter>application\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\game\ScoreManager.h">
+      <Filter>application\game</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\base\GameObjectTag.h">
+      <Filter>application\GameObject\base</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\base\CombatableObject.h">
+      <Filter>application\GameObject\Combatable\base</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\base\StatusSystem.h">
+      <Filter>application\GameObject\Combatable\base</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\base\Character.h">
+      <Filter>application\GameObject\Combatable\character\base</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\ActionNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\BehaviorTree\BehaviorTree.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\BlackBoard.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\BTNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\CompositeNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\ConditionNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\InverterNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\NodeUtils.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\ParallelNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\SelectorNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\base\Node\SequenceNode.h">
+      <Filter>application\GameObject\Combatable\character\enemy\base\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\enemy\EnemyManager.h">
+      <Filter>application\GameObject\Combatable\character\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\character\player\Player.h">
+      <Filter>application\GameObject\Combatable\character\player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\weapon\Bullet.h">
+      <Filter>application\GameObject\Combatable\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Combatable\weapon\Knife.h">
+      <Filter>application\GameObject\Combatable\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\AssaultRifleComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\BulletComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\EnemyUIComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\GravityPhysicsComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\IWeaponComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\KnifeEnemyBehavior.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\MoveComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\PistolComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\PlayerUIComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\ShotgunComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\StatusComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\component\action\WeaponManagerComponent.h">
+      <Filter>application\GameObject\component\action</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\obstacle\BarrierBlock.h">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\obstacle\Obstacle.h">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\obstacle\ObstacleData.h">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\obstacle\ObstacleManager.h">
+      <Filter>application\GameObject\obstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\minimap\Minimap.h">
+      <Filter>application\minimap</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\debug\ParticleTestScene.h">
+      <Filter>application\scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\debug\TestScene.h">
+      <Filter>application\scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\play\GamePlayScene.h">
+      <Filter>application\scene\play</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\play\PlayerStatusEditor.h">
+      <Filter>application\scene\play</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\play\ResultScene.h">
+      <Filter>application\scene\play</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\play\TitleScene.h">
+      <Filter>application\scene\play</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\Area.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\AreaInfo.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\AreaManager.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\AreaWaveData.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\GameObjectInfo.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\Stage.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\StageData.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\StageManager.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\Wave.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\WaveInfo.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\WaveManager.h">
+      <Filter>application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\ControlsGuide.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\Cursor.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\GameUI.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\LevelUpUI.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\PoseMenu.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UI\SkillSelectionUI.h">
+      <Filter>application\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="application\weapon\WeaponManager.h">
+      <Filter>application\weapon</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
+      <Filter>Resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Object3d.Vs.hlsl">
+      <Filter>Resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Skybox.PS.hlsl">
+      <Filter>Resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Skybox.VS.hlsl">
+      <Filter>Resources\shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shaders\Line.hlsli">
+      <Filter>Resources\shaders</Filter>
+    </None>
+    <None Include="Resources\shaders\Object3d.hlsli">
+      <Filter>Resources\shaders</Filter>
+    </None>
+    <None Include="Resources\shaders\Particle.hlsli">
+      <Filter>Resources\shaders</Filter>
+    </None>
+    <None Include="Resources\shaders\Skybox.hlsli">
+      <Filter>Resources\shaders</Filter>
+    </None>
+    <None Include="Resources\shaders\Sprite.hlsli">
+      <Filter>Resources\shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

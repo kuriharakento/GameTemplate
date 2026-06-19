@@ -1,0 +1,1465 @@
+{
+  "name": "scene",
+  "objects": [
+    {
+      "type": "BarrierBlock",
+      "name": "BarrierBlock_00",
+      "transform": {
+        "translation": [
+          28.976757049560547,
+          0.0,
+          0.46852684020996094
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.0,
+          100.00000762939453
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "BarrierBlock",
+      "name": "BarrierBlock_00.001",
+      "transform": {
+        "translation": [
+          -31.016613006591797,
+          0.0,
+          1.3604373931884766
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.0,
+          100.00000762939453
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "BarrierBlock",
+      "name": "BarrierBlock_02",
+      "transform": {
+        "translation": [
+          0.4665881395339966,
+          0.0,
+          100.9034423828125
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          29.999998092651367,
+          5.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "BarrierBlock",
+      "name": "BarrierBlock_02.001",
+      "transform": {
+        "translation": [
+          -2.5064470767974854,
+          0.0,
+          -99.074462890625
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          29.999998092651367,
+          5.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_00",
+      "transform": {
+        "translation": [
+          -2.1923515796661377,
+          0.0,
+          -77.94718170166016
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          3.782048463821411,
+          1.0,
+          0.5120924711227417
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "PlayerSpawn",
+      "name": "PlayerSpawn",
+      "transform": {
+        "translation": [
+          -2.3974111080169678,
+          0.0,
+          -91.74027252197266
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          1.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "player",
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_00.001",
+      "transform": {
+        "translation": [
+          -14.89998722076416,
+          0.0,
+          -68.15130615234375
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          3.782048463821411,
+          1.0,
+          0.5120924711227417
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_00.002",
+      "transform": {
+        "translation": [
+          11.917500495910645,
+          0.0,
+          -68.54998779296875
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          3.782048463821411,
+          1.0,
+          0.5120924711227417
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_00.004",
+      "transform": {
+        "translation": [
+          -1.9086966514587402,
+          0.0,
+          -58.86744689941406
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          3.782048463821411,
+          1.0,
+          0.5120924711227417
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Area",
+      "name": "Area_00",
+      "transform": {
+        "translation": [
+          -2.02427077293396,
+          0.0,
+          -66.64140319824219
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          27.159032821655273,
+          5.0,
+          15.501102447509766
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false,
+      "children": [
+        {
+          "type": "Wave",
+          "name": "Wave_00",
+          "transform": {
+            "translation": [
+              3.725290298461914e-09,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              -0.0,
+              9.313224635931761e-10,
+              -0.0
+            ],
+            "scaling": [
+              1.0000001192092896,
+              0.9999999403953552,
+              1.0
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-0",
+              "transform": {
+                "translation": [
+                  -0.48995572328567505,
+                  0.0,
+                  -0.2233734130859375
+                ],
+                "rotation": [
+                  -0.0,
+                  1.2415732886239539e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03682016208767891,
+                  0.20000001788139343,
+                  0.06451154500246048
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-1",
+              "transform": {
+                "translation": [
+                  0.44117531180381775,
+                  0.0,
+                  -0.20452880859375
+                ],
+                "rotation": [
+                  -0.0,
+                  1.2415732886239539e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03682016208767891,
+                  0.20000001788139343,
+                  0.06451154500246048
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "type": "Wave",
+          "name": "Wave_01",
+          "transform": {
+            "translation": [
+              3.725290298461914e-09,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              -0.0,
+              9.313224635931761e-10,
+              -0.0
+            ],
+            "scaling": [
+              1.0000001192092896,
+              0.9999999403953552,
+              1.0
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-0.001",
+              "transform": {
+                "translation": [
+                  3.725290298461914e-09,
+                  0.0,
+                  -0.7258796691894531
+                ],
+                "rotation": [
+                  -0.0,
+                  1.2415732886239539e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03682016208767891,
+                  0.20000001788139343,
+                  0.06451154500246048
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.0-1.001",
+              "transform": {
+                "translation": [
+                  0.0,
+                  0.0,
+                  -0.22223711013793945
+                ],
+                "rotation": [
+                  -0.0,
+                  1.2415732886239539e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03682016208767891,
+                  0.20000001788139343,
+                  0.06451154500246048
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_04",
+      "transform": {
+        "translation": [
+          16.78874397277832,
+          0.0,
+          -25.27909278869629
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          10.83544635772705,
+          1.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_04.001",
+      "transform": {
+        "translation": [
+          -19.11900520324707,
+          0.0,
+          -24.745264053344727
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          10.83544635772705,
+          1.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Area",
+      "name": "Area_01",
+      "transform": {
+        "translation": [
+          -1.0199296474456787,
+          0.0,
+          0.9144821166992188
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          28.712976455688477,
+          5.0,
+          13.182114601135254
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false,
+      "children": [
+        {
+          "type": "Wave",
+          "name": "Wave_00.001",
+          "transform": {
+            "translation": [
+              3.725290298461914e-09,
+              0.0,
+              -7.450580596923828e-09
+            ],
+            "rotation": [
+              -0.0,
+              2.0954755708402217e-09,
+              -0.0
+            ],
+            "scaling": [
+              1.0000001192092896,
+              0.9999999403953552,
+              1.0
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0",
+              "transform": {
+                "translation": [
+                  -0.7319327592849731,
+                  0.0,
+                  0.4766220450401306
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-1",
+              "transform": {
+                "translation": [
+                  0.6394557356834412,
+                  0.0,
+                  0.41276320815086365
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-2",
+              "transform": {
+                "translation": [
+                  0.0,
+                  0.0,
+                  -0.5845563411712646
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "type": "Wave",
+          "name": "Wave_01.001",
+          "transform": {
+            "translation": [
+              3.725290298461914e-09,
+              0.0,
+              -7.450580596923828e-09
+            ],
+            "rotation": [
+              -0.0,
+              2.0954755708402217e-09,
+              -0.0
+            ],
+            "scaling": [
+              1.0000001192092896,
+              0.9999999403953552,
+              1.0
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0.001",
+              "transform": {
+                "translation": [
+                  0.557124137878418,
+                  0.0,
+                  -0.44391003251075745
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-1.001",
+              "transform": {
+                "translation": [
+                  -0.4857785403728485,
+                  0.0,
+                  -0.2511347830295563
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "enemy",
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "type": "Wave",
+          "name": "Wave_02.001",
+          "transform": {
+            "translation": [
+              3.725290298461914e-09,
+              0.0,
+              -7.450580596923828e-09
+            ],
+            "rotation": [
+              -0.0,
+              2.0954755708402217e-09,
+              -0.0
+            ],
+            "scaling": [
+              1.0000001192092896,
+              0.9999999403953552,
+              1.0
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.1-0.002",
+              "transform": {
+                "translation": [
+                  3.725290298461914e-09,
+                  0.0,
+                  0.6168352961540222
+                ],
+                "rotation": [
+                  -0.0,
+                  1.6713153083713905e-09,
+                  -0.0
+                ],
+                "scaling": [
+                  0.03482745587825775,
+                  0.19999997317790985,
+                  0.07586036622524261
+                ]
+              },
+              "fileName": "knife",
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_06",
+      "transform": {
+        "translation": [
+          -1.0199296474456787,
+          0.0,
+          0.9144821166992188
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          1.0,
+          4.6897196769714355
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_07",
+      "transform": {
+        "translation": [
+          -15.951119422912598,
+          0.0,
+          1.1364612579345703
+        ],
+        "rotation": [
+          -0.0,
+          -2.6589062213897705,
+          0.0
+        ],
+        "scaling": [
+          4.991582870483398,
+          1.0,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_07.001",
+      "transform": {
+        "translation": [
+          15.340520858764648,
+          0.0,
+          0.6712551116943359
+        ],
+        "rotation": [
+          -0.0,
+          2.694608449935913,
+          0.0
+        ],
+        "scaling": [
+          4.991582870483398,
+          1.0,
+          1.0
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Area",
+      "name": "Area_02",
+      "transform": {
+        "translation": [
+          0.1288306713104248,
+          0.0,
+          78.1845703125
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          28.306291580200195,
+          5.0,
+          21.30266571044922
+        ]
+      },
+      "fileName": "",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false,
+      "children": [
+        {
+          "type": "Wave",
+          "name": "Wave_00.002",
+          "transform": {
+            "translation": [
+              -3.725290298461914e-09,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              -0.0,
+              9.313225746154785e-10,
+              -0.0
+            ],
+            "scaling": [
+              1.0,
+              1.0,
+              1.0000001192092896
+            ]
+          },
+          "fileName": "",
+          "disabled": false,
+          "children": [
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-0",
+              "transform": {
+                "translation": [
+                  0.0,
+                  0.0,
+                  -0.5104384422302246
+                ],
+                "rotation": [
+                  -0.0,
+                  8.238213999867128e-10,
+                  -0.0
+                ],
+                "scaling": [
+                  0.035327840596437454,
+                  0.20000000298023224,
+                  0.046942487359046936
+                ]
+              },
+              "fileName": "knife",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-1",
+              "transform": {
+                "translation": [
+                  -0.40648484230041504,
+                  0.0,
+                  -0.024608373641967773
+                ],
+                "rotation": [
+                  -0.0,
+                  8.238213999867128e-10,
+                  -0.0
+                ],
+                "scaling": [
+                  0.035327840596437454,
+                  0.20000000298023224,
+                  0.046942487359046936
+                ]
+              },
+              "fileName": "knife",
+              "disabled": false
+            },
+            {
+              "type": "EnemySpawn",
+              "name": "EnemySpawn.2-2",
+              "transform": {
+                "translation": [
+                  0.34545403718948364,
+                  0.0,
+                  -0.05353116989135742
+                ],
+                "rotation": [
+                  -0.0,
+                  8.238213999867128e-10,
+                  -0.0
+                ],
+                "scaling": [
+                  0.035327840596437454,
+                  0.20000000298023224,
+                  0.046942487359046936
+                ]
+              },
+              "fileName": "knife",
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "type": "Wave",
+          "name": "Wave_01.002",
+          "transform": {
+            "translation": [
+              -3.725290298461914e-09,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              -0.0,
+              9.313225746154785e-10,
+              -0.0
+            ],
+            "scaling": [
+              1.0,
+              1.0,
+              1.0000001192092896
+            ]
+          },
+          "fileName": "",
+          "disabled": false
+        },
+        {
+          "type": "Wave",
+          "name": "Wave_02",
+          "transform": {
+            "translation": [
+              -3.725290298461914e-09,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              -0.0,
+              9.313225746154785e-10,
+              -0.0
+            ],
+            "scaling": [
+              1.0,
+              1.0,
+              1.0000001192092896
+            ]
+          },
+          "fileName": "",
+          "disabled": false
+        }
+      ]
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_09",
+      "transform": {
+        "translation": [
+          -12.118008613586426,
+          0.0,
+          86.23460388183594
+        ],
+        "rotation": [
+          -0.0,
+          2.1886703968048096,
+          0.0
+        ],
+        "scaling": [
+          5.831783771514893,
+          1.0,
+          1.0
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_09.001",
+      "transform": {
+        "translation": [
+          -12.422005653381348,
+          0.0,
+          69.17232513427734
+        ],
+        "rotation": [
+          -0.0,
+          -2.2837564945220947,
+          0.0
+        ],
+        "scaling": [
+          5.831783771514893,
+          1.0,
+          1.0
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_09.002",
+      "transform": {
+        "translation": [
+          14.218663215637207,
+          0.0,
+          69.38658905029297
+        ],
+        "rotation": [
+          -0.0,
+          2.3172600269317627,
+          0.0
+        ],
+        "scaling": [
+          5.831783771514893,
+          1.0,
+          1.0
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_09.003",
+      "transform": {
+        "translation": [
+          14.044975280761719,
+          0.0,
+          85.75371551513672
+        ],
+        "rotation": [
+          -0.0,
+          -2.2262156009674072,
+          0.0
+        ],
+        "scaling": [
+          5.831783771514893,
+          1.0,
+          1.0
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_13",
+      "transform": {
+        "translation": [
+          -20.902929306030273,
+          0.0,
+          91.58099365234375
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.5238494873046875,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_13.001",
+      "transform": {
+        "translation": [
+          23.838205337524414,
+          0.0,
+          94.26639556884766
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.5238494873046875,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_13.002",
+      "transform": {
+        "translation": [
+          23.388212203979492,
+          0.0,
+          63.998085021972656
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.5238494873046875,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_13.003",
+      "transform": {
+        "translation": [
+          -21.41847801208496,
+          0.0,
+          64.66421508789062
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          0.9999999403953552,
+          5.5238494873046875,
+          0.9999999403953552
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Obstacle",
+      "name": "Obstacle_17",
+      "transform": {
+        "translation": [
+          0.6428461074829102,
+          0.0,
+          76.7450180053711
+        ],
+        "rotation": [
+          -0.0,
+          -3.1267266273498535,
+          0.0
+        ],
+        "scaling": [
+          4.475015163421631,
+          0.2046935111284256,
+          5.308269500732422
+        ]
+      },
+      "fileName": "wall",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "type": "Floor",
+      "name": "floor",
+      "transform": {
+        "translation": [
+          0.0,
+          -1.5,
+          -104.33999633789062
+        ],
+        "rotation": [
+          -0.0,
+          -0.0,
+          0.0
+        ],
+        "scaling": [
+          31.899999618530273,
+          1.0,
+          22.419998168945312
+        ]
+      },
+      "fileName": "street",
+      "collider": {
+        "type": "BOX",
+        "center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "size": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      },
+      "disabled": false
+    }
+  ]
+}

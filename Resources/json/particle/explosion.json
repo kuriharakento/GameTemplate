@@ -1,0 +1,112 @@
+{
+  "name": "explosion",
+  "emitters": [
+    {
+      "name": "debris",
+      "maxParticles": 50,
+      "simulationMode": "CPU",
+      "renderer": {
+        "type": "Mesh",
+        "primitive": "Sphere",
+        "blendMode": "Alpha"
+      },
+      "modules": [
+        {
+          "type": "SpawnBurst",
+          "count": 50,
+          "delay": 0.0
+        },
+        {
+          "type": "InitialLifetime",
+          "min": 0.5,
+          "max": 1.0
+        },
+        {
+          "type": "InitialScale",
+          "min": 0.1,
+          "max": 0.3
+        },
+        {
+          "type": "Gravity",
+          "force": {
+            "x": 0,
+            "y": -9.8,
+            "z": 0
+          }
+        },
+        {
+          "type": "ColorOverLifetime",
+          "start": [
+            1,
+            1,
+            0,
+            1
+          ],
+          "end": [
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "type": "ScaleOverLifetime",
+          "start": 1.0,
+          "end": 0.0
+        }
+      ]
+    },
+    {
+      "name": "smoke",
+      "maxParticles": 30,
+      "simulationMode": "CPU",
+      "renderer": {
+        "type": "Sprite",
+        "texture": "Resources/textures/smoke.png",
+        "blendMode": "Alpha"
+      },
+      "modules": [
+        {
+          "type": "SpawnBurst",
+          "count": 30,
+          "delay": 0.1
+        },
+        {
+          "type": "InitialLifetime",
+          "min": 1.0,
+          "max": 2.0
+        },
+        {
+          "type": "InitialScale",
+          "min": 0.5,
+          "max": 1.0
+        },
+        {
+          "type": "Drag",
+          "drag": 0.5
+        },
+        {
+          "type": "ColorOverLifetime",
+          "start": [
+            0.5,
+            0.5,
+            0.5,
+            0.8
+          ],
+          "end": [
+            0.3,
+            0.3,
+            0.3,
+            0
+          ]
+        },
+        {
+          "type": "ScaleOverLifetime",
+          "start": 1.0,
+          "end": 2.0
+        }
+      ]
+    }
+  ],
+  "deltaTimeType": 0
+}

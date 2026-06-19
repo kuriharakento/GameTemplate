@@ -1,0 +1,121 @@
+name: StaticAnalysis
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+env:
+  PROJECT_DIR: project/
+
+jobs:
+  analyze:
+    runs-on: windows-2022
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # 1. 環境構築 (cppcheck / llvm)
+    - name: Install Tools
+      shell: pwsh
+      run: |
+        choco install cppcheck -y
+        choco install llvm -y
+        # 実行パスの追加
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+        echo "C:\Program Files\LLVM\bin" >> $env:GITHUB_PATH
+
+    # レポートヘッダーの初期化
+    - name: Initialize Markdown Summary
+      shell: pwsh
+      run: |
+        echo "# KentoCompoEngine 解析レポート" >> $env:GITHUB_STEP_SUMMARY
+        echo "Push または Pull Request に伴うコードの静的解析結果です。" >> $env:GITHUB_STEP_SUMMARY
+
+    # 2. cppcheckによる静的解析
+    - name: Run cppcheck
+      shell: pwsh
+      run: |
+        echo "## cppcheck (バグ・メモリリーク検知)" >> $env:GITHUB_STEP_SUMMARY
+        $errFile = "cppcheck_err.txt"
+        cppcheck --enable=warning,performance,portability ${{ env.PROJECT_DIR }} 2> $errFile
+        
+        if (Test-Path $errFile) {
+            $content = Get-Content $errFile
+            if ($content) {
+                # ログ出力形式の調整 (Markdownブロックのパース回避のため <pre> を使用)
+                echo '<pre>' >> $env:GITHUB_STEP_SUMMARY
+                $content | ForEach-Object { echo $_ >> $env:GITHUB_STEP_SUMMARY }
+                echo '</pre>' >> $env:GITHUB_STEP_SUMMARY
+                exit 1
+            }
+        }
+        echo "危険なコードやメモリリークは検出されませんでした。" >> $env:GITHUB_STEP_SUMMARY
+
+    # 3. clang-formatによるスタイル検査
+    - name: Run clang-format
+      if: success() || failure()
+      shell: pwsh
+      run: |
+        echo "## コーディングスタイル (.clang-format)" >> $env:GITHUB_STEP_SUMMARY
+        $files = Get-ChildItem -Path ${{ env.PROJECT_DIR }} -Include *.cpp,*.h -Recurse
+        $failedFiles = @()
+        
+        foreach ($f in $files) {
+            clang-format --dry-run -Werror $f.FullName 2> $null
+            if ($LASTEXITCODE -ne 0) {
+                $failedFiles += $f.Name
+                Write-Host "::error file=$($f.FullName)::Workspace Rule違反: スタイル(Allman, タブ等)が崩れています。"
+            }
+        }
+        
+        if ($failedFiles.Count -gt 0) {
+            echo "以下のファイルでフォーマット違反が検出されました。" >> $env:GITHUB_STEP_SUMMARY
+            foreach ($name in $failedFiles) { echo "- **$name**" >> $env:GITHUB_STEP_SUMMARY }
+            exit 1
+        } else {
+            echo "すべてのファイルがフォーマット規約に準拠しています。" >> $env:GITHUB_STEP_SUMMARY
+        }
+
+    # 4. 独自コーディング規約の検査
+    - name: Run Custom Rule Checker
+      if: success() || failure()
+      shell: pwsh
+      run: |
+        echo "## Workspace 独自ルール" >> $env:GITHUB_STEP_SUMMARY
+        $files = Get-ChildItem -Path ${{ env.PROJECT_DIR }} -Include *.cpp,*.h -Recurse
+        $errors = 0
+        
+        foreach ($f in $files) {
+            if (Select-String -Path $f.FullName -Pattern "\bnew\s+[A-Za-z]" -Quiet) {
+                echo "- **$($f.Name)**: 生の 'new' を検出しました。スマートポインタの使用を検討してください。" >> $env:GITHUB_STEP_SUMMARY
+                Write-Host "::error file=$($f.FullName)::Workspace Rule違反: 生の 'new' を検出しました。"
+                $errors++
+            }
+            if (Select-String -Path $f.FullName -Pattern "^\s*///" -Quiet) {
+                echo "- **$($f.Name)**: '///' コメントを検出しました。Doxygen形式 (/** ... */) を使用してください。" >> $env:GITHUB_STEP_SUMMARY
+                Write-Host "::error file=$($f.FullName)::Workspace Rule違反: '///' コメントを検出しました。"
+                $errors++
+            }
+        }
+        
+        if ($errors -gt 0) {
+            exit 1
+        } else {
+            echo "独自ルール違反は検出されませんでした。" >> $env:GITHUB_STEP_SUMMARY
+        }
+
+    # 5. Discordへの実行結果通知
+    - name: Discord Notification
+      if: always()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_ANALYSIS }}
+        status: ${{ job.status }}
+        title: "GitHub Actions: KentoCompo Static Analysis"
+        description: "詳細な解析結果は GitHub Actions の Summary 画面から確認できます。"
