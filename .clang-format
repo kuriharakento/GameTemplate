@@ -1,0 +1,149 @@
+# =============================================================================
+# .clang-format — KentoCompoEngine
+# 既存ファイルへの一括適用は行わず、新規・変更ファイルから段階的に揃える。
+# =============================================================================
+
+Language: Cpp
+Standard: c++20
+
+# --- ブレーススタイル ---
+# Allman: { を必ず次行に置く（Workspace Rules で明示指定）
+BreakBeforeBraces: Allman
+
+# --- インデント ---
+# 既存コードの主流はタブインデント
+UseTab: Always
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+
+# アクセス指定子（public: / private: 等）はクラス本体と同じレベルに置く
+# 既存コードに合わせて -4（= インデントなし）
+AccessModifierOffset: -4
+
+# namespace 内はインデントしない（既存の慣例に合わせる）
+NamespaceIndentation: None
+
+# switch-case の case ラベルはインデントしない
+IndentCaseLabels: false
+
+# extern "C" ブロックはインデントしない
+IndentExternBlock: NoIndent
+
+# プリプロセッサはインデントしない
+IndentPPDirectives: None
+
+# goto ラベルはインデントしない
+IndentGotoLabels: false
+
+# --- カラム幅 ---
+# 既存コードに長い行が多いので、制限は緩めに設定
+ColumnLimit: 0
+
+# --- ポインタ・参照のアライメント ---
+# 既存コードはおおむね左寄せ（型側）: int* ptr, const T& ref
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+
+# --- テンプレート ---
+# template <typename T> の後に改行を入れる（既存スタイルに合致）
+AlwaysBreakTemplateDeclarations: Yes
+
+# --- 関数宣言・定義 ---
+# 戻り値型は同じ行に置く（既存に合致）
+AlwaysBreakAfterReturnType: None
+
+# 関数の引数が1行に収まらない場合の改行ルール
+BinPackArguments: true
+BinPackParameters: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowAllArgumentsOnNextLine: true
+
+# --- コンストラクタ初期化子リスト ---
+# 既存コードの流儀: コロンの後に改行し、カンマを行頭に置く
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 4
+PackConstructorInitializers: Never
+
+# --- 継承リスト ---
+BreakInheritanceList: BeforeComma
+
+# --- 短い構文のインライン化 ---
+# 短い関数はヘッダーで1行にまとめてOK（既存の getter/setter に合致）
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+AllowShortEnumsOnASingleLine: false
+
+# --- スペーシング ---
+# 括弧内のスペース
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceInEmptyBlock: false
+
+# {} の前にスペースを入れない（Allman なので改行で分離される）
+SpaceBeforeCpp11BracedList: false
+
+# --- インクルード ---
+# インクルードのソートは有効にする（グループ内でアルファベット順）
+SortIncludes: CaseInsensitive
+IncludeBlocks: Preserve
+
+# --- 空行 ---
+MaxEmptyLinesToKeep: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# --- コメント ---
+# コメントの位置揃えは控えめに
+AlignTrailingComments: true
+SpacesBeforeTrailingComments: 1
+
+# --- アライメント ---
+# 連続宣言のアライメントは行わない（既存に合致）
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: false
+AlignConsecutiveBitFields: false
+AlignEscapedNewlines: Left
+AlignOperands: Align
+
+# --- その他 ---
+# 文字列リテラルの改行
+BreakStringLiterals: false
+
+# #pragma once 等の後に改行を維持
+SeparateDefinitionBlocks: Leave
+
+# ラムダ式のインデント
+LambdaBodyIndentation: Signature
+
+# bool 演算子の改行位置
+BreakBeforeBinaryOperators: None
+
+# 三項演算子の改行
+BreakBeforeTernaryOperators: true
+
+# 修飾子の順序
+QualifierAlignment: Leave
+
+# 関数定義の戻り値型のあとの改行
+AlwaysBreakAfterDefinitionReturnType: None
+
+# 波括弧付き初期化子リスト
+Cpp11BracedListStyle: true
+
+# マクロ関連
+# 属性マクロの定義（clang-format が誤解しやすいマクロを登録）
+AttributeMacros: []
+StatementMacros: []
