@@ -1,58 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="..">
-      <UniqueIdentifier>{F7054B89-2007-4695-A298-6686C09C8904}</UniqueIdentifier>
+    <Filter Include="engine">
+      <UniqueIdentifier>{A94319AD-6DFD-7E3D-E1E6-AF41A5B0D3E7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..\engine">
-      <UniqueIdentifier>{0F04312B-6A83-439B-A220-16A8D83AD70C}</UniqueIdentifier>
+    <Filter Include="engine\externals">
+      <UniqueIdentifier>{1A7AAFF3-D016-50E8-3430-761F4E8FAA5B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..\engine\externals">
-      <UniqueIdentifier>{A09CBACC-E6D7-4451-A14C-1B3423C2A528}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\engine\externals\ImGui">
-      <UniqueIdentifier>{F43A0918-C917-4216-906B-D75C133E6F1E}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resources">
-      <UniqueIdentifier>{09BB0E34-BD35-4628-AEC5-BB35D59A6272}</UniqueIdentifier>
+    <Filter Include="engine\externals\ImGui">
+      <UniqueIdentifier>{C20B866B-A693-70F2-F747-F2B589C594B2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources">
-      <UniqueIdentifier>{E86185FA-4BB2-4C38-989A-8E117123B459}</UniqueIdentifier>
+      <UniqueIdentifier>{C250CFDD-9492-41D4-4F3F-7C1BBC892CB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{C758B555-82EF-6E0E-00E5-993B9E55D93B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources\shaders">
-      <UniqueIdentifier>{37891B88-26E5-44AF-8580-6924988C20C0}</UniqueIdentifier>
+      <UniqueIdentifier>{2E181770-B06F-7BBB-B84B-996D35E442E5}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene">
-      <UniqueIdentifier>{1BC53546-D608-4BC7-B93B-317C9E7A5A81}</UniqueIdentifier>
+      <UniqueIdentifier>{4B607F1E-4186-DE5A-94E1-5FEF8627609B}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene\debug">
-      <UniqueIdentifier>{85E4AC1B-FBC0-4991-94DC-BAD160E9A9C1}</UniqueIdentifier>
+      <UniqueIdentifier>{6E9A3A04-7520-F685-1633-A6DA8AC323DB}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene\play">
-      <UniqueIdentifier>{4A1793F9-BD6B-4C38-AC83-7F7D31A6E265}</UniqueIdentifier>
+      <UniqueIdentifier>{14975470-86C4-D18B-27AB-5E9361D090E7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\engine\externals\ImGui\imgui.cpp">
+      <Filter>engine\externals\ImGui</Filter>
+    </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_demo.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_draw.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_impl_dx12.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_impl_win32.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_tables.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\externals\ImGui\imgui_widgets.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui.cpp">
-      <Filter>..\engine\externals\ImGui</Filter>
+      <Filter>engine\externals\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp">
