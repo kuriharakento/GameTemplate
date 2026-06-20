@@ -1,3 +1,4 @@
+#pragma pack_matrix(row_major)
 #include "Particle.hlsli"
 
 // シミュレーション用パーティクル構造体 (128 bytes - CPU Particle構造体と一致)
@@ -36,10 +37,33 @@ cbuffer Constants : register(b0)
     uint maxParticles;
     
     float3 emitterPosition;
-    float padding1;
+    uint isBillboard;
     
     float3 gravity;
-    uint isBillboard;
+    uint simulationSpace;
+
+    float4x4 emitterWorld;
+
+    // 追加モジュールパラメータ (アプローチB)
+    uint hasDrag;
+    float dragMin;
+    float dragMax;
+    float paddingDrag;
+    
+    uint hasColorFade;
+    uint colorFadeUseInitial;
+    uint colorFadeEasing;
+    float paddingCF;
+    float4 colorFadeStart;
+    float4 colorFadeEnd;
+    
+    uint hasScaleOL;
+    uint scaleOLEasing;
+    float2 paddingScaleOL;
+    float3 scaleOLStart;
+    float paddingS1;
+    float3 scaleOLEnd;
+    float paddingS2;
 }
 
 // カメラ定数
@@ -51,20 +75,55 @@ cbuffer CameraBuffer : register(b1)
     float cameraPad;
 }
 
-// クォータニオン -> 回転行列
-float4x4 QuaternionToMatrix(float4 q)
-{
-    float x2 = q.x + q.x; float y2 = q.y + q.y; float z2 = q.z + q.z;
-    float xx = q.x * x2;  float xy = q.x * y2;  float xz = q.x * z2;
-    float yy = q.y * y2;  float yz = q.y * z2;  float zz = q.z * z2;
-    float wx = q.w * x2;  float wy = q.w * y2;  float wz = q.w * z2;
+// フラグ定数
+static const uint FLAG_ALIVE = 1 << 0;
 
+// X軸回転行列を生成
+float4x4 MakeRotateXMatrix(float rad)
+{
+    float s = sin(rad);
+    float c = cos(rad);
     float4x4 m = (float4x4)0;
-    m[0][0] = 1.0f - (yy + zz); m[0][1] = xy + wz;          m[0][2] = xz - wy;          m[3][3] = 1.0f;
-    m[1][0] = xy - wz;          m[1][1] = 1.0f - (xx + zz); m[1][2] = yz + wx;
-    m[2][0] = xz + wy;          m[2][1] = yz - wx;          m[2][2] = 1.0f - (xx + yy);
-    
+    m[0][0] = 1.0f;
+    m[1][1] = c;     m[1][2] = s;
+    m[2][1] = -s;    m[2][2] = c;
+    m[3][3] = 1.0f;
     return m;
+}
+
+// Y軸回転行列を生成
+float4x4 MakeRotateYMatrix(float rad)
+{
+    float s = sin(rad);
+    float c = cos(rad);
+    float4x4 m = (float4x4)0;
+    m[0][0] = c;     m[0][2] = -s;
+    m[1][1] = 1.0f;
+    m[2][0] = s;     m[2][2] = c;
+    m[3][3] = 1.0f;
+    return m;
+}
+
+// Z軸回転行列を生成
+float4x4 MakeRotateZMatrix(float rad)
+{
+    float s = sin(rad);
+    float c = cos(rad);
+    float4x4 m = (float4x4)0;
+    m[0][0] = c;     m[0][1] = s;
+    m[1][0] = -s;    m[1][1] = c;
+    m[2][2] = 1.0f;
+    m[3][3] = 1.0f;
+    return m;
+}
+
+// オイラー角 -> 回転行列 (X * Y * Z順)
+float4x4 EulerToMatrix(float3 rot)
+{
+    float4x4 rx = MakeRotateXMatrix(rot.x);
+    float4x4 ry = MakeRotateYMatrix(rot.y);
+    float4x4 rz = MakeRotateZMatrix(rot.z);
+    return mul(rx, mul(ry, rz));
 }
 
 // ビルボード回転行列生成
@@ -95,7 +154,7 @@ void CSMain(uint3 dtid : SV_DispatchThreadID)
     Particle p = gParticles[id];
     
     // Aliveチェック
-    if ((p.flags & 1) == 0)
+    if ((p.flags & FLAG_ALIVE) == 0)
     {
         gRenderParticles[id].World = (float4x4)0;
         gRenderParticles[id].WVP = (float4x4)0;
@@ -120,7 +179,7 @@ void CSMain(uint3 dtid : SV_DispatchThreadID)
     }
     else
     {
-        rotMat = QuaternionToMatrix(p.rotation);
+        rotMat = EulerToMatrix(p.rotation.xyz);
     }
 
     // 平行移動行列
@@ -132,6 +191,12 @@ void CSMain(uint3 dtid : SV_DispatchThreadID)
 
     // World行列合成 (Scale * Rot * Trans)
     float4x4 world = mul(scaleMat, mul(rotMat, transMat));
+
+    // ローカルシミュレーションの場合はエミッターのワールド行列を適用
+    if (simulationSpace == 1)
+    {
+        world = mul(world, emitterWorld);
+    }
 
     // WVP行列
     float4x4 viewProj = mul(cameraView, cameraProjection);

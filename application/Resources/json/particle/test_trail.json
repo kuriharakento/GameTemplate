@@ -1,0 +1,183 @@
+{
+    "deltaTimeType": 0,
+    "emitters": [
+        {
+            "duration": 0.0,
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 1,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "rate": 30.0,
+                    "type": "SpawnRate"
+                },
+                {
+                    "easingType": 2,
+                    "end": {
+                        "a": 0.0,
+                        "b": 0.0,
+                        "g": 0.0,
+                        "r": 0.0
+                    },
+                    "start": {
+                        "a": 1.0,
+                        "b": 1.0,
+                        "g": 0.0,
+                        "r": 0.8482141494750977
+                    },
+                    "type": "ColorFade",
+                    "useInitialColor": false
+                }
+            ],
+            "name": "e1",
+            "position": {
+                "x": -3.6539971828460693,
+                "y": 2.513406753540039,
+                "z": 1.6273611783981323
+            },
+            "renderer": {
+                "alphaFade": true,
+                "billboard": true,
+                "blendMode": 0,
+                "minSegmentDistance": 0.05000000074505806,
+                "recordInterval": 0.01600000075995922,
+                "texture": "resources/gradation.png",
+                "textureMode": 0,
+                "tileScale": 1.0,
+                "trailLifetime": 1.0,
+                "trailWidth": 0.17000000178813934,
+                "type": "Ribbon",
+                "widthFade": true
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        },
+        {
+            "duration": 0.0,
+            "followEmitterIndex": 0,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "inactiveResponse": 0,
+            "loopBehavior": 1,
+            "loopCount": 1,
+            "maxParticles": 1000,
+            "minMoveDistance": 0.05000000074505806,
+            "modules": [
+                {
+                    "rate": 30.799999237060547,
+                    "type": "SpawnRate"
+                },
+                {
+                    "arcAngle": 360.0,
+                    "boxSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "coneHeight": 2.0,
+                    "emitFromSurface": false,
+                    "initialSpeed": 0.0,
+                    "innerRadius": 0.0,
+                    "lineEnd": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    },
+                    "lineStart": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "outerRadius": 1.0,
+                    "shapeType": 1,
+                    "spawnLocation": 0,
+                    "type": "SpawnShape"
+                },
+                {
+                    "easingType": 2,
+                    "end": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "start": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "type": "ScaleOverLifetime"
+                },
+                {
+                    "easeIn": false,
+                    "easeOut": true,
+                    "endAlpha": 0.0,
+                    "startAlpha": 1.0,
+                    "type": "AlphaFade"
+                }
+            ],
+            "name": "e2",
+            "position": {
+                "x": -3.6539971828460693,
+                "y": 2.513406753540039,
+                "z": 1.6273611783981323
+            },
+            "renderer": {
+                "billboard": true,
+                "blendMode": 1,
+                "primitiveOptions": {
+                    "cubeFaceVisible": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                    ],
+                    "cubeSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "doubleSided": false,
+                    "innerRadius": 0.5,
+                    "outerRadius": 1.0,
+                    "points": 5,
+                    "rings": 8,
+                    "segments": 16,
+                    "tubeRadius": 0.30000001192092896,
+                    "turns": 2.0,
+                    "withCaps": true
+                },
+                "primitiveType": 0,
+                "scale": 1.9700000286102295,
+                "texture": "resources/star.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 0.10881693661212921,
+                    "g": 0.8635104298591614,
+                    "r": 0.9375
+                },
+                "type": "Mesh"
+            },
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        }
+    ],
+    "name": "test_trail",
+    "position": {
+        "x": -3.6539971828460693,
+        "y": 2.513406753540039,
+        "z": 1.6273611783981323
+    }
+}

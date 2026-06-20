@@ -92,7 +92,14 @@ void ParticleTestScene::OnUpdatePlaying()
 	}
 
 	// スカイドームの更新
-	skydome_->Update(sceneManager_->GetCameraManager());
+	if (skydome_)
+	{
+		if (particleEditor_)
+		{
+			skydome_->SetColor(particleEditor_->GetSkydomeColor());
+		}
+		skydome_->Update(sceneManager_->GetCameraManager());
+	}
 }
 
 void ParticleTestScene::Draw2D()
@@ -108,7 +115,10 @@ void ParticleTestScene::Draw3D()
 	);
 
 	// スカイドームの描画
-	skydome_->Draw();
+	if (skydome_)
+	{
+		skydome_->Draw();
+	}
 
 	// パーティクルエディタのデバッグ描画（エミッター・パーティクル位置表示）
 	if (particleEditor_)
