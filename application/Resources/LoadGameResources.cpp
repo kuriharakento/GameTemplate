@@ -9,22 +9,22 @@
 
 void MyGame::LoadTextures()
 {
-	TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/black.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/red.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/testSprite.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/white1x1.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/gradationLine.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/gradation.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/circle2.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/flowerfun.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/star.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/skybox.dds");
-	TextureManager::GetInstance()->LoadTexture("./Resources/numbers.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/black.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/red.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/testSprite.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/white1x1.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/gradationLine.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/gradation.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/circle2.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/flowerfun.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/star.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/skybox.dds");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/numbers.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/luna_atlas.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/simplexNoise.png");
+	TextureManager::GetInstance()->LoadTexture("./Resources/textures/flameEye.png");
 }
 
 void MyGame::LoadModels()
