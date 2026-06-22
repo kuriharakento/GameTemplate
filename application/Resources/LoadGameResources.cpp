@@ -9,6 +9,10 @@
 
 void MyGame::LoadTextures()
 {
+	// =========================
+	// エンジン
+	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
+	// =========================
 	TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/black.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/red.png");
@@ -25,12 +29,23 @@ void MyGame::LoadTextures()
 	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png");
+
+	// ===================
+	// ゲーム固有のリソース
+	// ===================
 }
 
 void MyGame::LoadModels()
 {
+	// =========================
+	// エンジン
+	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
+	// =========================
 	ModelManager::GetInstance()->LoadModel("cube");
 	ModelManager::GetInstance()->LoadModel("skydome");
-	ModelManager::GetInstance()->LoadModel("chicken", ".gltf");
 	ModelManager::GetInstance()->LoadModel("plane", ".gltf");
+
+	// ====================
+	// ゲーム固有のリソース	
+	// ====================
 }
