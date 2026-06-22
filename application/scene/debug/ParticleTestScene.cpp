@@ -94,10 +94,6 @@ void ParticleTestScene::OnUpdatePlaying()
 	// スカイドームの更新
 	if (skydome_)
 	{
-		if (particleEditor_)
-		{
-			skydome_->SetColor(particleEditor_->GetSkydomeColor());
-		}
 		skydome_->Update(sceneManager_->GetCameraManager());
 	}
 }
