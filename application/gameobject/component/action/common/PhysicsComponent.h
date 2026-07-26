@@ -3,7 +3,7 @@
 #include "jsonEditor/JsonEditableBase.h"
 #include "math/Vector3.h"
 
-namespace GameObjectComponent
+namespace KCE::GameObjectComponent
 {
 	/**
 	 * @brief キャラクターの物理挙動（移動速度と外部物理速度を分離して管理）を制御するコンポーネント
@@ -15,7 +15,7 @@ namespace GameObjectComponent
 		 * @brief コンストラクタ
 		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		PhysicsComponent(::GameObject* owner);
+		PhysicsComponent(GameObject* owner);
 
 		/**
 		 * @brief デストラクタ
@@ -26,7 +26,7 @@ namespace GameObjectComponent
 		 * @brief 毎フレームの更新処理
 		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		void Update(::GameObject* owner) override;
+		void Update(GameObject* owner) override;
 
 		/**
 		 * @brief 瞬間的な外力（被弾の衝撃や反射時の反動など）を加える

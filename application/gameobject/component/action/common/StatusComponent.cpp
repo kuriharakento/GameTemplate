@@ -6,9 +6,9 @@
 // ファクトリに登録
 REGISTER_COMPONENT(StatusComponent)
 
-namespace GameObjectComponent
+namespace KCE::GameObjectComponent
 {
-	StatusComponent::StatusComponent(::GameObject* owner)
+	StatusComponent::StatusComponent(GameObject* owner)
 	{
 		// メンバ変数をJSONエディタ/シリアライズ用に登録
 		Register("hp", &hp_);
@@ -22,7 +22,7 @@ namespace GameObjectComponent
 	{
 	}
 
-	void StatusComponent::Update(::GameObject* owner)
+	void StatusComponent::Update(GameObject* owner)
 	{
 		// 被弾後の無敵タイマーを減算
 		if (invincibleTimer_ > 0.0f)
