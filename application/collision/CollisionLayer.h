@@ -3,7 +3,7 @@
 
 namespace CollisionLayer
 {
-using GameObjectComponent::ColliderLayer;
+using KCE::GameObjectComponent::ColliderLayer;
 
 static constexpr ColliderLayer None = 0;
 static constexpr ColliderLayer Default = 1 << 0; // デフォルト
