@@ -320,6 +320,8 @@ project/imgui.ini
 # DirectXTex Compiled Shaders
 **/DirectXTex/Shaders/Compiled/
 
-# AI Agent configuration (Gemini/Antigravity)
+# AI Agent configuration
 .agent/
 .gemini/
+AGENTS.md
+/WaveData

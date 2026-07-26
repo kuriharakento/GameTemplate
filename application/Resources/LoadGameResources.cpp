@@ -29,10 +29,7 @@ void MyGame::LoadTextures()
 	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png");
 	TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png");
-
-	// ===================
-	// ゲーム固有のリソース
-	// ===================
+	TextureManager::GetInstance()->LoadTexture("./Resources/lock_on.png");
 }
 
 void MyGame::LoadModels()
@@ -44,8 +41,4 @@ void MyGame::LoadModels()
 	ModelManager::GetInstance()->LoadModel("cube");
 	ModelManager::GetInstance()->LoadModel("skydome");
 	ModelManager::GetInstance()->LoadModel("plane", ".gltf");
-
-	// ====================
-	// ゲーム固有のリソース	
-	// ====================
 }

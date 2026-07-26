@@ -1,55 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{DDCF50C2-9294-D441-4F3F-7C1BBC892CB5}</UniqueIdentifier>
+    <Filter Include="collision">
+      <UniqueIdentifier>{238A5ECB-9EEC-A846-5837-2247AF29A414}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\shaders">
-      <UniqueIdentifier>{7017182E-6FB0-BB7B-B84B-996D35E442E5}</UniqueIdentifier>
+    <Filter Include="gameobject">
+      <UniqueIdentifier>{5242FE77-4E2F-0251-6545-8111A6DB2382}</UniqueIdentifier>
     </Filter>
-    <Filter Include="engine">
-      <UniqueIdentifier>{AD1943A9-FD6D-3D7E-E1E6-AF41A5B0D3E7}</UniqueIdentifier>
+    <Filter Include="gameobject\component">
+      <UniqueIdentifier>{27DE8F67-50F5-62C8-3050-C8AD830AB54F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="engine\externals">
-      <UniqueIdentifier>{F3AF7A1A-16D0-E850-3430-761F4E8FAA5B}</UniqueIdentifier>
+    <Filter Include="gameobject\component\action">
+      <UniqueIdentifier>{FC3F862F-77E3-D871-89DA-01F2AD6F1555}</UniqueIdentifier>
     </Filter>
-    <Filter Include="engine\externals\ImGui">
-      <UniqueIdentifier>{6B860BC2-93A6-F270-F747-F2B589C594B2}</UniqueIdentifier>
+    <Filter Include="gameobject\component\action\common">
+      <UniqueIdentifier>{53C6C3B6-B541-9B75-5C99-ACB29017302B}</UniqueIdentifier>
     </Filter>
     <Filter Include="resources">
-      <UniqueIdentifier>{55B558C7-EF82-0E6E-00E5-993B9E55D93B}</UniqueIdentifier>
+      <UniqueIdentifier>{C758B555-82EF-6E0E-00E5-993B9E55D93B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{C250CFDD-9492-41D4-4F3F-7C1BBC892CB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\shaders">
+      <UniqueIdentifier>{2E181770-B06F-7BBB-B84B-996D35E442E5}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene">
-      <UniqueIdentifier>{1E7F604B-8641-5ADE-94E1-5FEF8627609B}</UniqueIdentifier>
+      <UniqueIdentifier>{4B607F1E-4186-DE5A-94E1-5FEF8627609B}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene\debug">
-      <UniqueIdentifier>{043A9A6E-2075-85F6-1633-A6DA8AC323DB}</UniqueIdentifier>
+      <UniqueIdentifier>{6E9A3A04-7520-F685-1633-A6DA8AC323DB}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene\play">
-      <UniqueIdentifier>{70549714-C486-8BD1-27AB-5E9361D090E7}</UniqueIdentifier>
+      <UniqueIdentifier>{14975470-86C4-D18B-27AB-5E9361D090E7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\play\title">
+      <UniqueIdentifier>{10579E04-AA6D-ABB6-07A8-40C40F20C526}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\engine\externals\ImGui\imgui.cpp">
-      <Filter>engine\externals\ImGui</Filter>
+    <ClCompile Include="gameobject\component\action\common\PhysicsComponent.cpp">
+      <Filter>gameobject\component\action\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_demo.cpp">
-      <Filter>engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_draw.cpp">
-      <Filter>engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_impl_dx12.cpp">
-      <Filter>engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_impl_win32.cpp">
-      <Filter>engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_tables.cpp">
-      <Filter>engine\externals\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\externals\ImGui\imgui_widgets.cpp">
-      <Filter>engine\externals\ImGui</Filter>
+    <ClCompile Include="gameobject\component\action\common\StatusComponent.cpp">
+      <Filter>gameobject\component\action\common</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp">
@@ -58,22 +52,28 @@
     <ClCompile Include="scene\debug\ParticleTestScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
-    <ClCompile Include="scene\debug\TestScene.cpp">
-      <Filter>scene\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="scene\play\TitleScene.cpp">
-      <Filter>scene\play</Filter>
+    <ClCompile Include="scene\play\title\TitleScene.cpp">
+      <Filter>scene\play\title</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collision\CollisionLayer.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="gameobject\component\action\common\PhysicsComponent.h">
+      <Filter>gameobject\component\action\common</Filter>
+    </ClInclude>
+    <ClInclude Include="gameobject\component\action\common\StatusComponent.h">
+      <Filter>gameobject\component\action\common</Filter>
+    </ClInclude>
+    <ClInclude Include="gameobject\GameObjectTag.h">
+      <Filter>gameobject</Filter>
+    </ClInclude>
     <ClInclude Include="scene\debug\ParticleTestScene.h">
       <Filter>scene\debug</Filter>
     </ClInclude>
-    <ClInclude Include="scene\debug\TestScene.h">
-      <Filter>scene\debug</Filter>
-    </ClInclude>
-    <ClInclude Include="scene\play\TitleScene.h">
-      <Filter>scene\play</Filter>
+    <ClInclude Include="scene\play\title\TitleScene.h">
+      <Filter>scene\play\title</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
