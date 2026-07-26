@@ -1,2 +1,7 @@
 [*.{cpp,h,hlsl,hlsli}]
 charset = utf-8
+end_of_line = crlf
+indent_style = tab
+indent_size = 4
+tab_width = 4
+cpp_indent_namespace_contents = true

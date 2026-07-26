@@ -11,10 +11,13 @@
 #include "manager/scene/CameraManager.h"
 #include "math/VectorColorCodes.h"
 #include "scene/manager/SceneManager.h"
+#include "engine/scene/factory/SceneFactory.h"
 #include "base/DirectXCommon.h"
 #include "manager/system/SrvManager.h"
 #include "manager/scene/LightManager.h"
 
+
+REGISTER_SCENE(ParticleTestScene);
 
 void ParticleTestScene::Initialize()
 {
@@ -51,24 +54,8 @@ void ParticleTestScene::Initialize()
 	skydome_->SetDirectionalLightDirection({ 0.0f, -1.0f, 0.0f });
 	skydome_->SetScale({ 0.8f, 0.8f, 0.8f });
 	skydome_->SetCastShadow(false);
-	
-	StartState(SceneState::Playing);
-}
 
-void ParticleTestScene::Finalize()
-{
-	particleEditor_.reset();
-	
-	// シーン終了時にパーティクルをクリア
-	ParticleManager::GetInstance()->Clear();
-}
-
-// ==================================================
-// 状態フック
-// ==================================================
-
-void ParticleTestScene::OnEnterPlaying()
-{
+	// エミッターの初期位置設定
 	auto* cylinder = ParticleManager::GetInstance()->GetEmitter("auraCylinder");
 	auto* mist = ParticleManager::GetInstance()->GetEmitter("auraMist");
 	auto* floor = ParticleManager::GetInstance()->GetEmitter("auraFloor");
@@ -78,7 +65,15 @@ void ParticleTestScene::OnEnterPlaying()
 	if (floor) floor->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
 }
 
-void ParticleTestScene::OnUpdatePlaying()
+void ParticleTestScene::OnFinalize()
+{
+	particleEditor_.reset();
+	
+	// シーン終了時にパーティクルをクリア
+	ParticleManager::GetInstance()->Clear();
+}
+
+void ParticleTestScene::CommonUpdate()
 {
 	if (debugCamera_)
 	{

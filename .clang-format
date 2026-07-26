@@ -21,8 +21,8 @@ ContinuationIndentWidth: 4
 # 既存コードに合わせて -4（= インデントなし）
 AccessModifierOffset: -4
 
-# namespace 内はインデントしない（既存の慣例に合わせる）
-NamespaceIndentation: None
+# namespace 内をインデントする（インデント維持のため）
+NamespaceIndentation: All
 
 # switch-case の case ラベルはインデントしない
 IndentCaseLabels: false
@@ -126,7 +126,7 @@ BreakStringLiterals: false
 SeparateDefinitionBlocks: Leave
 
 # ラムダ式のインデント
-LambdaBodyIndentation: Signature
+LambdaBodyIndentation: OuterScope
 
 # bool 演算子の改行位置
 BreakBeforeBinaryOperators: None

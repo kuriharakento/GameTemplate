@@ -10,13 +10,16 @@ class ParticleTestScene : public BaseScene
 {
 public:
 	void Initialize() override;
-	void Finalize() override;
 	void Draw3D() override;
 	void Draw2D() override;
 
+	/**
+	 * @brief シーン全体の共通更新処理
+	 */
+	void CommonUpdate() override;
+
 protected:
-	void OnEnterPlaying() override;
-	void OnUpdatePlaying() override;
+	void OnFinalize() override;
 
 private:
 	// ライティング

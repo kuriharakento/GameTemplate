@@ -1,0 +1,169 @@
+name: windows_build_test
+on: [pull_request]
+env:
+  SOLUTION_FILE_PATH: GameTemplate.sln
+
+jobs:
+  filter-fix:
+    runs-on: highperf-hosted
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Run UpdateFilters
+        shell: pwsh
+        run: py UpdateFilters.py
+
+      - name: Commit and push if filters changed
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- '*.filters'
+          if (git diff --cached --quiet) {
+            Write-Host "No filter changes."
+          } else {
+            git commit -m "chore: auto-organize filters [skip ci]"
+            git push origin HEAD:${{ github.head_ref }}
+          }
+
+  build:
+    needs: filter-fix
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration:
+          - Debug
+          - Release
+
+    runs-on: highperf-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+    
+      - name: Build
+        shell: pwsh
+        run: |
+          $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+          $logfile = "BuildLog-${{ matrix.configuration }}-$timestamp.log"
+          "LOGFILE=$logfile" >> $env:GITHUB_ENV
+
+          
+          Write-Host "Building solution with configuration: ${{ matrix.configuration }}"
+          msbuild $env:SOLUTION_FILE_PATH /t:Clean /p:Platform=x64,Configuration=${{ matrix.configuration }}
+          msbuild $env:SOLUTION_FILE_PATH /t:Build /p:Platform=x64,Configuration=${{ matrix.configuration }} | Tee-Object -FilePath $logfile
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Build failed. Check the log file: $logfile"
+            exit $LASTEXITCODE
+          }
+      
+      - name: Upload log to Discord
+        if: failure()
+        shell: pwsh
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOKURL_LOGGER }}
+        run: |
+          pwsh --version
+          if (-Not (Test-Path $env:LOGFILE)) {
+            Write-Host "Log file not found. Exiting."
+            exit 1
+          }
+
+          $payload = @{
+            embeds = @(
+              @{
+                title = "Job Failed (${{ matrix.configuration }})"
+                url = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                color = 15548997
+
+                author = @{
+                  name = "GitHub Actions"
+                  url = "https://github.com/n1m4-org/TD4_02-assumed-/actions"
+                  icon_url = "https://drive.google.com/uc?id=1Qp-YcNpbMzaXENi8c7wvss6CzZ5-J4rG"
+                }
+
+                fields = @(
+                  @{
+                    name = "PR"
+                    value = "[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})"
+                    inline = $false
+                  },
+                  @{
+                    name = "Branch"
+                    value = "${{ github.head_ref }}"
+                    inline = $true
+                  },
+                  @{
+                    name = "Author"
+                    value = "${{ github.event.pull_request.user.login }}"
+                    inline = $true
+                  }
+                )
+              }
+            )
+          }
+
+          $json = $payload | ConvertTo-Json -Depth 10 -Compress
+
+          Write-Host "Sending payload to Discord webhook..."
+          Invoke-RestMethod `
+            -Uri $env:WEBHOOK `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $json
+
+          Write-Host "Uploading log file to Discord webhook..."
+          curl.exe `
+            -F "file1=@$env:LOGFILE" `
+            $env:WEBHOOK
+
+  notify-discord:
+    needs: build
+    if: always()
+    runs-on: highperf-hosted
+
+    steps:
+      - name: Fail if build did not succeed
+        if: needs.build.result != 'success'
+        shell: pwsh
+        run: |
+          Write-Host "Build result was '${{ needs.build.result }}'. Failing this job."
+          exit 1
+
+      - name: Notify Discord
+        if: needs.build.result == 'success'
+        shell: pwsh
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOKURL_NOTIFY }}
+          ADMIN_ROLE_ID: ${{ secrets.DISCORD_ADMIN_ROLE_ID }}
+        run: |
+          $payload = @{
+            content = "<@&$env:ADMIN_ROLE_ID> Build test passed: ${{ github.event.pull_request.html_url }}"
+            allowed_mentions = @{ parse = @("roles") }
+          }
+
+          $json = $payload | ConvertTo-Json -Depth 5 -Compress
+
+          Invoke-RestMethod `
+            -Uri $env:WEBHOOK `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $json
+
