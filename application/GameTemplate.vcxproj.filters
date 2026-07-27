@@ -46,6 +46,7 @@
       <Filter>gameobject\component\action\common</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp">
       <Filter>resources</Filter>
     </ClCompile>
@@ -57,6 +58,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MyGame.h" />
     <ClInclude Include="collision\CollisionLayer.h">
       <Filter>collision</Filter>
     </ClInclude>

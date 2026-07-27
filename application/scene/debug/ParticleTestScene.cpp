@@ -102,7 +102,7 @@ void ParticleTestScene::Draw3D()
 	LineManager::GetInstance()->DrawGrid(
 		50.0f,
 		5.0f,
-		VectorColorCodes::White
+		KCE::VectorColorCodes::White
 	);
 
 	// スカイドームの描画

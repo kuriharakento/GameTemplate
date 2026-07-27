@@ -121,12 +121,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameobject\component\action\common\PhysicsComponent.cpp" />
     <ClCompile Include="gameobject\component\action\common\StatusComponent.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp" />
+    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="scene\debug\ParticleTestScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scene\play\title\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameobject\GameObjectTag.h" />
+    <ClInclude Include="MyGame.h" />
     <ClInclude Include="collision\CollisionLayer.h" />
     <ClInclude Include="gameobject\component\action\common\PhysicsComponent.h" />
     <ClInclude Include="gameobject\component\action\common\StatusComponent.h" />

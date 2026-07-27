@@ -1,4 +1,4 @@
-#include <scene/MyGame.h>
+#include "MyGame.h"
 #include <manager/graphics/TextureManager.h>
 
 ///=============================================================================
