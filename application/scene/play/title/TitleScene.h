@@ -10,7 +10,7 @@
  * 
  * テンプレート用の基本シーン実装。
  */
-class TitleScene : public BaseScene
+class TitleScene : public KCE::BaseScene
 {
 public:
     /**
@@ -39,8 +39,8 @@ protected:
 
 private:
 	// 3D背景・サンプルオブジェクト
-	std::unique_ptr<Object3d> skydome_;
-	std::unique_ptr<Object3d> sampleCube_;
+	std::unique_ptr<KCE::Object3d> skydome_;
+	std::unique_ptr<KCE::Object3d> sampleCube_;
 
 	// アニメーション用タイマー
 	float timer_ = 0.0f;

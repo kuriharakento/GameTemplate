@@ -8,9 +8,9 @@
 // ファクトリに登録
 REGISTER_COMPONENT(PhysicsComponent)
 
-namespace GameObjectComponent
+namespace KCE::GameObjectComponent
 {
-	PhysicsComponent::PhysicsComponent(::GameObject* owner)
+	PhysicsComponent::PhysicsComponent(GameObject* owner)
 	{
 		// メンバ変数をJSONエディタ/シリアライズ用に登録
 		Register("movementVelocity", &movementVelocity_);
@@ -29,7 +29,7 @@ namespace GameObjectComponent
 	{
 	}
 
-	void PhysicsComponent::Update(::GameObject* owner)
+	void PhysicsComponent::Update(GameObject* owner)
 	{
 		float dt = TimeManager::GetInstance().GetGameContext().deltaTime;
 		if (dt <= 0.0f)

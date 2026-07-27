@@ -2,7 +2,7 @@
 #include "engine/gameobject/component/base/IActionComponent.h"
 #include "jsonEditor/JsonEditableBase.h"
 
-namespace GameObjectComponent
+namespace KCE::GameObjectComponent
 {
 	/**
 	 * @brief キャラクターのステータスや無敵状態を管理するコンポーネント
@@ -14,7 +14,7 @@ namespace GameObjectComponent
 		 * @brief コンストラクタ
 		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		StatusComponent(::GameObject* owner);
+		StatusComponent(GameObject* owner);
 
 		/**
 		 * @brief デストラクタ
@@ -25,7 +25,7 @@ namespace GameObjectComponent
 		 * @brief 毎フレームの更新処理
 		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		void Update(::GameObject* owner) override;
+		void Update(GameObject* owner) override;
 
 		/**
 		 * @brief ダメージを適用する

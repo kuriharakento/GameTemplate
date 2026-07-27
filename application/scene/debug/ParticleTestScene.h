@@ -6,7 +6,7 @@
 /**
  * @brief パーティクルテストシーン
  */
-class ParticleTestScene : public BaseScene
+class ParticleTestScene : public KCE::BaseScene
 {
 public:
 	void Initialize() override;
@@ -23,11 +23,11 @@ protected:
 
 private:
 	// ライティング
-	static constexpr Vector3 kLightDirection = { 0.0f, -1.0f, 0.0f };
+	static constexpr KCE::Vector3 kLightDirection = { 0.0f, -1.0f, 0.0f };
 	static constexpr float kLightIntensity = 0.0f;
 
-	std::unique_ptr<DebugCamera> debugCamera_;
-	std::unique_ptr<ParticleEditor> particleEditor_;
+	std::unique_ptr<KCE::DebugCamera> debugCamera_;
+	std::unique_ptr<KCE::ParticleEditor> particleEditor_;
 	// スカイドーム（背景天球）
-	std::unique_ptr<Object3d> skydome_;
+	std::unique_ptr<KCE::Object3d> skydome_;
 };

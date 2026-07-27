@@ -4,7 +4,7 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	//フレームワーク
-	std::unique_ptr<Framework> game = std::make_unique<MyGame>();
+	std::unique_ptr<KCE::Framework> game = std::make_unique<KCE::MyGame>();
 
 	//実行
 	game->Run();

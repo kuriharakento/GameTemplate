@@ -7,38 +7,38 @@
 
 // NOTE: エンジンでデフォルト使用するリソースもここで読み込んでいる。
 
-void MyGame::LoadTextures()
+void KCE::MyGame::LoadTextures()
 {
 	// =========================
 	// エンジン
 	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
 	// =========================
-	TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/black.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/red.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/testSprite.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/white1x1.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/gradationLine.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/gradation.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/circle2.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/flowerfun.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/star.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/skybox.dds");
-	TextureManager::GetInstance()->LoadTexture("./Resources/numbers.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/luna_atlas.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png");
-	TextureManager::GetInstance()->LoadTexture("./Resources/lock_on.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/black.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/red.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/testSprite.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/white1x1.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/gradationLine.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/gradation.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/circle2.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/flowerfun.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/star.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/skybox.dds");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/numbers.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/fonts/luna_atlas.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png");
+	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/lock_on.png");
 }
 
-void MyGame::LoadModels()
+void KCE::MyGame::LoadModels()
 {
 	// =========================
 	// エンジン
 	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
 	// =========================
-	ModelManager::GetInstance()->LoadModel("cube");
-	ModelManager::GetInstance()->LoadModel("skydome");
-	ModelManager::GetInstance()->LoadModel("plane", ".gltf");
+	KCE::ModelManager::GetInstance()->LoadModel("cube");
+	KCE::ModelManager::GetInstance()->LoadModel("skydome");
+	KCE::ModelManager::GetInstance()->LoadModel("plane", ".gltf");
 }
