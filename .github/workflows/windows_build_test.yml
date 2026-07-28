@@ -1,46 +1,17 @@
 name: windows_build_test
-on: [pull_request]
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
 env:
   SOLUTION_FILE_PATH: GameTemplate.sln
 
 jobs:
-  filter-fix:
-    runs-on: windows-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Run UpdateFilters
-        shell: pwsh
-        run: python UpdateFilters.py application/GameTemplate.vcxproj
-
-      - name: Commit and push if filters changed
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -- '*.filters'
-          if (git diff --cached --quiet) {
-            Write-Host "No filter changes."
-          } else {
-            git commit -m "chore: auto-organize filters [skip ci]"
-            git push origin HEAD:${{ github.head_ref }}
-          }
-
   build:
-    needs: filter-fix
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
           submodules: recursive
           fetch-depth: 0
 
@@ -80,7 +50,7 @@ jobs:
           }
       
       - name: Upload log to Discord
-        if: failure()
+        if: failure() && github.event_name == 'pull_request'
         shell: pwsh
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOKURL_LOGGER }}
@@ -139,21 +109,90 @@ jobs:
             -F "file1=@$env:LOGFILE" `
             $env:WEBHOOK
 
-  notify-discord:
+      - name: Discord Notification
+        if: always() && github.event_name != 'pull_request'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+          status: ${{ job.status }}
+          title: "GitHub Actions: GameTemplate ${{ matrix.configuration }}Build"
+
+  filter-fix:
     needs: build
-    if: always()
+    if: >-
+      always() && needs.build.result == 'success' &&
+      (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+    runs-on: windows-latest
+    permissions:
+      actions: write
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run UpdateFilters
+        shell: pwsh
+        run: python UpdateFilters.py application/GameTemplate.vcxproj
+
+      - name: Commit updated filters
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git add -- application/GameTemplate.vcxproj.filters
+          if (git diff --cached --quiet) {
+            Write-Host "No filter changes."
+            exit 0
+          }
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update Visual Studio filters"
+          git push origin "HEAD:$env:HEAD_REF"
+          gh workflow run windows_build_test.yml --ref $env:HEAD_REF
+
+      - name: Verify filters are up to date
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+        shell: pwsh
+        run: |
+          git diff --exit-code -- application/GameTemplate.vcxproj.filters
+          $diffExitCode = $LASTEXITCODE
+          if ($diffExitCode -ne 0) {
+            Write-Error "Filters are out of date and cannot be updated automatically for this run."
+            exit $diffExitCode
+          }
+
+  notify-discord:
+    needs:
+      - build
+      - filter-fix
+    if: always() && github.event_name == 'pull_request'
     runs-on: windows-latest
 
     steps:
-      - name: Fail if build did not succeed
-        if: needs.build.result != 'success'
+      - name: Fail if validation did not succeed
+        if: needs.build.result != 'success' || needs.filter-fix.result != 'success'
         shell: pwsh
         run: |
-          Write-Host "Build result was '${{ needs.build.result }}'. Failing this job."
+          Write-Host "Build result: '${{ needs.build.result }}'."
+          Write-Host "Filter update result: '${{ needs.filter-fix.result }}'."
           exit 1
 
       - name: Notify Discord
-        if: needs.build.result == 'success'
+        if: needs.build.result == 'success' && needs.filter-fix.result == 'success'
         shell: pwsh
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOKURL_NOTIFY }}
@@ -171,4 +210,3 @@ jobs:
             -Method Post `
             -ContentType "application/json" `
             -Body $json
-
