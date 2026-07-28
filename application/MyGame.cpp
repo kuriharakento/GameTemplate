@@ -15,6 +15,8 @@
 #include "manager/graphics/LineManager.h"
 #include "input/Input.h"
 
+#include "base/PathManager.h"
+
 namespace KCE
 {
 ///=============================================================================
@@ -23,6 +25,9 @@ namespace KCE
 
 void MyGame::Initialize()
 {
+	// アプリケーションリソースルートの設定
+	PathManager::SetApplicationResourceRoot("application/Resources");
+
 	// フレームワークの初期化
 	Framework::Initialize();
 
