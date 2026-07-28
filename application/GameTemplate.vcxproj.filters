@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{C250CFDD-9492-41D4-4F3F-7C1BBC892CB5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\shaders">
-      <UniqueIdentifier>{2E181770-B06F-7BBB-B84B-996D35E442E5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="collision">
       <UniqueIdentifier>{238A5ECB-9EEC-A846-5837-2247AF29A414}</UniqueIdentifier>
     </Filter>
@@ -77,36 +71,5 @@
     <ClInclude Include="scene\play\title\TitleScene.h">
       <Filter>scene\play\title</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
-      <Filter>Resources\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Object3d.Vs.hlsl">
-      <Filter>Resources\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Skybox.PS.hlsl">
-      <Filter>Resources\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Skybox.VS.hlsl">
-      <Filter>Resources\shaders</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\shaders\Line.hlsli">
-      <Filter>Resources\shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Object3d.hlsli">
-      <Filter>Resources\shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Particle.hlsli">
-      <Filter>Resources\shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Skybox.hlsli">
-      <Filter>Resources\shaders</Filter>
-    </None>
-    <None Include="Resources\shaders\Sprite.hlsli">
-      <Filter>Resources\shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

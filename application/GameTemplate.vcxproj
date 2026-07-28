@@ -137,29 +137,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="scene\debug\ParticleTestScene.h" />
     <ClInclude Include="scene\play\title\TitleScene.h" />
   </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Object3d.Vs.hlsl">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Skybox.PS.hlsl">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-      <ShaderType>Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Skybox.VS.hlsl">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-      <ShaderType>Vertex</ShaderType>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\shaders\Line.hlsli" />
-    <None Include="Resources\shaders\Object3d.hlsli" />
-    <None Include="Resources\shaders\Particle.hlsli" />
-    <None Include="Resources\shaders\Skybox.hlsli" />
-    <None Include="Resources\shaders\Sprite.hlsli" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
