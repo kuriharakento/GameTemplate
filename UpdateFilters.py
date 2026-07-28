@@ -22,7 +22,7 @@ ITEM_TAGS = [
 
 def get_deterministic_guid(text: str) -> str:
     md5 = hashlib.md5(text.encode('utf-8')).digest()
-    u = uuid.UUID(bytes=md5)
+    u = uuid.UUID(bytes_le=md5)
     return f"{{{str(u).upper()}}}"
 
 def convert_to_filter_name(include_path: str) -> str:
@@ -113,6 +113,10 @@ def write_filters_file(vcxproj_path: str):
 
     # 保存
     filters_path = vcxproj_path + ".filters"
+    has_utf8_bom = False
+    if os.path.exists(filters_path):
+        with open(filters_path, "rb") as existing_file:
+            has_utf8_bom = existing_file.read(3) == b"\xef\xbb\xbf"
     
     # XMLをきれいに整形して保存するための処理
     try:
@@ -124,9 +128,15 @@ def write_filters_file(vcxproj_path: str):
     # XML宣言付きで書き出し
     filters_tree = ET.ElementTree(filters_root)
     try:
+        xml_bytes = ET.tostring(filters_tree.getroot(), encoding="utf-8", xml_declaration=False)
+        xml_bytes = xml_bytes.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
         with open(filters_path, "wb") as f:
-            f.write(b'<?xml version="1.0" encoding="utf-8"?>\n')
-            filters_tree.write(f, encoding="utf-8", xml_declaration=False)
+            if has_utf8_bom:
+                f.write(b"\xef\xbb\xbf")
+            f.write(b'<?xml version="1.0" encoding="utf-8"?>\r\n')
+            f.write(xml_bytes)
+            if not xml_bytes.endswith(b"\r\n"):
+                f.write(b"\r\n")
         print(f"  -> \033[92mSuccessfully saved: {filters_path}\033[0m")
     except Exception as e:
         print(f"Error saving file: {e}")
@@ -141,7 +151,8 @@ def main():
         "engine/KentoCompoEngine.vcxproj"
     ]
     
-    for proj in default_projects:
+    projects = sys.argv[1:] or default_projects
+    for proj in projects:
         write_filters_file(proj)
 
 if __name__ == "__main__":

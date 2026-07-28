@@ -1,0 +1,37 @@
+name: ReleaseBuild
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE_PATH: GameTemplate.sln
+  CONFIGURATION: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+
+      - name: Build
+        shell: pwsh
+        run: msbuild $env:SOLUTION_FILE_PATH /p:Platform=x64 /p:Configuration=$env:CONFIGURATION
+
+      - name: Discord Notification
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+          status: ${{ job.status }}
+          title: "GitHub Actions: GameTemplate ReleaseBuild"

@@ -1,6 +1,8 @@
 #pragma once
 #include "framework/Framework.h"
 
+namespace KCE
+{
 class MyGame : public Framework
 {
 public:
@@ -46,4 +48,5 @@ private:
 	// シーン描画用レンダーテクスチャ（ポストプロセス後）
 	std::unique_ptr<RenderTexture> sceneRenderTexture_;
 };
+} // namespace KCE
 

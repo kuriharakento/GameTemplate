@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{C250CFDD-9492-41D4-4F3F-7C1BBC892CB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\shaders">
+      <UniqueIdentifier>{2E181770-B06F-7BBB-B84B-996D35E442E5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="collision">
       <UniqueIdentifier>{238A5ECB-9EEC-A846-5837-2247AF29A414}</UniqueIdentifier>
     </Filter>
@@ -19,12 +25,6 @@
     <Filter Include="resources">
       <UniqueIdentifier>{C758B555-82EF-6E0E-00E5-993B9E55D93B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{C250CFDD-9492-41D4-4F3F-7C1BBC892CB5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\shaders">
-      <UniqueIdentifier>{2E181770-B06F-7BBB-B84B-996D35E442E5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="scene">
       <UniqueIdentifier>{4B607F1E-4186-DE5A-94E1-5FEF8627609B}</UniqueIdentifier>
     </Filter>
@@ -39,6 +39,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="gameobject\component\action\common\PhysicsComponent.cpp">
       <Filter>gameobject\component\action\common</Filter>
     </ClCompile>
@@ -46,7 +47,6 @@
       <Filter>gameobject\component\action\common</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp">
       <Filter>resources</Filter>
     </ClCompile>
@@ -62,14 +62,14 @@
     <ClInclude Include="collision\CollisionLayer.h">
       <Filter>collision</Filter>
     </ClInclude>
+    <ClInclude Include="gameobject\GameObjectTag.h">
+      <Filter>gameobject</Filter>
+    </ClInclude>
     <ClInclude Include="gameobject\component\action\common\PhysicsComponent.h">
       <Filter>gameobject\component\action\common</Filter>
     </ClInclude>
     <ClInclude Include="gameobject\component\action\common\StatusComponent.h">
       <Filter>gameobject\component\action\common</Filter>
-    </ClInclude>
-    <ClInclude Include="gameobject\GameObjectTag.h">
-      <Filter>gameobject</Filter>
     </ClInclude>
     <ClInclude Include="scene\debug\ParticleTestScene.h">
       <Filter>scene\debug</Filter>

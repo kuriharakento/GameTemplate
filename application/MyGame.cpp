@@ -15,6 +15,8 @@
 #include "manager/graphics/LineManager.h"
 #include "input/Input.h"
 
+namespace KCE
+{
 ///=============================================================================
 ///						初期化・終了処理
 ///=============================================================================
@@ -474,3 +476,4 @@ void MyGame::Draw()
 	imguiManager_->Draw();
 	dxCommon_->PostDraw();
 }
+} // namespace KCE

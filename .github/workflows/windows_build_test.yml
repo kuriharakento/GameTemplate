@@ -5,7 +5,7 @@ env:
 
 jobs:
   filter-fix:
-    runs-on: highperf-hosted
+    runs-on: windows-latest
     permissions:
       contents: write
 
@@ -17,9 +17,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
       - name: Run UpdateFilters
         shell: pwsh
-        run: py UpdateFilters.py
+        run: python UpdateFilters.py application/GameTemplate.vcxproj
 
       - name: Commit and push if filters changed
         shell: pwsh
@@ -43,7 +48,7 @@ jobs:
           - Debug
           - Release
 
-    runs-on: highperf-hosted
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -137,7 +142,7 @@ jobs:
   notify-discord:
     needs: build
     if: always()
-    runs-on: highperf-hosted
+    runs-on: windows-latest
 
     steps:
       - name: Fail if build did not succeed
