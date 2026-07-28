@@ -14,6 +14,7 @@
 #include "manager/editor/ConsoleLog.h"
 #include "manager/graphics/LineManager.h"
 #include "input/Input.h"
+#include "audio/Audio.h"
 
 #include "base/PathManager.h"
 
@@ -30,6 +31,9 @@ void MyGame::Initialize()
 
 	// フレームワークの初期化
 	Framework::Initialize();
+
+	Audio::GetInstance()->Load("Cozy_rain.mp3", SoundGroup::BGM);
+	Audio::GetInstance()->PlayWave("Cozy_rain.mp3", true);
 
 	// ゲーム側でウィンドウタイトルを決める
 	winApp_->SetWindowTitle(L"MyGame");
