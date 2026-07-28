@@ -107,7 +107,7 @@ struct PixelShaderOutput
 };
 
 // 効率化された照明計算関数
-float3 CalculateHalfLambert(float3 normal, float3 lightDir)
+float CalculateHalfLambert(float3 normal, float3 lightDir)
 {
     float NdotL = dot(normal, lightDir);
     NdotL = NdotL * 0.5f + 0.5f;

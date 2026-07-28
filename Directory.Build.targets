@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup Condition="'$(SolutionFileName)' == 'GameTemplate.sln' and '$(ProjectName)' != 'GameTemplate'">
+    <OutDir>$(SolutionDir)generated\outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetDir>$(OutDir)</TargetDir>
+    <TargetPath>$(TargetDir)$(TargetName)$(TargetExt)</TargetPath>
+  </PropertyGroup>
+</Project>
