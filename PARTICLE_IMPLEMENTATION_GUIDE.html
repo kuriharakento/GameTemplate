@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KCE Particle System 実装・利用ガイド</title>
+<style>
+:root{--bg:#0b1020;--panel:#141b30;--panel2:#19233d;--text:#e8edf7;--muted:#9eacc7;--accent:#6ee7ff;--accent2:#a78bfa;--ok:#58d68d;--warn:#ffc857;--bad:#ff6b6b;--line:#2a3655}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(140deg,#090d18,#10182d 48%,#0b1020);color:var(--text);font:15px/1.75 system-ui,"Yu Gothic UI","Meiryo",sans-serif}a{color:var(--accent)}header{padding:64px max(24px,calc((100% - 1180px)/2));border-bottom:1px solid var(--line);background:radial-gradient(circle at 80% 0,#293b6a88,transparent 42%)}h1{font-size:clamp(30px,5vw,54px);line-height:1.15;margin:0 0 16px}h2{margin-top:52px;padding-bottom:9px;border-bottom:1px solid var(--line)}h3{margin-top:30px;color:#d7e3ff}.lead{max-width:850px;font-size:18px;color:#c7d3e9}.pill{display:inline-block;padding:4px 10px;margin:4px;border:1px solid #38527e;border-radius:999px;background:#17233d;color:#caeefa;font-size:12px}main{max-width:1180px;margin:auto;padding:25px 24px 80px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:linear-gradient(150deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:18px}.card h3{margin:0 0 8px}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}nav{position:sticky;top:0;z-index:5;background:#0b1020ed;border-bottom:1px solid var(--line);padding:9px max(24px,calc((100% - 1180px)/2));overflow:auto;white-space:nowrap}nav a{margin-right:20px;text-decoration:none;color:#b8c7e3}table{width:100%;border-collapse:collapse;margin:14px 0;background:#11192c}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#1c2948;color:#dce7fb}code{font-family:Consolas,monospace;color:#b9f4ff;background:#09101e;padding:2px 5px;border-radius:4px}pre{overflow:auto;background:#080e1a;border:1px solid var(--line);border-radius:9px;padding:15px;line-height:1.55}pre code{padding:0;background:none}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:18px 0}.node{padding:10px 14px;border:1px solid #405985;background:#17233d;border-radius:8px}.arrow{color:var(--accent);font-size:20px}.note{border-left:4px solid var(--accent);background:#121d34;padding:12px 16px;margin:15px 0}.warning{border-left-color:var(--warn)}details{border:1px solid var(--line);background:#11192c;border-radius:8px;margin:10px 0;padding:10px 14px}summary{cursor:pointer;font-weight:700}.small{color:var(--muted);font-size:13px}.file{word-break:break-all;color:#c6d5ef}footer{border-top:1px solid var(--line);padding:25px;color:var(--muted);text-align:center}@media(max-width:700px){table{display:block;overflow-x:auto}header{padding-top:38px}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="pill">Pure GPU resident</div><div class="pill">Indirect Draw</div><div class="pill">44 Modules</div><div class="pill">JSON v2</div>
+  <h1>KCE Particle System<br>実装・利用ガイド</h1>
+  <p class="lead">今回のリファクタリングで追加・変更した機能、その内部構造、公開API、Editor/JSONからの利用方法、検証方法を一冊にまとめた実装者向けドキュメントです。</p>
+  <p class="small">更新日: 2026-08-02 / 対象: Pure GPU化から安定性対策までの全パーティクル実装差分</p>
+</header>
+<nav><a href="#overview">概要</a><a href="#architecture">構造</a><a href="#features">機能</a><a href="#api">API</a><a href="#usage">使い方</a><a href="#editor">Editor/JSON</a><a href="#diagnostics">診断</a><a href="#status">検証・制約</a><a href="#dynamic">Dynamic/Resource</a><a href="#files">ファイル</a></nav>
+<main>
+<section id="overview"><h2>1. 実装概要</h2>
+<div class="grid">
+ <article class="card"><h3>Pure GPUシミュレーション</h3><p>固定長GPU pool、dead-slot atomic claim、GPU内alive compact、4 byte非同期completion recordにより、粒子payloadを毎フレームCPUへ戻さず更新します。</p></article>
+ <article class="card"><h3>GPU-driven描画</h3><p>Sprite/Mesh/Ribbonの描画数をGPUで生成し、Indirect Drawで発行。Ribbonはpersistent IDによるsortとribbonId groupingを行います。</p></article>
+ <article class="card"><h3>Niagara型モジュール基盤</h3><p>44モジュールをdescriptor registryへ登録。phase、priority、parameter schema、CPU/Pure GPU capabilityを宣言し、CompiledEmitterへコンパイルします。</p></article>
+ <article class="card"><h3>GPU event chain</h3><p>Spawn/Death eventをGPU bufferへ記録し、後続emitterが同一effect・同一frame内で直接消費します。velocity/color継承にも対応します。</p></article>
+ <article class="card"><h3>Editor / Serialization</h3><p>全44モジュールの追加・編集・JSON v2往復を整備。旧JSONのmigration、値域・参照順・enumの厳密validationを追加しました。</p></article>
+ <article class="card"><h3>互換fallbackと診断</h3><p>Pure GPU非対応構成はHybrid/CPUへ明示的にfallback。CPU/GPU時間、転送量、descriptor数、実行経路をCSVへ記録します。</p></article>
+</div></section>
+
+<section id="architecture"><h2>2. 実行アーキテクチャ</h2>
+<h3>Pure GPUフレーム</h3><div class="flow"><div class="node">SpawnPrepare CS<br><small>Rate/Burst/Event数</small></div><div class="arrow">→</div><div class="node">ParticleCompute CS<br><small>age/death/claim/module</small></div><div class="arrow">→</div><div class="node">Alive compact<br><small>render SRV</small></div><div class="arrow">→</div><div class="node">Indirect args</div><div class="arrow">→</div><div class="node">Sprite / Mesh / Ribbon</div></div>
+<p>CPUが毎フレーム渡すのは定数・dispatch/draw commandだけです。Particle構造体、alive/dead状態、event、描画個数はGPU常駐です。CPUが寿命終了を知る必要がある場合のみ、payloadではなく4 byteのcompletion recordを非同期pollします。</p>
+<h3>経路選択</h3><table><thead><tr><th>経路</th><th>条件</th><th>転送</th></tr></thead><tbody><tr><td>Pure GPU</td><td>全moduleとrendererがPure GPU対応</td><td>粒子payload readbackなし</td></tr><tr><td>Hybrid GPU</td><td>GPU simulationを使うがCPU生成、外部CPU transform、非対応module等が必要</td><td>必要部分のみupload/readback</td></tr><tr><td>CPU</td><td><code>SimulationMode::CPU</code>を指定</td><td><code>std::vector&lt;Particle&gt;</code>を正本として描画用upload</td></tr></tbody></table>
+</section>
+
+<section id="features"><h2>3. 実装した機能</h2>
+<details open><summary>SpawnRate / Burst / dead-slot再利用</summary><p><code>ParticleSpawnPrepare.CS.hlsl</code>がrate accumulator、burst delay/interval/loop、event spawn数をGPU emitter stateへ保存します。低FPSや大きなdeltaTimeでも、寿命内に残るRate birthだけを保持し、sub-frame ageを付けます。更新CSは既存粒子を先に死亡判定するため、同一dispatchで空いたslotをすぐ再利用できます。</p></details>
+<details><summary>主要Spawn Shape</summary><p>Point、Sphere、Circle、Box、Cone、LineをGPU生成。inner/outer radius、surface/edge、arc、box size、cone height、line endpoints、surface direction初速をconstant bufferへコンパイルします。</p></details>
+<details><summary>Sprite / Mesh</summary><p>GPU compact bufferをSRVとして参照し、GPU生成のdraw argumentsで描画します。Spriteはbillboard/2D alignment、Meshはinstance indirect描画に対応します。</p></details>
+<details><summary>Ribbon / Multi-ribbon</summary><p>alive粒子を<code>(ribbonId, persistentId)</code>でbitonic sortし、6頂点の独立segmentとgroup境界の縮退要素をGPU生成します。<code>AssignRibbonId(N)</code>で1 emitter内にN本のRibbonを構築します。外部CPU source transformを使うMultiSourceRibbonは互換Hybrid経路です。</p></details>
+<details><summary>GPU Event / Sub-emitter</summary><p>Spawn=0、Death=1、Collision=2のevent型を定義。現在Pure GPUで生成するのはSpawn/Deathです。source emitterはchildより前のindexである必要があり、probability filter、velocity scale、color継承をGPUだけで処理します。</p></details>
+<details><summary>Packed GPU module program</summary><p>モジュール列を固定recordのprogram bufferとcurve/gradient用LUTへpackし、ParticleComputeが順番に解釈します。CPUでは同じdescriptor列を<code>CompiledEmitter::Execute</code>がphase別に実行します。</p></details>
+<details><summary>容量変更と失敗時rollback</summary><p><code>SetMaxParticles</code>は1〜1,000,000へclampし、新しいGPUSimulatorと21個のdescriptorを先にtransactional確保します。初期化が成功した場合だけ旧Simulatorと交換し、枯渇・resource生成失敗時は旧capacityを保持します。Sprite/Meshはserializeされた容量を利用でき、GPU sortを使うRibbonだけ65,536上限です。</p></details>
+<details><summary>Renderer交換・Effect削除のGPU安全性</summary><p>交換されたRenderer/Simulator/Effectは即時deleteせず、次にsubmitされるfence値と一緒に退避します。<code>GetCompletedFenceValue()</code>が到達してから解放するため、GPUが旧bufferを参照中でもuse-after-freeになりません。Effect poolは同名2個・全体16個までに制限し、異なる名前のone-shot Effectによるdescriptor保持の無制限増加を防ぎます。</p></details>
+</section>
+
+<section id="api"><h2>4. 追加・変更した主なAPI</h2>
+<h3>ParticleEmitter</h3><table><thead><tr><th>関数</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>SetSimulationMode(SimulationMode)</code></td><td>CPU/GPUを選択。GPU指定後もcapability判定によりPure/Hybridが決まります。</td></tr>
+<tr><td><code>SetGPUEventSourceEmitterIndex(int)</code></td><td>JSON/Effect内でevent sourceをindex指定。sourceは必ず自分より前です。</td></tr>
+<tr><td><code>SetGPUEventTrigger(uint32_t)</code></td><td>0=Spawn、1=Death、2=Collisionを選択します。</td></tr>
+<tr><td><code>SetGPUEventProbability(float)</code></td><td>受信eventを0..1の確率でfilterします。</td></tr>
+<tr><td><code>SetGPUEventVelocityInheritance(bool,float)</code></td><td>source velocityの継承有無と倍率を設定します。</td></tr>
+<tr><td><code>SetGPUEventInheritColor(bool)</code></td><td>source colorをchildへ継承します。</td></tr>
+<tr><td><code>BindGPUEventSource(ParticleEmitter*)</code></td><td>Effectがindexを実ポインタへ解決する内部接続APIです。</td></tr>
+<tr><td><code>GetActiveParticleCount()</code></td><td>CPUは正確なvector数、Pure GPUは非同期completion recordの最終既知値を返します。</td></tr>
+<tr><td><code>GetCompiledEmitter()</code></td><td>layout hash、pass列、packed parameter、compile errorを取得します。</td></tr>
+<tr><td><code>GetParameterStore()</code></td><td>emitter単位のtyped parameter storeを参照します。</td></tr>
+<tr><td><code>SetMaxParticles(uint32_t)</code></td><td>CPU reserveまたはGPU poolを安全に再構築。GPU再確保失敗時は旧capacityへrollbackします。</td></tr>
+<tr><td><code>SetRenderer(unique_ptr&lt;IRenderer&gt;)</code></td><td>Rendererを交換。旧RendererはParticleManagerのfence連動退避キューへ移動します。</td></tr>
+<tr><td><code>SetDynamicBinding / RemoveDynamicBinding / FindDynamicBinding</code></td><td>module parameterへConstant/Range/Curve/EmitterParameter入力を設定・削除・参照します。</td></tr>
+</tbody></table>
+<h3>GPUSimulator</h3><table><thead><tr><th>関数</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>DispatchPure(dt,camera,modules,world,space,emitting,reset)</code></td><td>CPU particle uploadなしの完全GPU更新を発行します。</td></tr>
+<tr><td><code>SupportsPureGPU(modules)</code></td><td>registry capabilityとrenderer制約からPure GPU可否を判定します。</td></tr>
+<tr><td><code>SetEventSource(...)</code> / <code>ClearEventSource()</code></td><td>source event SRV/counterと継承条件を接続・解除します。</td></tr>
+<tr><td><code>SetRibbonParameters(...,groupCount)</code></td><td>GPU Ribbon幅、fade、group数を設定します。</td></tr>
+<tr><td><code>GetDrawArgumentsBuffer()</code></td><td>Sprite/Mesh用indirect argumentsを返します。</td></tr>
+<tr><td><code>GetRibbonVertexBuffer()</code> / <code>GetRibbonDrawArgumentsBuffer()</code></td><td>GPU生成Ribbon頂点とindirect argumentsを返します。</td></tr>
+<tr><td><code>IsPureGPUPath()</code></td><td>直近dispatchがPure GPUか診断します。</td></tr>
+<tr><td><code>HasCompletionRecord()</code> / <code>MayHaveLiveParticles()</code></td><td>非同期完了値の有無と安全な生存可能性を返します。</td></tr>
+</tbody></table>
+<h3>Module runtime</h3><table><thead><tr><th>型/関数</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>ModuleDescriptorRegistry::GetInstance()</code></td><td>44 moduleの唯一のmetadata/factory registry。</td></tr>
+<tr><td><code>Find(id)</code> / <code>GetDescriptors()</code></td><td>Editor、serializer、toolingからschemaを列挙します。</td></tr>
+<tr><td><code>Compile(modules)</code></td><td>priority順pass、parameter offsets、layout hashを持つCompiledEmitterを生成します。</td></tr>
+<tr><td><code>ModuleParameterStore::Set/FindAs/Remove</code></td><td>Float/UInt/Int/Bool/Vector/String等を名前付きで保持します。</td></tr>
+</tbody></table>
+<h3>Serializer / Diagnostics</h3><table><thead><tr><th>関数</th><th>用途</th></tr></thead><tbody><tr><td><code>ParticleEffectSerializer::Load(path)</code></td><td>JSON v2をvalidation/migrationしてEffectを復元。無効なemitterを黙って飛ばさず全体失敗します。</td></tr><tr><td><code>ParticleEffectSerializer::Save(effect,path)</code></td><td>renderer、44 module、event、lifecycleをJSONへ保存します。</td></tr><tr><td><code>ParticleDiagnostics::RecordGpuEmitter(...)</code></td><td>Pure/Hybrid数、module operations、LUT、descriptor推定を記録します。</td></tr><tr><td><code>ExportToCSV(...)</code></td><td>時間、転送byte、active count、runtime経路、PASS/FAILをCSV出力します。</td></tr></tbody></table>
+<h3>ParticleManager / SrvManager / DirectXCommon</h3><table><thead><tr><th>関数</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>ParticleManager::PurgeEffectPools()</code></td><td>pool中Effectをfence連動の実破棄キューへ移し、GPU完了後にdescriptor/resourceを回収します。</td></tr>
+<tr><td><code>ParticleManager::GetPooledEffectCount()</code></td><td>現在再利用待ちのEffect総数を返します。</td></tr>
+<tr><td><code>AddRendererToTrashBin / AddSimulatorToTrashBin</code></td><td>交換済みGPU resourceを、関連commandの完了まで所有します。</td></tr>
+<tr><td><code>SrvManager::TryAllocate / TryAllocateRange</code></td><td>単一または連続descriptor範囲を例外なしで確保し、枯渇時はfalseを返します。</td></tr>
+<tr><td><code>SrvManager::Free / FreeRange</code></td><td>所有bitmapを検査して安全に解放。二重解放・範囲外解放を拒否します。</td></tr>
+<tr><td><code>GetActiveSRVCount / GetAvailableSRVCount / IsAllocated</code></td><td>descriptor使用量、残数、index所有状態を診断します。</td></tr>
+<tr><td><code>GetLastSubmittedFenceValue / GetNextFenceValue / GetCompletedFenceValue</code></td><td>resourceの遅延破棄時点をフレーム数ではなく実fence値で決定します。</td></tr>
+</tbody></table>
+</section>
+
+<section id="usage"><h2>5. C++からの使い方</h2>
+<h3>JSONをロードして再生</h3><pre><code>auto* particles = KCE::ParticleManager::GetInstance();
+particles-&gt;Load("Explosion", "./Resources/particles/explosion.json");
+particles-&gt;Warmup("Explosion", 4);
+
+// ゲーム中
+KCE::ParticleEffect* effect = particles-&gt;Play("Explosion", hitPosition);
+// effect-&gt;Stop(); / Reset(); で制御可能</code></pre>
+<h3>コードでPure GPU emitterを作成</h3><pre><code>auto emitter = std::make_unique&lt;KCE::ParticleEmitter&gt;();
+emitter-&gt;Initialize("GpuSpark");
+emitter-&gt;SetSimulationMode(KCE::SimulationMode::GPU);
+emitter-&gt;SetMaxParticles(20000);
+emitter-&gt;AddModule(std::make_unique&lt;KCE::SpawnRateModule&gt;(1000.0f));
+emitter-&gt;AddModule(std::make_unique&lt;KCE::InitialLifetimeModule&gt;(0.8f, 1.2f));
+emitter-&gt;AddModule(std::make_unique&lt;KCE::InitialVelocityModule&gt;(/* min, max */));
+emitter-&gt;SetRenderer(std::make_unique&lt;KCE::SpriteRenderer&gt;());
+emitter-&gt;Play();
+KCE::ParticleManager::GetInstance()-&gt;AddEmitter(std::move(emitter));</code></pre>
+<h3>GPU Death event chain</h3><pre><code>// effect内で source を先、child を後に追加する
+child-&gt;SetSimulationMode(KCE::SimulationMode::GPU);
+child-&gt;SetGPUEventSourceEmitterIndex(0);
+child-&gt;SetGPUEventTrigger(static_cast&lt;uint32_t&gt;(KCE::GPUParticleEventType::Death));
+child-&gt;SetGPUEventProbability(1.0f);
+child-&gt;SetGPUEventVelocityInheritance(true, 0.5f);
+child-&gt;SetGPUEventInheritColor(true);</code></pre>
+<h3>Dynamic Inputをコードから設定</h3><pre><code>emitter-&gt;GetParameterStore().Set("User.SpawnRate", 60000.0f);
+
+KCE::DynamicParameterBinding binding;
+binding.moduleId = "SpawnRate";
+binding.parameterId = "rate";
+binding.type = KCE::ModuleParameterType::Float;
+binding.mode = KCE::DynamicBindingMode::EmitterParameter;
+binding.emitterParameter = "User.SpawnRate";
+binding.fallback = 1000.0f;
+binding.minimum = 0.0f;
+binding.maximum = 1000000.0f;
+
+if (!emitter-&gt;SetDynamicBinding(binding)) {
+    // schema不一致、非対応parameter、空parameter名など
+}</code></pre>
+<h3>Effect poolを明示的に解放</h3><pre><code>auto* manager = KCE::ParticleManager::GetInstance();
+manager-&gt;RemoveEffect(effect); // 通常は再利用poolへ
+
+// Scene遷移、Editor大量ロード後、厳密なresource回収確認時
+manager-&gt;PurgeEffectPools();   // GPU完了後に実破棄</code></pre>
+<div class="note"><b>通常は<code>GPUSimulator</code>を直接操作しません。</b> ParticleEmitterがcapability判定、resource state、event binding、renderer接続を管理します。</div>
+</section>
+
+<section id="editor"><h2>6. EditorとJSON</h2>
+<ol><li>ParticleTestSceneでParticle Editorを開く。</li><li>Effect → Emitterを追加し、Simulation ModeをGPUへ設定。</li><li>Module追加画面からSpawn/Update moduleを追加。registry schemaに応じてproperty UIが表示されます。</li><li>Sprite/Mesh/Ribbon rendererを選択。Ribbonを複数化する場合はAssignRibbonIdとgroup countを合わせます。</li><li>Event childはsourceより後へ配置し、source indexとtriggerを設定。</li><li>SaveでJSON v2へ保存し、Loadでround-trip確認。</li></ol>
+<p>validation対象にはversion、deltaTimeType、follow/event source index、duration/delay、loop count、probability、enum、path長、SubEmitter config最大64件などが含まれます。</p>
+<pre><code>{
+  "formatVersion": 2,
+  "moduleSchemaVersion": 1,
+  "name": "GpuExample",
+  "emitters": [
+    { "name": "Source", "simulationMode": 1, "maxParticles": 20000,
+      "modules": [
+        { "type": "SpawnRate", "rate": 1000.0 },
+        { "type": "InitialLifetime", "min": 0.8, "max": 1.2 }
+      ],
+      "renderer": { "type": "Sprite", "texture": "./Resources/uvChecker.png", "blendMode": 1 }
+    }
+  ]
+}</code></pre>
+<p class="small">実際のkeyは保存済みJSONを正本として使用してください。旧形式はloaderがv2へmigrationします。</p>
+</section>
+
+<section id="diagnostics"><h2>7. 診断・自動検証の使い方</h2>
+<h3>環境変数</h3><table><thead><tr><th>変数</th><th>値</th><th>用途</th></tr></thead><tbody><tr><td><code>KCE_START_SCENE</code></td><td><code>ParticleTest</code></td><td>テストsceneを直接起動</td></tr><tr><td><code>KCE_PARTICLE_BENCHMARK_PRESET</code></td><td>1..8</td><td>B01〜B08を自動選択</td></tr><tr><td><code>KCE_PARTICLE_BENCHMARK_MODE</code></td><td>CPU / GPU</td><td>実行経路を指定</td></tr><tr><td><code>KCE_PARTICLE_SERIALIZATION_SELF_TEST</code></td><td>1</td><td>registry factoryから全44 moduleを作成しSave/Load/値照合</td></tr><tr><td><code>KCE_PARTICLE_JSON_GPU_TEST</code></td><td>JSON path</td><td>Load→Save→再Loadして再生し、Pure GPU・active数・readback 0を自動判定</td></tr><tr><td><code>KCE_PARTICLE_STABILITY_TEST</code></td><td>JSON path</td><td>再生制御・容量変更・Renderer交換・Effect破棄を100回反復しdescriptor回収を判定</td></tr><tr><td><code>KCE_D3D12_CAPTURE_ERRORS</code></td><td>1</td><td>D3D12 validation messageをファイルへ記録し、ERROR時breakを抑制</td></tr></tbody></table>
+<pre><code>$env:KCE_START_SCENE='ParticleTest'
+$env:KCE_PARTICLE_BENCHMARK_PRESET='8'
+$env:KCE_PARTICLE_BENCHMARK_MODE='GPU'
+.\generated\outputs\Release\GameTemplate.exe</code></pre>
+<h3>Pure GPU JSON統合テスト</h3><pre><code>$env:KCE_START_SCENE='ParticleTest'
+$env:KCE_PARTICLE_JSON_GPU_TEST='.\application\Resources\json\particles\tests\pure_gpu_sprite_test.json'
+.\generated\outputs\Release\GameTemplate.exe
+
+Get-Content .\application\Resources\test-results\particles\pure_gpu_sprite_test_result.txt</code></pre>
+<p>結果は<code>application/Resources/test-results/particles/particle_benchmark_baseline.csv</code>へ出力。Pure GPU試験では<code>pure_gpu_emitters &gt; 0</code>、<code>hybrid_gpu_emitters = 0</code>、CPU readback memcpy = 0を確認します。</p>
+<h3>100回安定性・descriptor回収テスト</h3><pre><code>$env:KCE_START_SCENE='ParticleTest'
+$env:KCE_PARTICLE_STABILITY_TEST='.\application\Resources\json\particles\tests\pure_gpu_sprite_test.json'
+$env:KCE_D3D12_CAPTURE_ERRORS='1' # Debugのみ
+.\generated\outputs\Debug\GameTemplate.exe
+
+Get-Content .\application\Resources\test-results\particles\particle_stability_test_result.txt
+Get-Content .\application\Resources\test-results\particles\particle_d3d12_errors.txt</code></pre>
+<p>Play/Stop/Reset、32,768↔65,536 resize、Sprite/Mesh/Ribbon交換を100回行い、Effect削除とpool purge後にactive descriptorがwarm-up済みbaselineへ戻ればPASSです。</p>
+</section>
+
+<section id="status"><h2>8. 現在の検証結果と制約</h2>
+<table><thead><tr><th>試験</th><th>最新結果</th><th>要点</th></tr></thead><tbody>
+<tr><td>Build Debug / Release x64</td><td class="ok">PASS</td><td>engine/application、shader compile、link成功</td></tr>
+<tr><td>B01 GPU Release</td><td class="ok">PASS: 996</td><td>Pure 1 / Hybrid 0 / readback 0</td></tr>
+<tr><td>B05 GPU Release</td><td class="ok">PASS: 9,913</td><td>100 emitters / descriptor 2200 / 大delta補正済み</td></tr>
+<tr><td>B07 GPU Ribbon Release</td><td class="ok">PASS: 996</td><td>sort/group/indirect、Pure 1</td></tr>
+<tr><td>B08 GPU Event Release</td><td class="ok">PASS: 915</td><td>Death→child、Pure 2 / Hybrid 0</td></tr>
+<tr><td>B09 GPU Mesh Selective Bloom Release</td><td class="ok">PASS: 65,536</td><td>Pure GPU / Hybrid 0 / Indirect Draw / readback 0</td></tr>
+<tr><td>B10 GPU Ribbon Selective Bloom Release</td><td class="ok">PASS: 65,536</td><td>Pure GPU sort/group/Indirect Draw / readback 0</td></tr>
+<tr><td>Selective Bloom設定マトリクス</td><td class="ok">PASS</td><td>9 BlendMode × On/Off、3 Source、Intensity 0/1/8/64、Contribution 0、PSO実行時生成0</td></tr>
+<tr><td>44 module serialization</td><td class="ok">PASS</td><td>Debug/Releaseでfactory→Save→Load→値照合</td></tr>
+<tr><td>Dynamic Input serialization/runtime</td><td class="ok">PASS</td><td>Float Parameter、Vector3 RandomRange、Vector4 Curve、layout hash</td></tr>
+<tr><td>Pure GPU JSON stress</td><td class="ok">PASS: 62,965</td><td>pool 65,536 / spawn 60,000/s / Hybrid 0 / readback 0</td></tr>
+<tr><td>D3D12 validation</td><td class="ok">PASS</td><td>ERROR / CORRUPTION / WARNING 0</td></tr>
+<tr><td>Debug lifecycle stability</td><td class="ok">PASS: 100回</td><td>descriptor 36 → peak 80 → 36、D3D12 message 0</td></tr>
+<tr><td>Release lifecycle stability</td><td class="ok">PASS: 100回</td><td>descriptor 35 → peak 79 → 35、完全回収</td></tr>
+<tr><td>B01 CPU Release</td><td class="ok">PASS: 955</td><td>CPU_VECTOR_EXACT</td></tr>
+<tr><td>B01 CPU Debug</td><td class="warn">調査中: 885</td><td>目標下限900を1.5%下回る。互換CPU経路またはDebug初期化時系列を継続調査</td></tr>
+</tbody></table>
+<div class="note warning"><b>既知の制約:</b> Collision eventのPure GPU生成、外部CPU transformを使うMultiSourceRibbonは完全GPU化されていません。capability判定によりHybridへfallbackします。またEffect全体のduration/startDelay制御はCPU policyです（粒子payload simulationはGPU常駐）。</div>
+<p>ベンチマークはwarm-up 3秒＋sampling 7秒、最低30 sampling frameを要求します。active countはtargetの90〜110%をPASS範囲とし、未達とovershootを別statusで検出します。</p>
+</section>
+
+<section id="dynamic"><h2>9. Dynamic Input、resource安全性、TextureSheet</h2>
+<h3>Dynamic Input</h3>
+<p>Registryで<code>dynamicInput=true</code>のparameterは、Constant、RandomRange、Curve、EmitterParameterを選択できます。EditorのEmitter Parametersで型付きparameterを作成し、Dynamic Inputsからmodule parameterへbindingします。型が一致しないparameterは候補に表示されません。</p>
+<pre><code>"dynamicInputs": [{
+  "module": "SpawnRate",
+  "parameter": "rate",
+  "type": 0,
+  "mode": 3,
+  "emitterParameter": "User.SpawnRate",
+  "fallback": 10.0,
+  "minimum": 0.0,
+  "maximum": 1000000.0,
+  "keys": []
+}]</code></pre>
+<p>RandomRangeはseedから決定論的に評価され、Curve keyは0〜1へ制限されます。同時刻keyは置換され、0除算しません。Bindingはcompiled emitterのlayout hashへ含まれ、CPU実行前にmoduleへ適用されるため、同じmodule getterをPure GPU定数／program packも参照します。未実装parameterはRegistryで公開されず、API・JSON・Editorで拒否されます。</p>
+<h3>Descriptorとresource寿命</h3>
+<ul><li><code>SrvManager::TryAllocate/TryAllocateRange</code>は枯渇をReleaseでも安全に返します。</li><li>GPU emitterの21 descriptorは一括transactionで、途中失敗時は全て巻き戻します。</li><li>最大数変更は新Simulator初期化成功後だけswapし、失敗時は旧capacityで継続します。</li><li>Renderer/Simulator/Effectの遅延破棄はフレーム数ではなくcompleted fence値で判定します。</li><li>Effect poolは同名2個・合計16個を上限とし、超過分はfence完了後に実破棄します。</li><li><code>PurgeEffectPools()</code>によりScene遷移やEditor試験後の明示回収が可能です。</li><li>Default heap bufferとMesh indirect argumentsはCOMMONで生成し、利用直前に明示transitionします。</li></ul>
+<h3>TextureSheetと容量</h3>
+<p>Hybrid GPU描画では<code>Particle::spriteIndex</code>とcolumns/rowsからConvert CSがUV offset/scaleを計算します。Ribbonだけがbitonic sort由来の65,536上限を持ち、Sprite/Meshにはこの制限を適用しません。</p>
+<div class="note warning"><b>Collision GPU event:</b> producerが未実装のため、OnCollisionはEditor候補から除外し、JSONとAPIでも拒否します。無言でOnDeath等へ置換しません。</div>
+</section>
+
+<section id="selective-bloom"><h2>10. Selective Bloom</h2>
+<p>Scene Colorの輝度ではなく、明示的に指定したParticle／GameObject／SkinnedModel／SpriteだけをRGBA16F Bloom Maskへ出力します。DeferredはGBuffer RT3、ForwardはScene Color + Bloom MaskのMRTを使い、Particleは全9 BlendModeについてBloom On/Offを起動時にプリウォームします。</p>
+<h3>Particle EditorとJSON</h3>
+<p>EmitterのRenderer欄にあるSelective BloomでEnabled、Source、HDR Color、Intensity（0〜64）、Bloom Contribution（0〜1）を設定します。SourceはUniform、Base Texture Mask、Emissive Textureの3種類です。専用TextureはLinear色空間でロードされ、不正パスまたは未設定時は黒へフォールバックします。</p>
+<p><strong>黒フォールバック:</strong> Emissive未設定時は専用資産<code>Resources/textures/emissive_black_1x1.png</code>を使用します。従来の<code>black.png</code>は実画素が黒ではなかったため、発光用途から完全に分離しました。<code>TextureManager</code>は1×1画像では生成不能なMip生成を行わず、元画像を直接アップロードします。Particle Sprite／Mesh／Ribbon、2D Sprite、Model、SkinnedModelの全経路で同じフォールバックを使用します。</p>
+<pre><code>"emissive": {
+  "enabled": true,
+  "source": "EmissiveTexture",
+  "color": { "r": 0.25, "g": 1.5, "b": 4.0 },
+  "intensity": 8.0,
+  "bloomContribution": 0.8,
+  "texture": "./Resources/circle2.png"
+}</code></pre>
+<h3>GameObject API</h3>
+<pre><code>EmissiveSettings glow;
+glow.enabled = true;
+glow.source = EmissiveSource::BaseTextureMask;
+glow.color = { 0.2f, 1.0f, 4.0f };
+glow.intensity = 8.0f;
+glow.bloomContribution = 0.75f;
+gameObject-&gt;SetEmissiveSettings(glow);</code></pre>
+<p>通常モデルとSkinnedModelは同じAPIを使用します。AssimpのEmissive Mapは専用Linear SRVとして自動読込されます。GameObject JSONでは<code>material.emissive</code>へ保存され、旧JSONはBloom無効としてロードされます。</p>
+<div class="note"><b>入力安全性:</b> CPU APIは無効な<code>EmissiveSource</code>またはNaN/Infを含む設定全体を拒否し、直前の正常値を維持します。有限な範囲外値だけをColor 0〜16、Intensity 0〜64、Contribution 0〜1へClampします。GPU側でも有限値検査とClampを再実行します。</div>
+<h3>GPU粒子テストJSON</h3>
+<p><code>Resources/json/particles/tests/selective_bloom_pure_gpu_test.json</code>は65,536個のPure GPU Spriteを生成し、Base Texture Mask、HDR Intensity 8、Additive BlendでSelective Bloomを確認します。Particle Editorの<code>Load...</code>から<code>tests/selective_bloom_pure_gpu_test.json</code>を選択してください。従来表示の比較にはBloom無効の<code>tests/pure_gpu_sprite_test.json</code>を使用します。</p>
+<h3>頂点伸長・画面全体を覆う粒子の防止</h3>
+<p>GPU変換時にNaN/Infだけでなく極端な有限座標・Scale・Rotationを除外します。Sprite頂点シェーダーはビルボード四隅のclip-space Wをインスタンス単位で検査し、1つでもカメラ近面を跨ぐ場合は四頂点を同時に画面外へ棄却します。これにより透視除算で単一三角形が画面全体へ伸びる一時的な描画破損を防ぎ、CPU readbackは追加しません。</p>
+<h3>RT・PSOの防御</h3>
+<p><code>RenderTexture</code>はSRV index 0も正規descriptorとして解放します。不正BlendModeは設定時に拒否され、PSO取得時にもBloom On/Off状態を維持したAlphaへフォールバックします。</p>
+<p>通常2D Spriteは<code>SpriteNoBloom.PS.hlsl</code>の1 RT PSO、Selective Bloom描画だけは<code>Sprite.PS.hlsl</code>の2 MRT PSOを使用します。これにより未Bindの<code>SV_TARGET1</code>へ出力するD3D12警告を発生させません。100回リサイズ試験結果は<code>Resources/test-results/particles/selective_bloom_resize_test.txt</code>、300秒連続試験結果は<code>selective_bloom_300s_test.txt</code>に出力されます。いずれも正しい<code>KCE_D3D12_CAPTURE_ERRORS=1</code>でWarning/Error 0を確認済みです。</p>
+<h3>2D Sprite</h3>
+<pre><code>sprite-&gt;SetEmissiveSettings(glow);
+sprite-&gt;SetEmissiveTexture("./Resources/glow_mask.png");
+// Scene ColorとBloom Maskの2 RTVがBindされたForward区間で呼ぶ
+sprite-&gt;DrawSelectiveBloom();</code></pre>
+<div class="note warning"><b>描画位置:</b> 通常の<code>Draw()</code>はポストプロセス後のUI用でBloom対象外です。Bloomさせる2D SpriteだけをForward区間で<code>DrawSelectiveBloom()</code>により描画してください。</div>
+<p>GPU側ではNaN/Infを0へ置換し、Emissive RGBを0〜64、Contributionを0〜1へ制限します。Bloom機能ON中の非対象ParticleとForward ObjectはRT1 WriteMask=0のPSOを使用します。Bloom機能全体をOFFにすると、Deferred Light Pass・Forward Object・Particle・Ribbonは単一RT専用PSOへ切り替わり、Bloom Mask RTのBegin/Bind/EndとBlur/Compositeを省略します。自動試験では環境変数<code>KCE_BLOOM_ENABLED=0</code>でこの経路を固定できます。</p>
+<h3>GPU timestamp診断</h3>
+<p><code>PostProcessManager::BeginBloomGpuFrame()</code>と<code>EndBloomMaskGpuScope()</code>がMask生成区間を囲み、内部でSource Extraction、水平Blur、垂直Blur、Compositeも個別にtimestamp計測します。結果は<code>GetBloomGpuTimings()</code>からミリ秒単位で取得できます。前フレームFence完了後にだけQuery Readbackを読むため、描画中のCPU待機やParticle readbackは増えません。</p>
+<pre><code>const auto&amp; gpu = postProcessManager-&gt;GetBloomGpuTimings();
+if (gpu.valid) {
+    // gpu.maskMs / sourceExtractionMs / blurHorizontalMs /
+    // blurVerticalMs / compositeMs
+}</code></pre>
+<p><code>KCE_BLOOM_GPU_TIMING_TEST=1</code>で起動すると、初期60フレームを除外して300サンプル平均を<code>Resources/test-results/particles/selective_bloom_gpu_timing_*.txt</code>へ保存します。正式試験では<code>KCE_FIXED_1080P=1</code>と<code>KCE_VSYNC=0</code>を併用します。<code>KCE_BLOOM_MODE=LEGACY</code>で従来のScene輝度抽出経路も同じ計測器へ通せます。</p>
+<p>RTX 3060 Laptop GPU、1920×1080、Release、VSync OFFの正式300サンプルでは、Selective 0.657 ms、Legacy 0.617 ms、差+0.040 ms/+6.47%で、+1.00 ms/+10%予算に合格しました。Particle Material Bloom書き込み差はMask区間+0.006 ms、固定VRAM増分23.730 MiBで、それぞれ+0.35 ms／32 MiB予算に合格しています。評価結果は<code>selective_bloom_performance_evaluation.txt</code>です。</p>
+</section>
+
+<section id="files"><h2>11. 主な実装ファイル</h2><table><thead><tr><th>領域</th><th>ファイル</th></tr></thead><tbody>
+<tr><td>GPU simulation</td><td class="file">engine/effects/particle/gpu/GPUSimulator.{h,cpp}<br>engine/Resources/shaders/ParticleCompute.hlsl<br>engine/Resources/shaders/ParticleSpawnPrepare.CS.hlsl</td></tr>
+<tr><td>Alive/convert/indirect</td><td class="file">engine/Resources/shaders/ParticleConvert.CS.hlsl<br>engine/effects/particle/gpu/GPUParticlePipeline.{h,cpp}</td></tr>
+<tr><td>Ribbon</td><td class="file">engine/Resources/shaders/ParticleRibbon.CS.hlsl<br>engine/effects/particle/renderer/TrailRenderer.{h,cpp}</td></tr>
+<tr><td>Module runtime</td><td class="file">engine/effects/particle/module/ModuleRuntime.{h,cpp}<br>engine/effects/particle/dynamic/DynamicInput.h</td></tr>
+<tr><td>Runtime orchestration</td><td class="file">engine/effects/particle/ParticleEmitter.{h,cpp}<br>engine/effects/particle/ParticleEffect.cpp<br>engine/effects/particle/ParticleManager.{h,cpp}</td></tr>
+<tr><td>Editor / JSON</td><td class="file">engine/effects/particle/editor/ParticleEditor.{h,cpp}<br>engine/effects/particle/serialization/ParticleEffectSerializer.cpp</td></tr>
+<tr><td>Diagnostics</td><td class="file">engine/effects/particle/diagnostics/ParticleDiagnostics.{h,cpp}<br>application/scene/debug/ParticleTestScene.{h,cpp}</td></tr>
+<tr><td>Descriptor / fence safety</td><td class="file">engine/manager/system/SrvManager.{h,cpp}<br>engine/base/DirectXCommon.{h,cpp}<br>engine/effects/particle/ParticleManager.{h,cpp}</td></tr>
+<tr><td>Selective Bloom</td><td class="file">engine/base/GraphicsTypes.h<br>engine/graphics/deferred/{GBufferPipeline,LightPassPipeline,DeferredRenderer}.*<br>engine/manager/effect/{ParticlePipelineManager,PostProcessManager}.*</td></tr>
+</tbody></table>
+<p>詳細表はRegistryから生成される <code>engine/effects/particle/docs/PARTICLE_MODULE_CAPABILITY_MATRIX.generated.md</code>、実装仕様は <code>PARTICLE_PURE_GPU_IMPLEMENTATION.md</code>、試験条件は <code>PARTICLE_BENCHMARK.md</code> を参照してください。</p></section>
+</main>
+<footer>KCE Particle System — Implementation &amp; Usage Guide</footer>
+</body></html>

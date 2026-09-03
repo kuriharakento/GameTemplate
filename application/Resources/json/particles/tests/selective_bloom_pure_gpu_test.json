@@ -1,0 +1,81 @@
+{
+  "formatVersion": 2,
+  "moduleSchemaVersion": 1,
+  "name": "SelectiveBloomPureGpuTest",
+  "position": { "x": 0.0, "y": 1.0, "z": 0.0 },
+  "deltaTimeType": 0,
+  "emitters": [
+    {
+      "name": "BloomGpuSphereEmitter",
+      "maxParticles": 65536,
+      "simulationMode": 1,
+      "position": { "x": 0.0, "y": 1.0, "z": 0.0 },
+      "followOffset": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "followEmitterIndex": -1,
+      "gpuEventSourceEmitterIndex": -1,
+      "gpuEventTrigger": 0,
+      "gpuEventProbability": 1.0,
+      "gpuEventInheritVelocity": false,
+      "gpuEventVelocityScale": 1.0,
+      "gpuEventInheritColor": false,
+      "parameters": [],
+      "spawnOnlyWhenMoving": false,
+      "minMoveDistance": 0.01,
+      "duration": 0.0,
+      "startDelay": 0.0,
+      "loopBehavior": 1,
+      "loopCount": 1,
+      "inactiveResponse": 0,
+      "modules": [
+        { "type": "SpawnRate", "version": 1, "rate": 60000.0 },
+        {
+          "type": "SpawnShape", "version": 1,
+          "shapeType": 1, "innerRadius": 0.2, "outerRadius": 1.5,
+          "boxSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+          "coneHeight": 2.0,
+          "lineStart": { "x": 0.0, "y": 0.0, "z": 0.0 },
+          "lineEnd": { "x": 0.0, "y": 1.0, "z": 0.0 },
+          "emitFromSurface": true, "initialSpeed": 4.0,
+          "spawnLocation": 1, "arcAngle": 360.0
+        },
+        { "type": "InitialLifetime", "version": 1, "min": 1.0, "max": 1.1 },
+        {
+          "type": "InitialVelocity", "version": 1,
+          "min": { "x": -0.5, "y": 2.0, "z": -0.5 },
+          "max": { "x": 0.5, "y": 5.0, "z": 0.5 }
+        },
+        {
+          "type": "InitialScale", "version": 1,
+          "min": { "x": 0.015, "y": 0.015, "z": 0.015 },
+          "max": { "x": 0.035, "y": 0.035, "z": 0.035 }
+        },
+        {
+          "type": "InitialColor", "version": 1,
+          "min": { "r": 0.1, "g": 0.55, "b": 1.0, "a": 1.0 },
+          "max": { "r": 0.7, "g": 0.95, "b": 1.0, "a": 1.0 }
+        },
+        {
+          "type": "Gravity", "version": 1,
+          "min": { "x": 0.0, "y": -2.5, "z": 0.0 },
+          "max": { "x": 0.0, "y": -4.0, "z": 0.0 }
+        },
+        { "type": "Drag", "version": 1, "min": 0.15, "max": 0.35 }
+      ],
+      "renderer": {
+        "type": "Sprite",
+        "texture": "./Resources/circle2.png",
+        "blendMode": 1,
+        "billboard": true,
+        "use2DAlignment": false,
+        "emissive": {
+          "enabled": true,
+          "source": "BaseTextureMask",
+          "color": { "r": 0.15, "g": 0.65, "b": 1.0 },
+          "intensity": 8.0,
+          "bloomContribution": 1.0,
+          "texture": ""
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+status=PASS
+bloom_enabled=1
+bloom_mode=legacy
+samples=300
+warmup_frames_excluded=60
+timestamp_frequency=1000000000
+resolution=1920x1080
+vsync=0
+adapter=NVIDIA GeForce RTX 3060 Laptop GPU
+driver_version=32.0.15.9579
+mask_scene_avg_ms=0.23184
+source_extraction_avg_ms=0.0631603
+blur_horizontal_avg_ms=0.137926
+blur_vertical_avg_ms=0.137035
+composite_avg_ms=0.0471962
+measured_total_avg_ms=0.617158

@@ -1,0 +1,238 @@
+engine\manager\effect\ParticlePipelineManager.cpp:126:		assert(false);
+engine\manager\effect\ParticlePipelineManager.cpp:134:	assert(SUCCEEDED(hr));
+engine\manager\effect\ParticlePipelineManager.cpp:235:	assert(vertexShaderBlob != nullptr);
+engine\manager\effect\ParticlePipelineManager.cpp:238:	assert(pixelShaderBlob != nullptr);
+engine\manager\effect\ParticlePipelineManager.cpp:269:	assert(SUCCEEDED(hr));
+engine\manager\effect\ParticlePipelineManager.cpp:345:		assert(false);
+engine\manager\effect\ParticlePipelineManager.cpp:353:	assert(SUCCEEDED(hr));
+engine\manager\effect\ParticlePipelineManager.cpp:458:	assert(vertexShaderBlob != nullptr);
+engine\manager\effect\ParticlePipelineManager.cpp:461:	assert(pixelShaderBlob != nullptr);
+engine\manager\effect\ParticlePipelineManager.cpp:490:	assert(SUCCEEDED(hr));
+engine\effects\particle\diagnostics\ParticleDiagnostics.h:47:	void Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.h:63:	void Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.h:87:	void Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:9:void ParticleScopeStats::Reset()
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:39:void ParticleByteStats::Reset()
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:83:void ParticleDiagnostics::Reset()
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:87:		stat.Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:89:	cpuUploadMemcpyStats_.Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:90:	gpuUploadCopyStats_.Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:91:	gpuReadbackCopyStats_.Reset();
+engine\effects\particle\diagnostics\ParticleDiagnostics.cpp:92:	cpuReadbackMemcpyStats_.Reset();
+engine\effects\particle\ParticleEffect.cpp:155:		emitter->Restart();
+engine\effects\particle\ParticleEffect.cpp:169:void ParticleEffect::Reset()
+engine\effects\particle\ParticleEffect.cpp:174:		emitter->Restart();
+engine\effects\particle\ParticleEffect.cpp:183:		emitter->Reset();
+engine\effects\particle\Particle.h:72:static_assert(std::is_standard_layout_v<Particle>, "Particle must be standard layout");
+engine\effects\particle\Particle.h:73:static_assert(sizeof(Particle) == 128, "Particle size must be 128 bytes");
+engine\effects\particle\Particle.h:74:static_assert(alignof(Particle) == 16, "Particle alignment must be 16");
+engine\effects\particle\Particle.h:76:static_assert(offsetof(Particle, position) == 0, "offsetof position must be 0");
+engine\effects\particle\Particle.h:77:static_assert(offsetof(Particle, velocity) == 16, "offsetof velocity must be 16");
+engine\effects\particle\Particle.h:78:static_assert(offsetof(Particle, scale) == 32, "offsetof scale must be 32");
+engine\effects\particle\Particle.h:79:static_assert(offsetof(Particle, rotation) == 48, "offsetof rotation must be 48");
+engine\effects\particle\Particle.h:80:static_assert(offsetof(Particle, color) == 64, "offsetof color must be 64");
+engine\effects\particle\Particle.h:81:static_assert(offsetof(Particle, initialColor) == 80, "offsetof initialColor must be 80");
+engine\effects\particle\Particle.h:82:static_assert(offsetof(Particle, age) == 96, "offsetof age must be 96");
+engine\effects\particle\Particle.h:83:static_assert(offsetof(Particle, lifetime) == 100, "offsetof lifetime must be 100");
+engine\effects\particle\Particle.h:84:static_assert(offsetof(Particle, ribbonWidth) == 104, "offsetof ribbonWidth must be 104");
+engine\effects\particle\Particle.h:85:static_assert(offsetof(Particle, flags) == 108, "offsetof flags must be 108");
+engine\effects\particle\Particle.h:86:static_assert(offsetof(Particle, id) == 112, "offsetof id must be 112");
+engine\effects\particle\Particle.h:87:static_assert(offsetof(Particle, ribbonId) == 116, "offsetof ribbonId must be 116");
+engine\effects\particle\Particle.h:88:static_assert(offsetof(Particle, spriteIndex) == 120, "offsetof spriteIndex must be 120");
+engine\effects\particle\Particle.h:89:static_assert(offsetof(Particle, pad3) == 124, "offsetof pad3 must be 124");
+engine\effects\particle\ParticleEmitter.cpp:57:			renderer_->SetGPUMode(true, gpuSimulator_->GetRenderSrvIndex(), gpuSimulator_->GetParticleCount(),
+engine\effects\particle\ParticleEmitter.cpp:65:			renderer_->SetGPUMode(false, 0, 0);
+engine\effects\particle\ParticleEmitter.cpp:78:			renderer_->SetGPUMode(true, gpuSimulator_->GetRenderSrvIndex(), gpuSimulator_->GetParticleCount(),
+engine\effects\particle\ParticleEmitter.cpp:86:			renderer_->SetGPUMode(false, 0, 0);
+engine\effects\particle\ParticleEmitter.cpp:241:	ClearParticles();
+engine\effects\particle\ParticleEmitter.cpp:242:	if (gpuSimulator_) gpuSimulator_->ClearParticles();
+engine\effects\particle\ParticleEmitter.cpp:272:	Reset();
+engine\effects\particle\ParticleEmitter.cpp:285:		if (gpuSimulator_) gpuSimulator_->ClearParticles();
+engine\effects\particle\ParticleEmitter.cpp:299:void ParticleEmitter::Reset()
+engine\effects\particle\ParticleEmitter.cpp:302:	if (gpuSimulator_) gpuSimulator_->ClearParticles();
+engine\effects\particle\ParticleEmitter.cpp:314:		renderer_->Reset();
+engine\effects\particle\ParticleEmitter.cpp:320:		module->Reset();
+engine\effects\particle\ParticleEmitter.cpp:324:void ParticleEmitter::Restart()
+engine\effects\particle\ParticleEmitter.cpp:337:		module->Reset();
+engine\effects\particle\ParticleEmitter.cpp:459:					module->Reset();
+engine\effects\particle\ParticleEmitter.cpp:470:						module->Reset();
+engine\effects\particle\ParticleEmitter.cpp:673:			gpuSimulator_->Dispatch(deltaTime, camera, modules_, emitterWorld, static_cast<uint32_t>(simulationSpace_));
+engine\effects\particle\ParticleEmitter.cpp:677:			gpuSimulator_->ClearParticles();
+engine\effects\particle\ParticleEmitter.cpp:748:					module->Reset();
+engine\effects\particle\ParticleEmitter.cpp:759:						module->Reset();
+engine\effects\particle\ParticleEffect.h:117:	void Reset();
+engine\effects\particle\ParticleManager.cpp:184:					effect->Reset();
+engine\effects\particle\ParticleManager.cpp:225:					emitter->ClearParticles();
+engine\effects\particle\ParticleEmitter.h:110:	void Reset();
+engine\effects\particle\ParticleEmitter.h:117:	void Restart();
+engine\effects\particle\ParticleEmitter.h:118:	void ClearParticles() { particles_.clear(); }
+engine\effects\particle\module\IModule.h:58:	virtual void Reset() {}
+engine\effects\particle\editor\ParticleEditor.cpp:620:		if (ImGui::Button("Reset View")) { if (currentEffect_) { currentEffect_->Reset(); currentEffect_->Play(); } }
+engine\effects\particle\editor\ParticleEditor.cpp:677:				currentEffect_->Reset(); 
+engine\effects\particle\editor\ParticleEditor.cpp:745:				if (emitter) emitter->Restart();
+engine\effects\particle\editor\ParticleEditor.cpp:772:				if (emitter) emitter->Reset();
+engine\effects\particle\editor\ParticleEditor.cpp:847:				emitter->Restart();
+engine\effects\particle\editor\ParticleEditor.cpp:1100:					emitter->Reset();
+engine\effects\particle\editor\ParticleEditor.cpp:1122:					emitter->Reset();
+engine\effects\particle\editor\ParticleEditor.cpp:1137:						emitter->Reset();
+engine\effects\particle\editor\ParticleEditor.cpp:1165:					emitter->Reset();
+engine\effects\particle\renderer\MeshRenderer.cpp:57:	primitiveVertexResource_.Reset();
+engine\effects\particle\renderer\MeshRenderer.cpp:58:	primitiveIndexResource_.Reset();
+engine\effects\particle\renderer\MeshRenderer.cpp:81:	dxCommon->GetDevice()->CreateCommittedResource(
+engine\effects\particle\renderer\MeshRenderer.cpp:91:	instanceResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
+engine\effects\particle\renderer\MeshRenderer.cpp:118:	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+engine\effects\particle\renderer\MeshRenderer.cpp:141:	dxCommon->GetDevice()->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &argsDesc,
+engine\effects\particle\renderer\MeshRenderer.cpp:145:	dxCommon->GetDevice()->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &argsDesc,
+engine\effects\particle\renderer\MeshRenderer.cpp:147:	indexedDrawArgumentsUpload_->Map(0, nullptr, reinterpret_cast<void**>(&indexedDrawArgumentsData_));
+engine\effects\particle\renderer\MeshRenderer.cpp:155:		primitiveVertexResource_.Reset();
+engine\effects\particle\renderer\MeshRenderer.cpp:156:		primitiveIndexResource_.Reset();
+engine\effects\particle\renderer\MeshRenderer.cpp:177:		dxCommon->GetDevice()->CreateCommittedResource(
+engine\effects\particle\renderer\MeshRenderer.cpp:187:		primitiveVertexResource_->Map(0, nullptr, &data);
+engine\effects\particle\renderer\MeshRenderer.cpp:207:		dxCommon->GetDevice()->CreateCommittedResource(
+engine\effects\particle\renderer\MeshRenderer.cpp:217:		primitiveIndexResource_->Map(0, nullptr, &data);
+engine\effects\particle\renderer\MeshRenderer.cpp:344:			commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\renderer\MeshRenderer.cpp:346:		commandList->CopyBufferRegion(indexedDrawArguments_.Get(), 0, indexedDrawArgumentsUpload_.Get(), 0,
+engine\effects\particle\renderer\MeshRenderer.cpp:350:		commandList->ResourceBarrier(1, &commonBarrier);
+engine\effects\particle\renderer\MeshRenderer.cpp:351:		commandList->CopyBufferRegion(indexedDrawArguments_.Get(), offsetof(D3D12_DRAW_INDEXED_ARGUMENTS, InstanceCount),
+engine\effects\particle\renderer\MeshRenderer.cpp:357:		commandList->ResourceBarrier(2, barriers);
+engine\effects\particle\renderer\MeshRenderer.cpp:359:		commandList->ExecuteIndirect(indexedDrawCommandSignature_.Get(), 1, indexedDrawArguments_.Get(), 0, nullptr, 0);
+engine\effects\particle\renderer\MeshRenderer.cpp:389:void MeshRenderer::SetGPUMode(bool enable, uint32_t srvIndex, uint32_t count, ID3D12Resource* drawArguments)
+engine\effects\particle\renderer\IRenderer.h:79:	virtual void SetGPUMode(bool enable, uint32_t srvIndex, uint32_t count, ID3D12Resource* drawArguments = nullptr) { (void)enable; (void)srvIndex; (void)count; (void)drawArguments; }
+engine\effects\particle\renderer\IRenderer.h:86:	virtual void Reset() {}
+engine\effects\particle\renderer\MeshRenderer.h:70:	void SetGPUMode(bool enable, uint32_t srvIndex, uint32_t count, ID3D12Resource* drawArguments = nullptr) override;
+engine\effects\particle\renderer\SpriteRenderer.cpp:20:		instancingResource_.Reset();
+engine\effects\particle\renderer\SpriteRenderer.cpp:25:		materialResource_.Reset();
+engine\effects\particle\renderer\SpriteRenderer.cpp:27:	vertexResource_.Reset();
+engine\effects\particle\renderer\SpriteRenderer.cpp:60:	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+engine\effects\particle\renderer\SpriteRenderer.cpp:75:	vertexResource_->Map(0, nullptr, &vertData);
+engine\effects\particle\renderer\SpriteRenderer.cpp:84:	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+engine\effects\particle\renderer\SpriteRenderer.cpp:185:		commandList->ExecuteIndirect(drawCommandSignature_.Get(), 1, gpuDrawArguments_, 0, nullptr, 0);
+engine\effects\particle\renderer\SpriteRenderer.cpp:193:void SpriteRenderer::SetGPUMode(bool enable, uint32_t srvIndex, uint32_t count, ID3D12Resource* drawArguments)
+engine\effects\particle\renderer\SpriteRenderer.h:82:	void SetGPUMode(bool enable, uint32_t srvIndex, uint32_t count, ID3D12Resource* drawArguments = nullptr) override;
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:61:	pipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:62:	rootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:63:	shaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:64:	spawnPreparePipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:65:	spawnPrepareShaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:66:	ribbonComputeRootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:67:	ribbonPrefixPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:68:	ribbonScanPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:69:	ribbonEmitPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:72:	converterPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:73:	converterRootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:74:	converterShaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:77:	vortexPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:78:	vortexRootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:79:	vortexShaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:81:	attractorPipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:82:	attractorRootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:83:	attractorShaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:85:	curlNoisePipelineState_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:86:	curlNoiseRootSignature_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:87:	curlNoiseShaderBlob_.Reset();
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:592:		assert(SUCCEEDED(hr));
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:598:		assert(SUCCEEDED(hr));
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:625:		assert(SUCCEEDED(hr));
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:631:		assert(SUCCEEDED(hr));
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:658:		assert(SUCCEEDED(hr));
+engine\effects\particle\gpu\GPUParticlePipeline.cpp:664:		assert(SUCCEEDED(hr));
+engine\effects\particle\renderer\TrailRenderer.cpp:20:		vertexResource_.Reset();
+engine\effects\particle\renderer\TrailRenderer.cpp:25:		materialResource_.Reset();
+engine\effects\particle\renderer\TrailRenderer.cpp:30:		viewProjResource_.Reset();
+engine\effects\particle\renderer\TrailRenderer.cpp:49:	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+engine\effects\particle\renderer\TrailRenderer.cpp:57:	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+engine\effects\particle\renderer\TrailRenderer.cpp:65:	viewProjResource_->Map(0, nullptr, reinterpret_cast<void**>(&viewProjData_));
+engine\effects\particle\renderer\TrailRenderer.cpp:824:		commandList->ExecuteIndirect(drawCommandSignature_.Get(), 1, gpuDrawArguments_, 0, nullptr, 0);
+engine\effects\particle\gpu\GPUSimulator.h:162:static_assert(sizeof(GPUParticleConstants) % 16 == 0, "GPU constant-buffer layout must remain 16-byte aligned");
+engine\effects\particle\gpu\GPUSimulator.h:171:static_assert(sizeof(GPUParticleEvent) == 48);
+engine\effects\particle\gpu\GPUSimulator.h:207:	void Dispatch(float deltaTime, CameraManager* camera, const std::vector<std::unique_ptr<class IModule>>& modules, const Matrix4x4& emitterWorld, uint32_t simulationSpace);
+engine\effects\particle\gpu\GPUSimulator.h:222:	void ClearParticles();
+engine\effects\particle\renderer\TrailRenderer.h:168:	void Reset() override { ClearTrails(); }
+engine\effects\particle\module\spawn\InitialModules.h:234:	void Reset() override { nextId_ = 0; }
+engine\effects\particle\module\update\BehaviorModules.h:520:		constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&constantData_));
+engine\effects\particle\module\update\BehaviorModules.h:543:	cmdList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\module\update\BehaviorModules.h:549:	cmdList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:53:	static_assert(sizeof(GPUEmitterState) == 48);
+engine\effects\particle\gpu\GPUSimulator.cpp:163:		RequireD3D(device->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:169:		RequireD3D(device->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:172:		RequireD3D(spawnCounterResetBuffer_->Map(0, nullptr, &mapped), "spawn counter reset map");
+engine\effects\particle\gpu\GPUSimulator.cpp:191:		RequireD3D(device->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:197:		RequireD3D(device->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:200:		RequireD3D(drawArgumentsResetBuffer_->Map(0, nullptr, &mapped), "draw arguments reset map");
+engine\effects\particle\gpu\GPUSimulator.cpp:217:		RequireD3D(device->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:222:		RequireD3D(device->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:225:		RequireD3D(emitterStateResetBuffer_->Map(0, nullptr, &mapped), "emitter state reset map");
+engine\effects\particle\gpu\GPUSimulator.cpp:235:		RequireD3D(device->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &eventDesc,
+engine\effects\particle\gpu\GPUSimulator.cpp:240:		RequireD3D(device->CreateCommittedResource(&defaultHeap, D3D12_HEAP_FLAG_NONE, &counterDesc,
+engine\effects\particle\gpu\GPUSimulator.cpp:245:		RequireD3D(device->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &counterDesc,
+engine\effects\particle\gpu\GPUSimulator.cpp:248:		RequireD3D(eventCounterResetBuffer_->Map(0, nullptr, &mapped), "event counter reset map");
+engine\effects\particle\gpu\GPUSimulator.cpp:265:			RequireD3D(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:291:		RequireD3D(device->CreateCommittedResource(&readbackHeap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:312:		RequireD3D(device->CreateCommittedResource(
+engine\effects\particle\gpu\GPUSimulator.cpp:337:		RequireD3D(device->CreateCommittedResource(
+engine\effects\particle\gpu\GPUSimulator.cpp:362:		RequireD3D(device->CreateCommittedResource(
+engine\effects\particle\gpu\GPUSimulator.cpp:387:		RequireD3D(device->CreateCommittedResource(
+engine\effects\particle\gpu\GPUSimulator.cpp:397:		RequireD3D(constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&constantData_)), "particle constant buffer map");
+engine\effects\particle\gpu\GPUSimulator.cpp:403:		RequireD3D(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:405:		RequireD3D(moduleProgramBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&moduleProgramData_)), "module program map");
+engine\effects\particle\gpu\GPUSimulator.cpp:411:		RequireD3D(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &desc,
+engine\effects\particle\gpu\GPUSimulator.cpp:413:		RequireD3D(moduleLutBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&moduleLutData_)), "module LUT map");
+engine\effects\particle\gpu\GPUSimulator.cpp:427:		RequireD3D(dxCommon_->GetDevice()->CreateCommittedResource(
+engine\effects\particle\gpu\GPUSimulator.cpp:631:		if (FAILED(particleUploadBuffer_->Map(0, nullptr, &data)) || !data)
+engine\effects\particle\gpu\GPUSimulator.cpp:657:		cmdList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:660:		cmdList->CopyBufferRegion(
+engine\effects\particle\gpu\GPUSimulator.cpp:671:		cmdList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:680:void GPUSimulator::ClearParticles()
+engine\effects\particle\gpu\GPUSimulator.cpp:743:			commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:745:		commandList->CopyBufferRegion(emitterStateBuffer_.Get(), 0, emitterStateResetBuffer_.Get(), 0, sizeof(GPUEmitterState));
+engine\effects\particle\gpu\GPUSimulator.cpp:748:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:769:	Dispatch(deltaTime, camera, modules, emitterWorld, simulationSpace);
+engine\effects\particle\gpu\GPUSimulator.cpp:781:	if (SUCCEEDED(completionReadbackBuffer_[readIndex]->Map(0, &readRange, &mapped)))
+engine\effects\particle\gpu\GPUSimulator.cpp:1151:void GPUSimulator::Dispatch(float deltaTime, CameraManager* camera, const std::vector<std::unique_ptr<class IModule>>& modules, const Matrix4x4& emitterWorld, uint32_t simulationSpace)
+engine\effects\particle\gpu\GPUSimulator.cpp:1174:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1181:		commandList->CopyBufferRegion(spawnCounterBuffer_.Get(), 0, spawnCounterResetBuffer_.Get(), 0, sizeof(uint32_t));
+engine\effects\particle\gpu\GPUSimulator.cpp:1185:	commandList->ResourceBarrier(1, &counterBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1190:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1197:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1199:	commandList->CopyBufferRegion(eventCounterBuffer_.Get(), 0, eventCounterResetBuffer_.Get(), 0, sizeof(uint32_t));
+engine\effects\particle\gpu\GPUSimulator.cpp:1203:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1225:		commandList->Dispatch(1, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1227:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1247:	commandList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1254:		commandList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1273:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1281:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1288:		commandList->ResourceBarrier(2, barriers);
+engine\effects\particle\gpu\GPUSimulator.cpp:1292:	commandList->CopyBufferRegion(drawArgumentsBuffer_.Get(), 0, drawArgumentsResetBuffer_.Get(), 0, sizeof(D3D12_DRAW_ARGUMENTS));
+engine\effects\particle\gpu\GPUSimulator.cpp:1296:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1307:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1334:	commandList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1352:		if (transitionCount) commandList->ResourceBarrier(transitionCount, transitions);
+engine\effects\particle\gpu\GPUSimulator.cpp:1365:		commandList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1367:		commandList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1369:		commandList->Dispatch(1, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1370:		commandList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1375:		commandList->Dispatch(sortDispatchCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1376:		commandList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1384:				commandList->Dispatch(sortDispatchCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1385:				commandList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1389:		commandList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\gpu\GPUSimulator.cpp:1394:		commandList->ResourceBarrier(2, ribbonReady);
+engine\effects\particle\gpu\GPUSimulator.cpp:1416:	commandList->ResourceBarrier(2, barriers);
+engine\effects\particle\gpu\GPUSimulator.cpp:1420:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1427:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1428:		commandList->CopyBufferRegion(completionReadbackBuffer_[completionFrameIndex_ % 2].Get(), 0,
+engine\effects\particle\gpu\GPUSimulator.cpp:1432:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1450:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1455:		commandList->CopyBufferRegion(
+engine\effects\particle\gpu\GPUSimulator.cpp:1470:		commandList->ResourceBarrier(1, &barrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1479:	commandList->ResourceBarrier(1, &counterBarrier);
+engine\effects\particle\gpu\GPUSimulator.cpp:1494:		HRESULT hr = particleReadbackBuffer_[readIndex]->Map(0, nullptr, &data);
+engine\effects\particle\module\spawn\SpawnModules.h:85:	void Reset() override
+engine\effects\particle\module\spawn\SpawnModules.h:212:	void Reset() override { hasFired_ = false; timeSinceLastBurst_ = 0.0f; currentLoop_ = 0; }
+engine\effects\particle\module\update\ForceFieldModules.h:254:		constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&constantData_));
+engine\effects\particle\module\update\ForceFieldModules.h:277:	cmdList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\module\update\ForceFieldModules.h:283:	cmdList->ResourceBarrier(1, &uavBarrier);
+engine\effects\particle\module\update\ForceFieldModules.h:292:		constantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&constantData_));
+engine\effects\particle\module\update\ForceFieldModules.h:316:	cmdList->Dispatch(groupCount, 1, 1);
+engine\effects\particle\module\update\ForceFieldModules.h:322:	cmdList->ResourceBarrier(1, &uavBarrier);

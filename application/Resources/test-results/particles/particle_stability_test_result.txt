@@ -1,0 +1,7 @@
+PASS
+iterations=100
+baseline_descriptors=38
+peak_descriptors=82
+final_descriptors=38
+descriptor_recovered=1
+operations=play_stop_reset,capacity_32768_65536,sprite_mesh_ribbon,effect_destroy

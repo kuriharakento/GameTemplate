@@ -1,0 +1,171 @@
+{
+    "deltaTimeType": 0,
+    "emitters": [
+        {
+            "duration": 0.0,
+            "dynamicInputs": [],
+            "followEmitterIndex": -1,
+            "followOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "gpuEventInheritColor": false,
+            "gpuEventInheritVelocity": false,
+            "gpuEventProbability": 1.0,
+            "gpuEventSourceEmitterIndex": -1,
+            "gpuEventTrigger": 0,
+            "gpuEventVelocityScale": 1.0,
+            "inactiveResponse": 0,
+            "loopBehavior": 1,
+            "loopCount": 1,
+            "maxParticles": 65536,
+            "minMoveDistance": 0.009999999776482582,
+            "modules": [
+                {
+                    "rate": 60000.0,
+                    "type": "SpawnRate",
+                    "version": 1
+                },
+                {
+                    "arcAngle": 360.0,
+                    "boxSize": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "coneHeight": 2.0,
+                    "emitFromSurface": true,
+                    "initialSpeed": 4.0,
+                    "innerRadius": 0.20000000298023224,
+                    "lineEnd": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    },
+                    "lineStart": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "outerRadius": 1.5,
+                    "shapeType": 1,
+                    "spawnLocation": 1,
+                    "type": "SpawnShape",
+                    "version": 1
+                },
+                {
+                    "max": 1.100000023841858,
+                    "min": 1.0,
+                    "type": "InitialLifetime",
+                    "version": 1
+                },
+                {
+                    "max": {
+                        "x": 0.5,
+                        "y": 5.0,
+                        "z": 0.5
+                    },
+                    "min": {
+                        "x": -0.5,
+                        "y": 2.0,
+                        "z": -0.5
+                    },
+                    "type": "InitialVelocity",
+                    "version": 1
+                },
+                {
+                    "max": {
+                        "x": 0.03500000014901161,
+                        "y": 0.03500000014901161,
+                        "z": 0.03500000014901161
+                    },
+                    "min": {
+                        "x": 0.014999999664723873,
+                        "y": 0.014999999664723873,
+                        "z": 0.014999999664723873
+                    },
+                    "type": "InitialScale",
+                    "version": 1
+                },
+                {
+                    "max": {
+                        "a": 1.0,
+                        "b": 1.0,
+                        "g": 0.949999988079071,
+                        "r": 0.699999988079071
+                    },
+                    "min": {
+                        "a": 1.0,
+                        "b": 1.0,
+                        "g": 0.550000011920929,
+                        "r": 0.10000000149011612
+                    },
+                    "type": "InitialColor",
+                    "version": 1
+                },
+                {
+                    "max": {
+                        "x": 0.0,
+                        "y": -4.0,
+                        "z": 0.0
+                    },
+                    "min": {
+                        "x": 0.0,
+                        "y": -2.5,
+                        "z": 0.0
+                    },
+                    "type": "Gravity",
+                    "version": 1
+                },
+                {
+                    "max": 0.3499999940395355,
+                    "min": 0.15000000596046448,
+                    "type": "Drag",
+                    "version": 1
+                }
+            ],
+            "name": "GpuSphereEmitter",
+            "parameters": [],
+            "position": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "renderer": {
+                "blendMode": 0,
+                "emissive": {
+                    "bloomContribution": 1.0,
+                    "color": {
+                        "b": 1.0,
+                        "g": 1.0,
+                        "r": 1.0
+                    },
+                    "enabled": false,
+                    "intensity": 1.0,
+                    "source": "Uniform",
+                    "texture": ""
+                },
+                "texture": "./Resources/circle2.png",
+                "tintColor": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "type": "Sprite"
+            },
+            "simulationMode": 1,
+            "spawnOnlyWhenMoving": false,
+            "startDelay": 0.0
+        }
+    ],
+    "formatVersion": 2,
+    "moduleSchemaVersion": 1,
+    "name": "PureGpuSpriteJsonTest",
+    "position": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+    }
+}

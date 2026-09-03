@@ -1,0 +1,111 @@
+2026/08/02 13:09:14 にビルドを開始しました。
+
+     1>ノード 1 上のプロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット)。
+     1>ValidateSolutionConfiguration:
+         ソリューション構成 "Debug|x64" をビルドしています。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 2 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj" (4) をビルドしています (既定のターゲット)。
+     4>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 4 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj" (3) をビルドしています (既定のターゲット)。
+     3>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+     4>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     3>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 3 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj" (5) をビルドしています (既定のターゲット)。
+     5>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+       InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     4>ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+     5>ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+     3>ClCompile:
+         すべての出力が最新のものです。
+         すべての出力が最新のものです。
+     4>ClCompile:
+         すべての出力が最新のものです。
+     3>Lib:
+         すべての出力が最新のものです。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.pdb" から "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\DirectXTex.pdb" へファイルをコピーしています。
+         DirectXTex_Desktop_2022_Win10.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\DirectXTex.lib
+     4>Lib:
+         すべての出力が最新のものです。
+         ImGui.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\ImGui.lib
+     3>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\DirectXTex\Debug\DirectXTex.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj]
+     4>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\Generated\obj\ImGui\Debug\ImGui.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj]
+       FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" を削除しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\ImGui.lastbuildstate" のタッチ タスクを実行しています。
+     3>FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" を削除しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\DirectXTex.lastbuildstate" のタッチ タスクを実行しています。
+     4>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj" (既定のターゲット) のビルドが完了しました。
+     3>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj" (既定のターゲット) のビルドが完了しました。
+     5>ClCompile:
+         すべての出力が最新のものです。
+       Lib:
+         すべての出力が最新のものです。
+         KentoCompoEngine.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\KentoCompoEngine.lib
+     5>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj]
+       FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" を削除しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\KentoCompoEngine.lastbuildstate" のタッチ タスクを実行しています。
+     5>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj" (既定のターゲット) のビルドが完了しました。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 1 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\GameTemplate.vcxproj" (2) をビルドしています (既定のターゲット)。
+     2>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+       InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+       ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+       ClCompile:
+         すべての出力が最新のものです。
+       Link:
+         すべての出力が最新のものです。
+         GameTemplate.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\GameTemplate.exe
+       PostBuildEvent:
+         copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\dxcompiler.dll" "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\dxcompiler.dll"
+         copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\dxil.dll" "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\dxil.dll"
+         :VCEnd
+                 1 個のファイルをコピーしました。
+                 1 個のファイルをコピーしました。
+       FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\unsuccessfulbuild" を削除しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\GameTemplate.lastbuildstate" のタッチ タスクを実行しています。
+     2>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\GameTemplate.vcxproj" (既定のターゲット) のビルドが完了しました。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット) のビルドが完了しました。
+
+ビルドに成功しました。
+
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット) (1) ->
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj" (既定のターゲット) (3) ->
+       (CreateRecipeFile ターゲット) -> 
+         C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\DirectXTex\Debug\DirectXTex.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj]
+
+
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット) (1) ->
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj" (既定のターゲット) (4) ->
+         C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\Generated\obj\ImGui\Debug\ImGui.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj]
+
+
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット) (1) ->
+       "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj" (既定のターゲット) (5) ->
+         C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj]
+
+    3 個の警告
+    0 エラー
+
+経過時間 00:00:01.15

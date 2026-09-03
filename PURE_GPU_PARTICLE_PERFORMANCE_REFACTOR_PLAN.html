@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pure GPU Particle 性能問題 修正計画書</title>
+<style>
+:root{--bg:#090e1b;--panel:#121a2d;--panel2:#18233d;--line:#2d3c61;--text:#e9eef8;--muted:#abb7ce;--cyan:#59d8e8;--blue:#81aaff;--green:#78e0a4;--yellow:#ffd071;--red:#ff858e;--code:#070c16}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(145deg,#070b14,#111b38 60%,#08131c);color:var(--text);font-family:"Segoe UI","Yu Gothic UI",sans-serif;line-height:1.72}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1540px;margin:auto}.nav{position:sticky;top:0;height:100vh;overflow:auto;padding:26px 18px;background:#080e1ddd;border-right:1px solid var(--line)}.nav strong{display:block;color:var(--cyan);font-size:18px;margin:0 8px 18px}.nav a{display:block;color:var(--muted);text-decoration:none;padding:7px 9px;border-radius:7px;font-size:14px}.nav a:hover{background:var(--panel2);color:#fff}main{min-width:0;padding:48px clamp(24px,5vw,76px) 100px}.hero{padding:40px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(130deg,#19284c,#102638);box-shadow:0 20px 60px #0005}.hero h1{font-size:clamp(30px,4vw,50px);line-height:1.15;margin:0 0 16px}.hero p{max-width:1000px;color:var(--muted)}.badge{display:inline-block;padding:3px 10px;margin:3px 6px 3px 0;border:1px solid #446394;border-radius:999px;color:var(--cyan);font-size:13px}section{margin-top:54px}h2{font-size:29px;border-bottom:1px solid var(--line);padding-bottom:12px}h3{color:var(--blue);margin-top:30px}h4{color:var(--cyan)}p,li{color:#d7deec}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}.card{padding:19px;background:var(--panel);border:1px solid var(--line);border-radius:12px}.card h3,.card h4{margin-top:0}.callout{margin:18px 0;padding:14px 18px;border-left:4px solid var(--cyan);background:#10253a;border-radius:8px}.warn{border-left-color:var(--yellow);background:#2b2315}.danger{border-left-color:var(--red);background:#2b171d}.ok{color:var(--green)}.flow{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.flow span{padding:10px 13px;background:var(--panel2);border:1px solid var(--line);border-radius:8px}.flow b{color:var(--cyan)}table{width:100%;border-collapse:collapse;background:var(--panel);font-size:14px}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:#1c2948;color:var(--cyan)}.table-wrap{overflow:auto;border-radius:10px}code{font-family:Consolas,"Cascadia Code",monospace;color:#bce8ff;background:#091225;padding:2px 5px;border-radius:4px}pre{overflow:auto;padding:18px;background:var(--code);border:1px solid var(--line);border-radius:10px;line-height:1.5}pre code{padding:0;background:none;color:#dbe9ff}.phase{display:grid;grid-template-columns:55px 1fr;gap:16px;margin:17px 0;padding:20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}.phase-no{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#1f4770;color:#fff;font-weight:700;font-size:19px}.small{font-size:13px;color:var(--muted)}@media(max-width:900px){.layout{display:block}.nav{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding-top:27px}.phase{grid-template-columns:1fr}.phase-no{display:none}}
+</style>
+</head>
+<body><div class="layout"><nav class="nav"><strong>Pure GPU最適化計画</strong><a href="#summary">1. 結論</a><a href="#fireworks">2. GPU Eventsと花火</a><a href="#current">3. 現状の問題</a><a href="#structures">4. 現行／修正後構造</a><a href="#target">5. 完成形</a><a href="#buffers">6. Buffer設計</a><a href="#events">7. Event再設計</a><a href="#phases">8. 実装Phase</a><a href="#api">9. API変更</a><a href="#tests">10. テスト計画</a><a href="#budget">11. 性能予算</a><a href="#risks">12. リスク</a><a href="#review">13. AIレビュー項目</a><a href="#dod">14. Definition of Done</a></nav>
+<main>
+<header class="hero" id="summary"><span class="badge">Alive List</span><span class="badge">Free List</span><span class="badge">DispatchIndirect</span><span class="badge">GPU Events</span><h1>Pure GPU Particle<br>性能問題 修正計画書</h1><p>10万粒子で顕在化する最大容量全走査、単一CounterへのAtomic競合、未使用Event生成、GPU Eventの最悪O(N²)探索を解消し、フレーム負荷を「最大容量」ではなく「実Alive数＋実Spawn数＋実Event数」に比例させるための実装計画です。</p><p class="small">対象: KentoCompoEngine / GameTemplate　作成日: 2026-08-12</p></header>
+
+<section id="fireworks"><h2>2. GPU Eventsで花火を作れるか</h2><p><strong>作れます。</strong>親EmitterのDeath Eventを、爆発用の子Emitterへ接続します。</p><div class="flow"><span>打ち上げEmitter</span><b>→</b><span>弾Particleが上昇</span><b>→</b><span>寿命終了</span><b>→</b><span>Death Event</span><b>→</b><span>爆発Emitter</span><b>→</b><span>火花を放射</span></div><pre><code>auto* rocket = effect-&gt;GetEmitter(0);
+auto* burst  = effect-&gt;GetEmitter(1);
+
+burst-&gt;SetGPUEventSourceEmitterIndex(0);
+burst-&gt;SetGPUEventTrigger(1);               // Death
+burst-&gt;SetGPUEventProbability(1.0f);
+burst-&gt;SetGPUEventVelocityInheritance(true, 0.2f);
+burst-&gt;SetGPUEventInheritColor(true);
+burst-&gt;BindGPUEventSource(rocket);</code></pre><p>さらに爆発EmitterのDeath Eventを煙Emitterへ接続すれば、打ち上げ→爆発→残煙という連鎖もCPU Readbackなしで作れます。ただし現在のEvent探索は大量イベント時にスケールしないため、本計画のEvent再設計を先に行います。</p></section>
+
+<section id="current"><h2>3. 現状の問題と根拠</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>問題</th><th>現在の処理量</th><th>影響</th><th>優先度</th></tr></thead><tbody>
+<tr><td>P-01</td><td><code>particleCount_=maxParticles</code>としてSimulation/Convertを全容量Dispatch</td><td>O(Capacity) × 2 pass以上</td><td>Aliveが少なくても10万slot走査</td><td>最高</td></tr>
+<tr><td>P-02</td><td>Spawn要求が1以上だと全Dead slotが単一<code>spawnCounter</code>へAtomic Add</td><td>最悪O(Dead Capacity)の単一点競合</td><td>少量Spawnでも大容量Poolで急落</td><td>最高</td></tr>
+<tr><td>P-03</td><td>購読者がいなくても全Spawn/Death EventをAtomic Append</td><td>O(Spawn+Death)</td><td>不要なAtomicとBuffer書込み</td><td>高</td></tr>
+<tr><td>P-04</td><td>子SpawnごとにSource Eventを先頭から線形検索</td><td>最悪O(ChildSpawn × SourceEvents)</td><td>花火の大量爆発で破綻</td><td>最高</td></tr>
+<tr><td>P-05</td><td>透明Spriteの面積・重なりを制限しない</td><td>O(covered pixels × overdraw)</td><td>Computeが軽くてもPixel Shaderが飽和</td><td>高</td></tr>
+<tr><td>P-06</td><td>全SimulatorがEvent/Ribbon用大容量Bufferを持つ</td><td>O(Capacity) VRAM</td><td>Spriteだけでも不要VRAMを確保</td><td>中</td></tr>
+<tr><td>P-07</td><td>Renderer種別・Module別のGPU時間内訳が不足</td><td>総時間のみでは原因不明</td><td>修正効果を誤判定しやすい</td><td>高</td></tr>
+</tbody></table></div><div class="danger callout"><strong>重要:</strong> 現在はPure GPUではありますが、「実Alive数だけ処理するGPU駆動構成」ではありません。CPU Readbackを除去したことと、GPU上の計算量が最適であることは別問題です。</div></section>
+
+<section id="structures"><h2>4. 現行構造と修正後構造</h2><p>この章は外部レビュー用の構造比較です。省略した概念図ではなく、各Passが何を読み書きし、どこで処理量が決まるかを示します。</p>
+<h3>4.1 現行クラス構造</h3><pre><code>ParticleManager
+ ├─ ParticleEffect[]
+ │   ├─ ParticleEmitter[]
+ │   │   ├─ IModule[]
+ │   │   ├─ IRenderer
+ │   │   │   ├─ SpriteRenderer
+ │   │   │   ├─ MeshRenderer
+ │   │   │   └─ TrailRenderer
+ │   │   └─ GPUSimulator               ← Emitterごとに所有
+ │   └─ Emitter follow/event接続情報
+ ├─ ParticlePipelineManager            ← Graphics PSO共有
+ └─ Fence連動のRenderer/Simulator/Effect破棄queue
+
+GPUParticlePipeline                     ← Compute PSO共有
+ ├─ SpawnPrepare CS
+ ├─ Main Simulation CS
+ ├─ Convert CS
+ └─ Ribbon Prefix/Scan/Sort/Emit CS</code></pre>
+<h3>4.2 現行GPU Buffer構造</h3><pre><code>GPUSimulator（Emitterごと）
+ ├─ ParticleBuffer[MaxCapacity]         Particle 128 bytes / UAV+SRV
+ ├─ RenderBuffer[MaxCapacity]           ParticleGPU / UAV+SRV
+ ├─ SpawnCounter                        1個の共有Atomic counter
+ ├─ EmitterState                        rate/burst/event spawn状態
+ ├─ EventBuffer[MaxCapacity]            Spawn/Death payload
+ ├─ EventCounter                        1個の共有Atomic counter
+ ├─ DrawArguments                       D3D12_DRAW_ARGUMENTS
+ ├─ ModuleProgram                       packed opcode、最大255 records
+ ├─ ModuleLUT                           Curve/Gradient sample
+ └─ Ribbon buffers                      prefix/count/offset/sort/vertex/args
+
+重要: Alive ListとFree Listは存在しない。
+      ParticleBufferのFLAG_ALIVEを全slot走査して判定する。</code></pre>
+<h3>4.3 現行フレーム依存関係</h3><pre><code>CPU UpdatePureGPULifecycle
+  │  Emitter単位のdelay/duration/loopだけ更新
+  ▼
+Upload/Map Constant + ModuleProgram/LUT
+  ▼
+Reset SpawnCounter / EventCounter
+  ▼ UAV/COPY barriers
+SpawnPrepare CS [1 group]
+  │  spawnCountをEmitterStateへ格納
+  ▼ UAV barrier
+Main Simulation CS [ceil(MaxCapacity / 256)]
+  │  READ/WRITE ParticleBuffer全slot
+  │  Dead slot全体 → SpawnCounter Atomic競合
+  │  Spawn/Death → EventCounter Atomic + EventBuffer write
+  ▼ UAV barrier
+Module固有Dispatch（必要なModuleのみ）
+  ▼ transition ParticleBuffer UAV → SRV
+Reset DrawArguments
+  ▼
+Convert CS [ceil(MaxCapacity / 256)]
+  │  AliveだけRenderBufferへcompact
+  │  DrawArgs.InstanceCountをAtomic increment
+  ├──────────────────────────────┐
+  ▼                              ▼
+Ribbon CS群（Ribbonのみ）         RenderBuffer → GENERIC_READ
+  ▼                              DrawArgs → INDIRECT_ARGUMENT
+ExecuteIndirect Draw ◀───────────┘</code></pre>
+<div class="danger callout"><strong>現行構造の律速点:</strong> Spawn数やAlive数ではなく<code>MaxCapacity</code>でSimulation/Convert Dispatch数が決まり、Spawn要求が1以上なら多数のDead threadが単一Counterへ集中します。</div>
+
+<h3>4.4 修正後クラス構造</h3><pre><code>ParticleManager
+ ├─ ParticleEffect[]
+ │   ├─ GPUEventGraphCompiler           新規: 依存graph・循環検出・dispatch順
+ │   └─ ParticleEmitter[]
+ │       ├─ IModule[] / IRenderer
+ │       └─ GPUSimulator
+ │           ├─ GPUParticlePool         新規: payload + Alive/Free list管理
+ │           ├─ GPUIndirectArgsSet      新規: Spawn/Update/Convert/Draw args
+ │           └─ GPUEventStream          新規: write mask/filter/index list
+ ├─ ParticlePipelineManager
+ └─ Fence連動resource retirement
+
+GPUParticlePipeline
+ ├─ PoolInitialize CS                   新規
+ ├─ SpawnPrepare CS
+ ├─ ArgsBuild CS                        新規
+ ├─ Spawn CS                            Main CSから分離
+ ├─ AliveUpdate CS                      Alive index入力へ変更
+ ├─ EventFilter CS                      新規
+ ├─ AliveConvert CS                     Alive index入力へ変更
+ └─ Ribbon CS群                         Alive入力へ変更</code></pre>
+<p>上記のhelper class名は設計上の責務名です。実装時に必ず別C++クラスへ分割するという意味ではなく、<code>GPUSimulator</code>内の構造体として実装しても構いません。ただし責務とBuffer所有権は分離します。</p>
+
+<h3>4.5 修正後GPU Buffer構造</h3><pre><code>GPUSimulator（Emitterごと）
+ ├─ ParticlePool[Capacity]              payload本体。indexは寿命中不変
+ ├─ AliveListA[Capacity] ─┐
+ ├─ AliveListB[Capacity] ─┴─ frameごとにCurrent/Nextをswap
+ ├─ AliveCounterA / B
+ ├─ FreeList[Capacity]                  空slot index stack
+ ├─ FreeCounter
+ ├─ SpawnRequest                        requested/accepted/dropを発生源別に保持
+ ├─ DispatchArguments
+ │   ├─ EventSpawnArgs
+ │   ├─ BurstSpawnArgs
+ │   ├─ RateSpawnArgs
+ │   ├─ UpdateArgs
+ │   ├─ ConvertArgs
+ │   └─ EventFilterArgs
+ ├─ DrawArguments                       Sprite/Mesh/Ribbon
+ ├─ EventBuffer[必要時のみ遅延確保]
+ ├─ EventCounter
+ ├─ FilteredEventIndices[接続edge単位、必要時のみ]
+ ├─ RuntimeStatsSnapshotRing            生Counterと分離した診断snapshot
+ ├─ ModuleProgram / ModuleLUT
+ └─ Ribbon buffers[Renderer=Ribbon時だけ遅延確保]
+
+フレーム安定点（Update開始前／swap完了後）の不変条件:
+  AliveCounterCurrent + FreeCounter == Capacity
+  AliveListCurrentとFreeListに同じindexは存在しない
+  Particle indexは一方の集合にちょうど1回だけ存在する
+Update実行中:
+  Currentは読み取りsnapshotとして残るため上記集合条件を一時的に適用しない
+  Update完了時は AliveListNext + FreeList が全indexを一意に覆う
+  swap後、旧Current counterを0へresetして次のNextとして再利用する
+  通常フレームでCounterをCPUへReadbackしない</code></pre>
+
+<h3>4.6 修正後フレーム依存関係</h3><pre><code>[Emitter graphのtopological orderで各Emitterを処理]
+
+CPU: Emitter定数/Module program更新
+  ▼
+ResetFrameCounters CS [1 group]
+  │ AliveCounterNext、EventCounter、Draw/Drop一時counterを0
+  │ AliveCounterCurrentとFreeCounterは変更しない
+  ▼ UAV barrier
+SpawnPrepare CS [1 group]
+  │ requested Event/Burst/Rateを別々に取得
+  │ FreeCounter snapshotをEvent→Burst→Rateの順に割当
+  │ accepted count、source range、drop countを発生源別に保存
+  ▼ UAV barrier
+Build SpawnArgs CS [1 group]
+  │ Event/Burst/Rate用の3組のDispatch Argumentsを生成
+  ▼ UAV→INDIRECT_ARGUMENT
+Event Spawn CS [DispatchIndirect: AcceptedEventCount threads]
+  │ FilteredEventIndices[eventOffset + threadId]を直接参照
+  │ Event位置・速度・色の継承を適用
+  ▼ UAV barrier（Free/Alive/Particle writesを次rangeへ可視化）
+Burst Spawn CS [DispatchIndirect: AcceptedBurstCount threads]
+  ▼ UAV barrier
+Rate Spawn CS [DispatchIndirect: AcceptedRateCount threads]
+  │ FreeList Pop
+  │ ParticlePool initialize + SpawnShape
+  │ AliveListCurrent Append
+  │ Spawn Eventはwrite maskがある時だけAppend
+  ▼ UAV barrier
+Build UpdateArgs CS [1 group]
+  │ groupCount = ceil(AliveCounterCurrent / 256)
+  ▼
+AliveUpdate CS [DispatchIndirect: AliveCount threads]
+  │ AliveListCurrentからparticle indexを読む
+  │ survivor → AliveListNext Append
+  │ death → FreeList Push
+  │ Death Eventはwrite maskがある時だけAppend
+  ▼ UAV barrier
+EventFilter CS [購読時のみ、DispatchIndirect: SourceEventCount]
+  │ trigger/probability通過indexを1回だけAppend
+  ▼ 次の依存EmitterのSpawnPrepareへ
+Build Convert/Draw Args CS [1 group]
+  │ Next Alive Countから生成
+  ▼
+AliveConvert CS [DispatchIndirect: SurvivorCount threads]
+  │ RenderBufferを0..SurvivorCount-1へ連続出力
+  ▼
+Ribbon CS群 [RibbonかつSurvivorCount&gt;0のみ]
+  ▼
+ExecuteIndirect Draw
+  ▼
+SnapshotRuntimeStats CS [診断有効時だけ1 group]
+  │ AliveNext/Free/Spawn/Drop/Event値を専用GPU snapshot slotへ複製
+  ▼ COPY_SOURCE（診断有効時だけ）
+Frame-indexed Readback RingへCopy
+  │ CPUは対応Fence完了後だけ過去slotを読む
+  ▼
+AliveList Current/Nextを論理swap（次フレーム）
+  │ 旧Currentは次フレームのNextになる
+  └─ 次フレーム冒頭のResetFrameCounters CSで0にする</code></pre>
+
+<h3>4.7 SpawnとUpdateを分離した際の意味論</h3><p>現行Shaderは新規Spawn後、同じDispatch内でUpdate Moduleまで評価します。修正後も見た目を維持するため、Spawnを<code>AliveListCurrent</code>へ追加した後にUpdate Argsを構築し、新規Particleを同フレームのAliveUpdateへ含めます。</p><ul><li>Rate Spawnごとに<code>birthOffsetInFrame</code>を生成し、一時Spawn MetadataまたはParticleの予約fieldへ保存する。</li><li>新規Rate ParticleのUpdateは<code>effectiveDt = max(0, frameDt - birthOffsetInFrame)</code>を使用する。既存AliveとBurst/Event Spawnは仕様で定めた各effectiveDtを使用する。</li><li>Age、位置積分、時間依存Module、Curve/LUT評価は同じ<code>effectiveDt</code>と補正後Ageを一貫して使用する。</li><li>Initial ModuleとSpawnShapeはSpawn CSで一度だけ評価する。</li><li>Update Moduleは既存Aliveと新規Spawnの両方へ同じフレームに一度だけ評価する。</li><li>Update中に死亡したParticleはNext Alive Listへ入れずFree Listへ戻す。</li><li>Update終了後の<code>AliveListNext</code>だけをConvert/Draw対象にする。</li></ul>
+
+<h3>4.8 Emitter間GPU Event構造</h3><pre><code>現行:
+Source EventBuffer
+  └─ Childの各Spawn threadが先頭から線形探索
+       → ChildSpawn × SourceEvents
+
+修正後:
+Source Update
+  └─ EventBuffer（購読bitがあるtypeだけ）
+       ▼
+Child EventFilter [1 thread / source event]
+  └─ FilteredEventIndices[]
+       ▼
+Child SpawnPrepare = Event/Burst/Rateを別rangeとして割当
+       ▼
+Child Spawn [1 thread / accepted event]
+  └─ FilteredEventIndices[eventOffset + eventSpawnId]を直接参照</code></pre>
+<p>複数の子Emitterが異なるtrigger/probabilityを持つため、Filtered Listは接続edge単位で所有します。Source Event Bufferを子ごとに複製しません。GPU Event接続は<strong>同一ParticleEffectインスタンス内</strong>に限定し、Effectを跨ぐ接続はEditor/API/JSON Loadの全経路で拒否します。</p>
+
+<h3>4.9 Resource stateの基本遷移</h3><div class="table-wrap"><table><thead><tr><th>Resource</th><th>Compute時</th><th>Indirect/Draw時</th><th>次の使用</th></tr></thead><tbody>
+<tr><td>Particle/Alive/Free/Event</td><td>UAVまたはNON_PIXEL_SHADER_RESOURCE</td><td>描画から直接参照しない</td><td>必要なUAV barrier後に継続</td></tr>
+<tr><td>DispatchArguments</td><td>UAVで生成</td><td>INDIRECT_ARGUMENT</td><td>次回生成前にUAV</td></tr>
+<tr><td>RenderBuffer</td><td>UAVで生成</td><td>GENERIC_READ/SRV</td><td>次回Convert前にUAV</td></tr>
+<tr><td>DrawArguments</td><td>UAVで生成</td><td>INDIRECT_ARGUMENT</td><td>次回Args Build前にUAV</td></tr>
+<tr><td>RibbonVertex</td><td>UAVで生成</td><td>VERTEX_AND_CONSTANT_BUFFER</td><td>次回Ribbon前にUAV</td></tr>
+</tbody></table></div><div class="warn callout"><strong>実装条件:</strong> Args BufferをUAVとINDIRECT_ARGUMENTの両方で使うため、各Build→Execute間に明示Transitionを置きます。UAV barrierだけではResource Stateの代わりになりません。</div><div class="callout"><strong>D3D12用語:</strong> 本書の「DispatchIndirect」は処理概念の略称です。D3D12 APIとしては<code>D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH</code>を持つCommand Signatureを作成し、<code>ID3D12GraphicsCommandList::ExecuteIndirect()</code>でCompute Dispatchを発行します。</div></section>
+
+<section id="target"><h2>5. 修正後の完成形</h2><h3>目標フレームフロー</h3><div class="flow"><span>Spawn Count生成</span><b>→</b><span>Free ListからSpawn数だけPop</span><b>→</b><span>Current Alive Listへ追加</span><b>→</b><span>Alive数だけUpdateIndirect</span><b>→</b><span>SurvivorをNext Alive ListへAppend</span><b>→</b><span>死亡indexをFree ListへPush</span><b>→</b><span>Alive数だけConvertIndirect</span><b>→</b><span>DrawIndirect</span></div>
+<h3>計算量の変更</h3><div class="table-wrap"><table><thead><tr><th>処理</th><th>現状</th><th>修正後</th></tr></thead><tbody><tr><td>Spawn</td><td>Dead Capacity全体がCounter競合</td><td>O(SpawnCount)</td></tr><tr><td>Simulation</td><td>O(MaxCapacity)</td><td>O(AliveCount)</td></tr><tr><td>Convert</td><td>O(MaxCapacity)</td><td>O(SurvivorCount)</td></tr><tr><td>Event filter</td><td>O(ChildSpawn × Events)</td><td>O(SourceEvents)</td></tr><tr><td>Event Spawn</td><td>検索を繰り返す</td><td>Filtered Event Indexを直接参照</td></tr></tbody></table></div>
+<div class="callout"><strong>不変条件:</strong> Particle payload、Alive/Free/Event Counter、Dispatch/Draw ArgumentsはGPU上に残し、通常フレームでCPU Readbackしません。</div></section>
+
+<section id="buffers"><h2>6. 新しいGPU Buffer設計</h2><div class="table-wrap"><table><thead><tr><th>Buffer</th><th>内容</th><th>更新者</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>ParticlePool</code></td><td>固定容量Particle payload</td><td>Spawn/Update CS</td><td>indexで状態参照</td></tr>
+<tr><td><code>AliveList[2]</code></td><td>生存Particle indexのPing-Pong list</td><td>Spawn/Update CS</td><td>現在AliveだけDispatch</td></tr>
+<tr><td><code>AliveCounter[2]</code></td><td>各Alive List件数</td><td>GPU Atomic</td><td>Dispatch/Draw args生成</td></tr>
+<tr><td><code>FreeList</code></td><td>未使用Particle index stack</td><td>Init/Death/Spawn CS</td><td>全Dead slot探索を廃止</td></tr>
+<tr><td><code>FreeCounter</code></td><td>Free List stack pointer</td><td>GPU Atomic</td><td>Spawn数だけPop</td></tr>
+<tr><td><code>SpawnRequest</code></td><td>Event/Burst/Rate別のrequested、accepted、drop、range offset</td><td>Spawn Prepare CS</td><td>発生源を混同せず、容量を優先順に割当</td></tr>
+<tr><td><code>DispatchArgs</code></td><td>Event/Burst/Rate Spawn、Update、Convert、Event Filter用<code>D3D12_DISPATCH_ARGUMENTS</code></td><td>Args Build CS</td><td>各発生源とAlive処理をIndirect化</td></tr>
+<tr><td><code>DrawArgs</code></td><td>Sprite/Mesh/Ribbon draw args</td><td>Args Build/Convert CS</td><td>ExecuteIndirect</td></tr>
+<tr><td><code>EventBuffer</code></td><td>購読対象だけのSpawn/Death Event</td><td>Update CS</td><td>子Emitter入力</td></tr>
+<tr><td><code>FilteredEventIndices</code></td><td>接続edgeごとに<code>capacity = min(SourceEventCapacity, EdgeEventSpawnLimit)</code>を確保</td><td>Event Filter CS</td><td>Append前にcapacityを検査し、超過分はedge別drop counterへ記録</td></tr>
+<tr><td><code>RuntimeStatsSnapshotRing</code></td><td>Alive/Free/Spawn/Drop/Eventのフレーム末尾snapshot。<code>max(FramesInFlight+1, 3)</code> slotを持ち、各slotにframe IDとFence値を関連付ける</td><td>Snapshot Stats CS + Copy</td><td>完了Fence未満のslotを読まず、再利用前にもFence完了を要求して生Counterから分離</td></tr>
+</tbody></table></div>
+<h3>List更新方法</h3><pre><code>// Update CS: 1 thread = AliveList[current]の1要素
+uint particleIndex = AliveListCurrent[dispatchId];
+Particle p = ParticlePool[particleIndex];
+Update(p);
+
+if (p.alive) {
+    uint dst = AtomicAppend(AliveCounterNext);
+    AliveListNext[dst] = particleIndex;
+} else {
+    PushFreeList(particleIndex);
+    EmitDeathEventIfRequested(p);
+}</code></pre><p>Ping-Pongすることで、同一フレーム内に読むAlive Listと書くAlive Listを分離し、順序競合を防ぎます。</p></section>
+
+<section id="events"><h2>7. GPU Event再設計</h2><h3>購読情報を事前計算</h3><p><code>ParticleEffect</code>が<strong>同一Effectインスタンス内</strong>のEmitter接続グラフを構築し、sourceごとに必要なEvent bitを設定します。Effectを跨ぐ接続は許可しません。</p><pre><code>EventWriteMask:
+bit 0 = Spawnに購読者あり
+bit 1 = Deathに購読者あり
+bit 2 = Collisionに購読者あり（将来）</code></pre><p>購読者がないEventはCounter Atomicもpayload書込みも行いません。</p>
+<h3>線形Filterを1回だけ実行</h3><pre><code>// 1 thread = 1 source event
+if (event.type == requestedType &amp;&amp;
+    Random(event.particleId) &lt;= probability) {
+    uint dst = AtomicAppend(filteredCount);
+    if (dst &lt; filteredCapacity)
+        FilteredEventIndices[dst] = sourceIndex;
+    else
+        AtomicIncrement(filteredOverflowDropCount);
+}</code></pre><p>子EmitterのEvent Spawn threadは<code>FilteredEventIndices[eventOffset + eventSpawnId]</code>を直接参照します。Filtered capacityは接続edgeごとに<code>min(SourceEventCapacity, EdgeEventSpawnLimit)</code>とし、CounterをcapacityへClampして後段へ渡します。</p>
+<h3>Spawn発生源と容量不足時の優先順位</h3><p>Spawn要求は合算した曖昧な範囲にせず、<strong>Event、Burst、Rateの3レンジと3 Dispatch Args</strong>へ分離します。Free slotはEvent→Burst→Rateの順で割り当て、継続生成のRateを最初にdropします。</p><pre><code>free = FreeCounterSnapshot;
+acceptedEvent = min(requestedEvent, free); free -= acceptedEvent;
+acceptedBurst = min(requestedBurst, free); free -= acceptedBurst;
+acceptedRate  = min(requestedRate,  free);
+
+dropEvent = requestedEvent - acceptedEvent;
+dropBurst = requestedBurst - acceptedBurst;
+dropRate  = requestedRate  - acceptedRate;</code></pre><p>各Dispatchは独立したthread ID空間を持つため、Event由来だけが位置・速度・色継承を適用します。</p>
+<h3>Emitter依存順序</h3><ul><li>同一フレームEventを使う場合、単一Effect内のEmitter graphをトポロジカル順にDispatchします。</li><li>循環参照はEditor/API/JSON Load時に検出します。</li><li>循環を許可する場合は明示的な<code>PreviousFrame</code>モードだけとし、Event BufferをPing-Pongします。</li><li>source削除・差し替え時はdescriptorをFence安全に更新します。</li><li>別Effectインスタンスをsourceとして渡すAPI呼び出しは失敗を返し、参照を保持しません。</li></ul><div class="warn callout"><strong>仕様決定:</strong> 初期実装では循環Event接続とEffect間Event接続を拒否します。暗黙の1フレーム遅延や外部Effect lifetime依存は導入しません。</div></section>
+
+<section id="phases"><h2>8. 実装Phase</h2>
+<article class="phase"><div class="phase-no">0</div><div><h3>基準計測とGPU Pass可視化</h3><ul><li>Simulation、Spawn Prepare、Module、Convert、Event Filter、Ribbon、Particle Drawを個別timestamp化</li><li>Alive/Capacity/Spawn/Event/covered-pixel proxyをCSV出力</li><li>Sprite 10k/50k/100k、Mesh、Ribbon、Bloom On/OffをRelease 1080pで計測</li></ul><p><strong>完了条件:</strong> 改修前baselineを同一GPU・同一scene・300 sampleで保存し、ボトルネックをpass単位で説明できる。</p></div></article>
+<article class="phase"><div class="phase-no">1</div><div><h3>Event無効化とO(N²)探索除去</h3><ul><li>Event write maskを追加</li><li>購読者なしEventのAtomic/writeを完全skip</li><li>edge単位Filtered Event Index Buffer、容量式、overflow drop counterを追加</li><li>子Spawnをindex直接参照へ変更</li><li>同一Effect内の依存graphと循環検出を追加し、Effect間接続を拒否</li></ul><p><strong>完了条件:</strong> Event未使用EffectでEvent write 0。10万Source Eventでも処理量が線形で、花火連鎖が同一seedで再現し、capacity超過時もBuffer外書込み0。</p></div></article>
+<article class="phase"><div class="phase-no">2</div><div><h3>Free ListによるSpawn</h3><ul><li>初期化CSでFree Listへ0..capacity-1を構築</li><li>Event/Burst/Rateを別range・別Dispatch Argsとして生成</li><li>Event→Burst→Rateの優先順でFree slotを予約</li><li>各Spawn threadがFree Listから1 indexをPop</li><li>発生源別Drop counterをGPUで更新</li><li>死亡時はindexをFree ListへPush</li></ul><p><strong>完了条件:</strong> Spawn 100／Capacity 100kでAtomic回数がO(100)となり、全Dead slot走査を行わない。容量不足時の継承先とdrop優先順が仕様通り。</p></div></article>
+<article class="phase"><div class="phase-no">3</div><div><h3>Alive ListとSimulation DispatchIndirect</h3><ul><li>Alive ListをPing-Pong化</li><li>フレーム冒頭のResetFrameCounters CSでNext counterを明示reset</li><li>Args Build CSでAlive数からUpdate Dispatch Argsを生成</li><li>Update CSをParticle index入力へ変更</li><li>新規Spawnのbirth offsetとeffectiveDtを一貫適用</li><li>Survivor append、Death free push、Event emitを統合</li><li>診断値を専用Snapshot Ringへ複製して生Counterから分離</li><li>Loop reset/Clear時のList/Counter初期化をGPU化</li></ul><p><strong>完了条件:</strong> Capacity 1,000,000／Alive 10,000のSimulation時間がCapacity 100,000／Alive 10,000と±10%以内。Ping-Pong resetと遅延診断が互いを上書きしない。</p></div></article>
+<article class="phase"><div class="phase-no">4</div><div><h3>Convert・Draw・RibbonのAlive List化</h3><ul><li>ConvertをSurvivor数だけDispatchIndirect</li><li>Render BufferはAlive順で連続出力</li><li>Draw ArgsをAlive Counterから生成</li><li>Ribbon prefix/sort入力をAlive Ribbon粒子だけに限定</li><li>Sprite/MeshではRibbon専用Bufferを遅延確保</li></ul><p><strong>完了条件:</strong> Sprite/MeshのConvertがO(Alive)、Ribbon sort capacityが実Aliveに近い2の累乗となる。</p></div></article>
+<article class="phase"><div class="phase-no">5</div><div><h3>Pixel/Overdraw対策</h3><ul><li>Particle draw timestampとBloom Mask drawを分離</li><li>Screen-size culling、透明度0、極小粒子をConvertで除外</li><li>任意のSoft Particle/Depth cullingを追加</li><li>Emitterごとの最大screen size、distance culling、LOD spawn倍率を追加</li><li>Bloom Maskの1/2解像度を品質設定として比較</li></ul><p><strong>完了条件:</strong> Compute改善後も重いsceneについて、Pixel負荷を数値で特定し、LOD High/Medium/Lowが期待通り負荷を削減する。</p></div></article>
+<article class="phase"><div class="phase-no">6</div><div><h3>耐久・互換・ドキュメント</h3><ul><li>JSON migrationと旧Effect互換</li><li>容量変更、Renderer交換、Scene遷移、Pool再利用を各100回</li><li>D3D12 Debug Layer、GPU-based validation、Debug/Release</li><li>実装ガイド・APIリファレンス・Editor tooltip更新</li></ul><p><strong>完了条件:</strong> 全自動試験、性能予算、resource/descriptor基準値復帰を満たす。</p></div></article>
+</section>
+
+<section id="api"><h2>9. 予定するAPI・データ変更</h2><div class="table-wrap"><table><thead><tr><th>対象</th><th>追加・変更案</th><th>用途</th></tr></thead><tbody>
+<tr><td><code>GPUSimulator</code></td><td><code>ResetFrameCounters</code>, <code>DispatchSpawnIndirect(SpawnOrigin)</code>, <code>DispatchAliveUpdate</code>, <code>BuildIndirectArguments</code></td><td>Next counterの明示reset、発生源別Spawn、容量全走査の廃止</td></tr>
+<tr><td><code>GPUSimulator</code></td><td><code>SetEventWriteMask(uint32_t)</code></td><td>未使用Event生成を停止</td></tr>
+<tr><td><code>ParticleEffect</code></td><td><code>CompileGPUEventGraph()</code>, <code>ValidateGPUEventGraph()</code></td><td>同一Effect内の依存順序、循環、Emitter所有関係を検証</td></tr>
+<tr><td><code>ParticleEffect</code></td><td><code>bool BindGPUEventSource(childIndex, sourceIndex)</code></td><td>Effect自身が両Emitterを所有するときだけ接続。既存Emitter直接APIは内部互換wrapperとし、外部Effect pointerを保持させない</td></tr>
+<tr><td><code>ParticleEmitter</code></td><td><code>GetGpuRuntimeStats()</code></td><td>Fence完了済みの専用Snapshot RingからAlive/Spawn/Drop/Eventを返す。生Counterを直接Map/Copyしない</td></tr>
+<tr><td><code>ParticleDiagnostics</code></td><td>Pass別GPU timestamp、Spawn contention、Event write/filter counter、frame ID/Fence付きSnapshot Ring</td><td>生Counterを上書きせず改善を非同期に証明</td></tr>
+<tr><td><code>ParticleQualitySettings</code></td><td>distance culling、spawn scale、screen size、Bloom resolution</td><td>コンテンツ側LOD</td></tr>
+</tbody></table></div><div class="callout"><strong>公開API互換:</strong> <code>ParticleManager::Load/Play</code>、既存Emitter設定、既存JSONの基本形は維持します。最適化は原則としてSimulator内部の置換です。</div></section>
+
+<section id="tests"><h2>10. テスト計画</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>ケース</th><th>合格条件</th></tr></thead><tbody>
+<tr><td>PF-01</td><td>Capacity 1M / Alive 10k</td><td>処理時間がAlive数に比例し、Capacity差±10%以内</td></tr>
+<tr><td>PF-02</td><td>Capacity 100k / Spawn 100</td><td>Spawn thread/Free popが約100、Dead全走査なし</td></tr>
+<tr><td>PF-03</td><td>100k一括Spawn</td><td>欠落・重複index・Free Counter underflowなし</td></tr>
+<tr><td>PF-04</td><td>全Particle同時Death</td><td>Free Listへ全indexが一度だけ戻る</td></tr>
+<tr><td>PF-05</td><td>Event購読者なし</td><td>Event atomic/write 0</td></tr>
+<tr><td>PF-06</td><td>100k Death Event→子Emitter</td><td>Event Filterが線形、O(N²)探索なし</td></tr>
+<tr><td>PF-07</td><td>花火 Rocket→Burst→Smoke</td><td>位置・速度・色継承、同一seed再現</td></tr>
+<tr><td>PF-08</td><td>Event循環 A→B→A</td><td>Load/Editorで明示エラー、実行しない</td></tr>
+<tr><td>PF-09</td><td>Sprite/Mesh/Ribbon各100k相当</td><td>対応上限とfallbackを明示、Readback 0</td></tr>
+<tr><td>PF-10</td><td>Bloom On/Off、粒子の大小・重なり</td><td>ComputeとPixel負荷を分離計測</td></tr>
+<tr><td>PF-11</td><td>容量変更100回</td><td>D3D12 message 0、descriptor基準値復帰</td></tr>
+<tr><td>PF-12</td><td>NaN/Inf、counter境界、Free capacity不足、FilteredEventIndices上限/上限+1/大幅超過</td><td>Buffer外書込み、GPU hang/TDRなし。Event→Burst→Rate優先で発生源別drop数が一致</td></tr>
+<tr><td>PF-13</td><td>Alive Counter Ping-Pongと診断を連続300 frame実行</td><td>Next reset値、描画Alive値、数frame遅延snapshot値が対応frame IDと一致し、生Counter再利用の影響を受けない</td></tr>
+<tr><td>PF-14</td><td>別Effect間Event接続をAPI/Editor/JSONから要求</td><td>全経路で明示拒否し、source pointer/descriptorを保持しない</td></tr>
+<tr><td>PF-15</td><td>既存JSON corpusのRNG視覚回帰</td><td>同一新実装内では完全再現。旧実装比は位置/速度/色/寿命の分布指標が許容範囲内</td></tr>
+<tr><td>PF-16</td><td>Rate Spawnのframe内発生時刻を低/高FPSで比較</td><td>新規Particleの全時間依存処理が<code>effectiveDt=frameDt-birthOffset</code>を使用し、rate×lifetimeと軌跡が許容差内</td></tr>
+</tbody></table></div></section>
+
+<section id="budget"><h2>11. 定量的な性能予算</h2><p>Phase 0で改修前baselineを固定し、同一GPU、1920×1080、Release、VSync OFF、60 frame warmup後300 sampleで比較します。</p><div class="table-wrap"><table><thead><tr><th>指標</th><th>目標</th></tr></thead><tbody>
+<tr><td>Sparse Sprite: Capacity 1,000,000／Alive 100,000、標準module、画面占有を制限したCompute合計</td><td>改修前比50%以上削減。Alive≪Capacity最適化の一次指標</td></tr>
+<tr><td>Dense Sprite: Capacity 100,000／Alive約100,000、Eventなし、標準module</td><td>回帰なし（改修前比+10%以内）。50%削減目標は適用しない</td></tr>
+<tr><td>Capacity 1M / Alive 10k対Capacity 100k / Alive 10k</td><td>Simulation+Convert差±10%以内</td></tr>
+<tr><td>Spawn 100 / Capacity 100k対Capacity 1M</td><td>Spawn Pass差±10%以内</td></tr>
+<tr><td>Event未使用時のEvent Pass</td><td>0 dispatch、0 write</td></tr>
+<tr><td>100k Event Filter</td><td>Event数を2倍にした時、GPU時間2.3倍未満</td></tr>
+<tr><td>CPU Particle readback</td><td>0 bytes/frame</td></tr>
+<tr><td>Runtime PSO生成</td><td>0</td></tr>
+<tr><td>D3D12 Warning/Error/Corruption</td><td>0</td></tr>
+</tbody></table></div><p class="small">絶対msはGPU依存が大きいため、baseline比とスケーリング率を一次合格基準とします。基準GPUの絶対値もレポートへ併記します。RNG視覚回帰は旧実装と新実装を各10万sampleで比較し、各Scalar分布の平均・標準偏差差を5%以内、正規化histogramのtotal variation distanceを0.05以下とします。意図的なバグ修正による差は個別承認・記録します。</p></section>
+
+<section id="risks"><h2>12. リスクと対策</h2><div class="grid">
+<article class="card"><h3>List重複・欠落</h3><p>Atomic append/popの境界バグは描画欠落や二重更新を生みます。Debug専用GPU validation passでAlive+Free=Capacity、index一意性を検証します。</p></article>
+<article class="card"><h3>Counter resetと診断世代</h3><p>ResetFrameCounters CSをフレーム冒頭へ固定します。診断はframe ID付きSnapshot Ringへ複製し、生Counterの再利用後に読むことを禁止します。</p></article>
+<article class="card"><h3>Event依存と寿命</h3><p>同一フレームeventは単一Effect内のtopological orderを必須とし、循環とEffect間接続を拒否してdangling sourceを防ぎます。</p></article>
+<article class="card"><h3>Filtered Event overflow</h3><p>edge単位capacityを明示し、全Appendを境界検査します。超過はdrop counterへ記録し、Counterをcapacity以下へClampします。</p></article>
+<article class="card"><h3>DispatchIndirect</h3><p>Arguments Bufferのoffset、alignment、stateを型付きhelperへ集約し、各passで重複実装しません。</p></article>
+<article class="card"><h3>再現性と既存の見た目</h3><p>Thread順依存を避けParticle serial/Event IDで決定論化します。旧乱数列とのbit一致は要求せず、既存JSON corpusの統計的同等性をPF-15で要求します。</p></article>
+<article class="card"><h3>Overdraw誤認</h3><p>Compute最適化だけで完了扱いにせず、Particle Draw/Mask Drawを別timestampで測定します。</p></article>
+</div></section>
+
+<section id="review"><h2>13. 他AI・設計レビュー用チェック項目</h2><p>レビュー担当には、実装の好みではなく次の整合性を確認してもらいます。</p><ol>
+<li>Spawn→Update→Convertの順序で、新規Spawnが同フレームにちょうど一度だけUpdateされるか。</li>
+<li>Rate由来の新規Spawnが全時間依存処理で<code>frameDt</code>ではなく<code>frameDt - birthOffsetInFrame</code>を使い、AgeとModule評価が同じ時間基準か。</li>
+<li>Alive ListとFree Listの和集合がフレーム安定点で全Particle indexと一致し、重複しないか。</li>
+<li>ResetFrameCounters CSがNext counterだけを0にし、Current/Freeを壊さず、swap後の旧Currentを次フレーム冒頭で確実にresetするか。</li>
+<li>診断snapshotが生Counterではなくframe ID付きRingからFence完了後に読まれるか。</li>
+<li>Counter 0、Capacity不足、全死亡、全生成の境界でunsigned underflow/overflowがないか。</li>
+<li>Args Build後のUAV→INDIRECT_ARGUMENT transitionと、再生成前の逆transitionが全経路にあるか。</li>
+<li>同一フレームEventのEmitter dispatch順がtopological orderで保証されるか。</li>
+<li>複数の子Emitterが同じSource Eventを異なる条件で読む場合、edge単位Filtered Listで正しく分離されるか。</li>
+<li>Event/Burst/Rateが別range・別Argsで、容量不足時にEvent→Burst→Rateの優先順となり、Event継承が他の発生源へ漏れないか。</li>
+<li>FilteredEventIndicesの全Appendがcapacity検査され、overflow Counterと後段Clampが一致するか。</li>
+<li>Effect間接続がAPI/Editor/JSONの全入口で拒否され、dangling pointer/descriptorを残さないか。</li>
+<li>Event未購読時にEvent Counter Atomic、payload write、Filter Dispatchが本当に0になるか。</li>
+<li>Ribbonのsort対象がCapacityではなく実Alive Ribbon数になっているか。</li>
+<li>通常フレームに診断目的のCounter Readbackが紛れ込まないか。</li>
+<li>透明ParticleのPixel負荷をCompute改善結果と混同していないか。</li>
+</ol><h3>レビュー時に明示すべき確定事項</h3><ul><li>GPU Event循環とEffect間Event接続は初期実装では拒否する。</li><li>新規Spawnは同フレームUpdate対象とし、Rate Spawnは<code>effectiveDt=frameDt-birthOffset</code>を使用する。</li><li>Spawn容量の優先順位はEvent→Burst→Rateとする。</li><li>Alive/Free/Event/ArgsはCPUへ同期Readbackせず、診断は専用Snapshot Ringから非同期取得する。</li><li>Filtered Event Listは接続edge単位で、容量は<code>min(SourceEventCapacity, EdgeEventSpawnLimit)</code>とする。</li><li>既存公開APIとJSONは原則互換を維持する。</li><li>RNGの旧実装とのbit一致は要求せず、既存JSONの統計的同等性を要求する。</li><li>Particle payload indexは寿命中固定し、描画順だけRender Bufferでcompactする。</li></ul><h3>実装前にレビューで確定する未決事項</h3><div class="table-wrap"><table><thead><tr><th>ID</th><th>判断事項</th><th>推奨案</th><th>比較対象</th></tr></thead><tbody>
+<tr><td>R-01</td><td>Free Listのstack実装</td><td>counter + index buffer</td><td>Append/Consume StructuredBuffer</td></tr>
+<tr><td>R-04</td><td>Alive append順と決定論</td><td>見た目上の順序非保証、乱数はID決定論</td><td>prefix sumによる安定compact</td></tr>
+<tr><td>R-05</td><td>Ribbonだけ安定順序が必要か</td><td>Particle IDでGPU sort</td><td>Alive Listを安定compact</td></tr>
+</tbody></table></div><div class="warn callout"><strong>レビュー上の注意:</strong> 安定compactは決定論を得やすい一方、prefix scan passと追加Bufferが必要です。Sprite/Meshは順序非保証のAtomic append、RibbonはID sortという用途別設計を推奨します。</div></section>
+
+<section id="dod"><h2>14. Definition of Done</h2><ul>
+<li>Spawn、Simulation、Convertの処理量が最大容量ではなく実Spawn/Alive数に比例する。</li>
+<li>Dead slot全体による単一Spawn Counter競合が存在しない。</li>
+<li>Event/Burst/Rateは別Dispatch rangeで処理され、容量不足時の優先順位がEvent→Burst→Rateとなる。</li>
+<li>ResetFrameCounters CS、Alive List swap、次フレームresetの順序が明示され、診断はFence管理された専用Snapshot Ringから取得される。</li>
+<li>GPU Event未使用時はEvent Atomic・書込み・Filter Dispatchがすべて0である。</li>
+<li>Event Spawnに子Spawn×Source Eventの二重ループが存在しない。</li>
+<li>FilteredEventIndicesはedge単位容量を超えて書かず、overflowを正確にdrop計上する。</li>
+<li>GPU Event接続は同一Effectインスタンス内だけに限定され、Effect間接続と循環接続を全入口で拒否する。</li>
+<li>花火のRocket→Burst→SmokeがGPU内で動き、位置・速度・色継承と決定論的再生が成立する。</li>
+<li>Rate Spawnのbirth offsetがAge、移動、時間依存Moduleのすべてへ一貫して反映される。</li>
+<li>通常フレームのParticle/Counter/Event/Draw Arguments CPU Readbackが0である。</li>
+<li>Sprite/Mesh/RibbonとSelective Bloomの既存JSONについて、構造・機能が回帰せず、乱数由来の見た目が定義済み統計許容範囲を満たす。</li>
+<li>PF-01～PF-16と性能予算をすべて満たす。</li>
+<li>Debug/Release、D3D12 Debug Layer/GPU-based validationでWarning/Error/Corruptionが0である。</li>
+<li>容量変更、Effect破棄、Pool再利用後にresource/descriptorが基準値へ戻る。</li>
+</ul><div class="callout"><strong>推奨実装順:</strong> Phase 0 → 1（Event）→ 2（Free List）→ 3（Alive List）→ 4（Convert/Ribbon）→ 5（Overdraw）の順です。各Phaseを個別に計測・回帰確認し、複数の根本変更を一度に混ぜません。</div></section>
+</main></div></body></html>

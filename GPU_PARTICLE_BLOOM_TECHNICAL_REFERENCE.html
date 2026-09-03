@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GPU Particle &amp; Selective Bloom 技術・APIリファレンス</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2f;--panel2:#18223b;--text:#e8edf8;--muted:#aab5cc;--line:#2b395d;--cyan:#55d6e8;--blue:#7aa7ff;--green:#79e2a6;--orange:#ffc66d;--red:#ff8585;--code:#080d19}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(145deg,#080d19,#101936 60%,#08121b);color:var(--text);font-family:"Segoe UI","Yu Gothic UI",sans-serif;line-height:1.75}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1500px;margin:auto}.side{position:sticky;top:0;height:100vh;padding:28px 20px;border-right:1px solid var(--line);background:#090f20e8;overflow:auto}.side h1{font-size:18px;margin:0 0 22px;color:var(--cyan)}.side a{display:block;color:var(--muted);text-decoration:none;padding:7px 9px;border-radius:7px;font-size:14px}.side a:hover{background:var(--panel2);color:#fff}.main{min-width:0;padding:52px clamp(24px,5vw,76px) 100px}.hero{padding:42px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(130deg,#162343,#102435);box-shadow:0 18px 60px #0005}.hero h1{font-size:clamp(30px,4vw,52px);line-height:1.12;margin:0 0 18px}.hero p{max-width:970px;color:var(--muted);font-size:17px}.badge{display:inline-block;margin:4px 7px 4px 0;padding:4px 10px;border:1px solid #3b568a;border-radius:999px;color:var(--cyan);font-size:13px}section{margin-top:56px}h2{font-size:29px;border-bottom:1px solid var(--line);padding-bottom:12px}h3{margin-top:30px;color:var(--blue)}h4{color:var(--cyan)}p,li{color:#d7dfef}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:20px}.card h3,.card h4{margin-top:0}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.flow span{padding:10px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:9px}.flow b{color:var(--cyan)}table{width:100%;border-collapse:collapse;background:var(--panel);font-size:14px}th,td{border:1px solid var(--line);padding:11px 13px;vertical-align:top;text-align:left}th{background:#1b2947;color:var(--cyan);position:sticky;top:0}td code{white-space:normal}.table-wrap{overflow:auto;border-radius:11px}code{font-family:Consolas,"Cascadia Code",monospace;color:#b9e6ff;background:#0a1224;padding:2px 5px;border-radius:4px}pre{overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:11px;padding:18px;line-height:1.55}pre code{padding:0;background:none;color:#d8e7ff}.callout{border-left:4px solid var(--cyan);background:#10253a;padding:14px 18px;border-radius:8px;margin:18px 0}.warn{border-left-color:var(--orange);background:#2a2114}.danger{border-left-color:var(--red);background:#2a151b}.ok{color:var(--green)}.internal{color:var(--orange)}.tag{display:inline-block;border-radius:5px;padding:1px 7px;font-size:12px;margin-right:6px;background:#24365a;color:#dce9ff}.tag.public{background:#164631;color:#aaf1ca}.tag.engine{background:#54401d;color:#ffe0a3}.tag.debug{background:#512933;color:#ffc1cc}@media(max-width:900px){.layout{display:block}.side{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.main{padding-top:28px}.hero{padding:27px}th{position:static}}
+</style>
+</head>
+<body><div class="layout">
+<nav class="side"><h1>GPU Particle / Bloom</h1>
+<a href="#purpose">1. 文書の目的</a><a href="#architecture">2. 技術構成</a><a href="#quick">3. API早見表</a><a href="#particle-use">4. 基本的な使い方</a><a href="#gpu-api">5. GPU Particle API</a><a href="#bloom-api">6. Bloom API</a><a href="#render-api">7. 描画・RT API</a><a href="#json">8. JSON仕様</a><a href="#editor">9. Editor操作</a><a href="#diagnostics">10. 診断・計測</a><a href="#shaders">11. Shader/PSO</a><a href="#rules">12. 注意事項</a><a href="#results">13. 検証結果</a>
+</nav>
+<main class="main">
+<header class="hero" id="purpose"><span class="badge">Pure GPU Simulation</span><span class="badge">ExecuteIndirect</span><span class="badge">Selective Bloom</span><span class="badge">D3D12</span><h1>GPU Particle &amp;<br>Selective Bloom 技術・APIリファレンス</h1><p>今回追加・改修したGPUパーティクル、Niagara型モジュール実行基盤、GPU Ribbon、JSON保存、Selective Bloom、診断機能を、利用者向けAPIとエンジン内部APIに分けてまとめた資料です。前半はクラス別の大まかな変更点、後半はAPI契約と使用例を掲載します。</p><p class="muted">対象リポジトリ: GameTemplate / KentoCompoEngine　最終更新: 2026-08-12</p></header>
+
+<section id="architecture"><h2>2. 実装で使用した主要技術</h2><div class="grid">
+<article class="card"><h3>Pure GPU lifecycle</h3><p>Spawn、Update、Alive判定、Compaction、描画引数生成をCompute Shader内で完結させます。毎フレームの粒子データやAlive CounterをCPUへ戻しません。</p></article>
+<article class="card"><h3>ExecuteIndirect</h3><p>GPUが生成した<code>D3D12_DRAW_ARGUMENTS</code>をSprite/Mesh/Ribbon描画へ直接渡します。CPUは生存数を知らなくても描画できます。</p></article>
+<article class="card"><h3>GPU module program</h3><p>EmitterのモジュールをGPU命令列とパラメータストアへコンパイルし、Compute Shaderで順番に評価します。Dynamic InputとCurve LUTもGPU側で参照します。</p></article>
+<article class="card"><h3>GPU events</h3><p>Spawn/DeathイベントをGPU Bufferへ生成し、別EmitterのSpawn入力として接続できます。速度・色の継承と確率制御に対応します。</p></article>
+<article class="card"><h3>GPU Ribbon</h3><p>Particle更新後にRibbon用Compute Passで頂点とIndirect Argumentsを構築します。Ribbon頂点のCPU生成やReadbackは行いません。</p></article>
+<article class="card"><h3>Selective Bloom MRT</h3><p>通常Scene Colorとは別の<code>R16G16B16A16_FLOAT</code> Bloom Maskへ、指定したParticle/Objectだけを出力します。横・縦のGaussian Blur後にSceneへ合成します。</p></article>
+</div><h3>Pure GPUフレーム処理</h3><div class="flow"><span>Emitter設定更新</span><b>→</b><span>Spawn Prepare CS</span><b>→</b><span>Simulation CS</span><b>→</b><span>Compact / Convert CS</span><b>→</b><span>Ribbon CS（必要時）</span><b>→</b><span>ExecuteIndirect</span></div>
+<h3>Selective Bloomフレーム処理</h3><div class="flow"><span>Deferred Emissive GBuffer</span><b>+</b><span>Forward / Particle MRT</span><b>→</b><span>HDR Bloom Mask</span><b>→</b><span>Horizontal Blur</span><b>→</b><span>Vertical Blur</span><b>→</b><span>Scene Composite</span></div></section>
+
+<section id="quick"><h2>3. クラス別・増加API早見表</h2><p>ここは「どのクラスに何が増えたか」を大まかに確認する一覧です。詳細は後続章を参照してください。</p><div class="table-wrap"><table><thead><tr><th>クラス／型</th><th>主な追加API・データ</th><th>目的</th><th>区分</th></tr></thead><tbody>
+<tr><td><code>ParticleManager</code></td><td><code>Load</code>, <code>CreateEmpty</code>, <code>Play</code>, <code>Warmup</code>, <code>PurgeEffectPools</code>, <code>AddSimulatorToTrashBin</code></td><td>JSONロード、再生、プール、GPU安全破棄</td><td><span class="tag public">利用</span></td></tr>
+<tr><td><code>ParticleEmitter</code></td><td><code>SetSimulationMode</code>, <code>SetMaxParticles</code>, <code>SetGPUEvent*</code>, <code>BindGPUEventSource</code>, <code>SetDynamicBinding</code>, <code>GetCompiledEmitter</code>, <code>GetGPUSimulator</code></td><td>Pure GPU選択、容量、イベント、動的入力</td><td><span class="tag public">利用</span></td></tr>
+<tr><td><code>GPUSimulator</code></td><td><code>DispatchPure</code>, <code>SupportsPureGPU</code>, <code>SetEventSource</code>, <code>SetRibbonParameters</code>, GPU Buffer/Indirect getter</td><td>GPU lifecycleと描画データ生成</td><td><span class="tag engine">内部</span></td></tr>
+<tr><td><code>IRenderer</code></td><td><code>SetGPUMode</code>, <code>SetGPURibbonMode</code>, <code>SetEmissive*</code>, <code>SetBloomContribution</code></td><td>GPU Buffer描画とEmitter単位Bloom</td><td><span class="tag public">利用</span><span class="tag engine">内部</span></td></tr>
+<tr><td><code>EmissiveSettings</code></td><td><code>enabled</code>, <code>source</code>, <code>color</code>, <code>intensity</code>, <code>bloomContribution</code></td><td>Particle/Object共通の発光設定</td><td><span class="tag public">利用</span></td></tr>
+<tr><td><code>Sprite / Object3d / SkinnedObject3d</code></td><td><code>SetEmissiveSettings</code>, <code>GetEmissiveSettings</code></td><td>GameObject系Selective Bloom</td><td><span class="tag public">利用</span></td></tr>
+<tr><td><code>PostProcessManager</code></td><td><code>Draw(...selectiveBloomSource)</code>, <code>IsSelectiveBloomEnabled</code>, <code>SetSelectiveBloomModeEnabled</code>, GPU timing/mask diagnostic API</td><td>Bloom Mask処理、モード、計測</td><td><span class="tag engine">内部</span><span class="tag debug">診断</span></td></tr>
+<tr><td><code>ParticlePipelineManager</code></td><td><code>GetPipelineState(mode,bloom)</code>, <code>GetRibbonPipelineState</code>, <code>SetSelectiveBloomOutputEnabled</code>, <code>GetPsoCreationCount</code></td><td>54 PSO順列の選択・プリウォーム監視</td><td><span class="tag engine">内部</span></td></tr>
+<tr><td><code>RenderTexture</code></td><td><code>TransitionTo</code>, Width/Height/Format/State getter</td><td>HDR RTと診断Copyの明示状態管理</td><td><span class="tag engine">内部</span></td></tr>
+<tr><td><code>TextureManager</code></td><td><code>LoadTextureLinear</code>, <code>GetLinearTextureIndexByFilePath</code>, <code>TryGetTextureIndexByFilePath</code>, <code>ResolveTexturePath</code></td><td>Emissive TextureのLinear読込と安全な解決</td><td><span class="tag engine">内部</span></td></tr>
+<tr><td><code>ParticleDiagnostics</code></td><td>時間・Upload/Readback bytes・Pure GPU emitter・module/LUT/descriptor counter、<code>ExportToCSV</code></td><td>Pure GPU性と性能の定量確認</td><td><span class="tag debug">診断</span></td></tr>
+</tbody></table></div></section>
+
+<section id="particle-use"><h2>4. GPUパーティクルの基本的な使い方</h2><h3>JSONをロードして再生</h3><pre><code>auto* particles = KCE::ParticleManager::GetInstance();
+
+KCE::ParticleEffect* effect = particles-&gt;Load(
+    "GpuFire",
+    "./Resources/json/particles/gpu_fire.json");
+
+if (effect) {
+    particles-&gt;Play("GpuFire", KCE::Vector3{0.0f, 1.0f, 0.0f});
+}</code></pre><div class="callout"><code>Load()</code>は登録とロード、<code>Play()</code>は再生を担当します。同じ効果を頻繁に出す場合は<code>Warmup()</code>でプールを準備します。</div>
+<h3>EmitterをPure GPUへ切り替える</h3><pre><code>auto* emitter = effect-&gt;GetEmitter(0);
+emitter-&gt;SetSimulationMode(KCE::SimulationMode::GPU);
+emitter-&gt;SetMaxParticles(65536);
+emitter-&gt;Play();</code></pre><p><code>SetMaxParticles()</code>は新Simulatorの作成成功後に交換するため、失敗時に旧容量を壊しません。交換前GPU resourceはFence連動の遅延破棄へ移されます。</p>
+<h3>GPU EventでEmitterを接続</h3><pre><code>auto* source = effect-&gt;GetEmitter(0);
+auto* child  = effect-&gt;GetEmitter(1);
+
+child-&gt;SetGPUEventSourceEmitterIndex(0);
+child-&gt;SetGPUEventTrigger(1);             // 0: Spawn, 1: Death
+child-&gt;SetGPUEventProbability(0.5f);
+child-&gt;SetGPUEventVelocityInheritance(true, 0.75f);
+child-&gt;SetGPUEventInheritColor(true);
+child-&gt;BindGPUEventSource(source);</code></pre><p>現状のPure GPU producerはSpawnとDeathです。Collisionは列挙値として予約されていますが、<code>SetGPUEventTrigger()</code>は2以上を拒否します。</p></section>
+
+<section id="gpu-api"><h2>5. GPU Particle API詳細</h2>
+<h3>ParticleManager — 通常利用の入口</h3><div class="table-wrap"><table><thead><tr><th>API</th><th>説明</th><th>使用上の注意</th></tr></thead><tbody>
+<tr><td><code>ParticleEffect* Load(name,jsonPath)</code></td><td>JSONからEffectを読み込み、非アクティブ状態で登録します。</td><td>失敗時は<code>nullptr</code>。</td></tr>
+<tr><td><code>ParticleEffect* CreateEmpty(name)</code></td><td>Editorやコード構築用の空Effectを作成します。</td><td>Emitter/Module/Rendererを後から追加。</td></tr>
+<tr><td><code>ParticleEffect* Play(name,position)</code></td><td>指定位置でEffectを再生します。</td><td>戻り値で停止・追跡可能。</td></tr>
+<tr><td><code>ParticleEffect* Play(name,followTarget)</code></td><td><code>Transform</code>へ追従して再生します。</td><td>対象の寿命をEffectより長く保つこと。</td></tr>
+<tr><td><code>Warmup(name,count)</code></td><td>Effect instanceを事前生成し、初回生成負荷を吸収します。</td><td>大量に確保するとVRAM/SRVを消費。</td></tr>
+<tr><td><code>PurgeEffectPools()</code></td><td>Poolを空にし、EffectをFence完了後の破棄へ送ります。</td><td>即時GPU破棄ではありません。</td></tr>
+<tr><td><code>AddRendererToTrashBin()</code><br><code>AddSimulatorToTrashBin()</code></td><td>使用中GPU resourceの所有権を安全な遅延破棄キューへ移します。</td><td>主にEditor・内部実装向け。</td></tr>
+</tbody></table></div>
+<h3>ParticleEmitter — シミュレーションとライフサイクル</h3><div class="table-wrap"><table><thead><tr><th>API</th><th>説明</th></tr></thead><tbody>
+<tr><td><code>SetSimulationMode(SimulationMode)</code></td><td>CPU/GPUシミュレーションを選択します。GPU対応Module/RendererならPure GPU経路を使用します。</td></tr>
+<tr><td><code>SetMaxParticles(uint32_t)</code></td><td>最大粒子数とGPU Buffer容量を変更します。</td></tr>
+<tr><td><code>SetSimulationSpace(Local/World)</code></td><td>Emitter Transformの影響方法を選択します。</td></tr>
+<tr><td><code>Play / Stop / Pause / Resume / Reset / Restart</code></td><td>Emitterの再生状態を制御します。<code>Restart</code>は既存粒子を残しEmitter lifecycleだけ再開します。</td></tr>
+<tr><td><code>SetDuration / SetStartDelay / SetLoopBehavior / SetLoopCount</code></td><td>生成期間、遅延、ループを設定します。</td></tr>
+<tr><td><code>GetActiveParticleCount()</code></td><td>CPU経路の実数またはPure GPU経路の非Readback設計に沿った管理値を返します。描画数の同期取得目的には使いません。</td></tr>
+<tr><td><code>GetGPUSimulator()</code></td><td>診断・内部連携用にSimulatorを取得します。</td></tr>
+<tr><td><code>SetDynamicBinding / RemoveDynamicBinding / FindDynamicBinding</code></td><td>Module ParameterへDynamic Inputを接続・解除・検索します。</td></tr>
+<tr><td><code>GetCompiledEmitter()</code></td><td>GPU実行用にコンパイルされたEmitter programを参照します。</td></tr>
+</tbody></table></div>
+<h3>GPUSimulator — エンジン内部</h3><p><span class="tag engine">内部API</span>通常のゲームコードは<code>ParticleEmitter</code>を通して使用します。</p><div class="table-wrap"><table><thead><tr><th>API</th><th>役割</th></tr></thead><tbody>
+<tr><td><code>Initialize(dx,srv,maxParticles)</code></td><td>Particle、counter、free-list、render、event、indirect、ribbon等のBuffer/SRV/UAVを確保します。</td></tr>
+<tr><td><code>DispatchPure(...,emitting,reset)</code></td><td>GPU Spawn/Update/Compact/Draw args生成を実行します。</td></tr>
+<tr><td><code>SupportsPureGPU(modules,rendererType)</code></td><td>現在の構成がCPU fallbackなしで実行可能か判定します。</td></tr>
+<tr><td><code>SetEventSource / ClearEventSource</code></td><td>別SimulatorのEvent Bufferを入力へ接続・解除します。</td></tr>
+<tr><td><code>SetRibbonParameters(...)</code></td><td>GPU Ribbon生成の幅、fade、group数を設定します。</td></tr>
+<tr><td><code>GetRenderSrvIndex()</code></td><td>Compact済み描画Particle SRVを返します。</td></tr>
+<tr><td><code>GetDrawArgumentsBuffer()</code></td><td>Sprite/Mesh用のGPU生成Indirect Argumentsを返します。</td></tr>
+<tr><td><code>GetRibbonVertexBuffer()</code><br><code>GetRibbonDrawArgumentsBuffer()</code></td><td>GPU Ribbon描画用Bufferを返します。</td></tr>
+<tr><td><code>IsPureGPUPath()</code></td><td>直近DispatchがPure GPUだったかを返します。</td></tr>
+<tr><td><code>MayHaveLiveParticles()</code></td><td>Alive CounterをReadbackせず、生成時刻と最大寿命から安全側に生存可能性を判定します。</td></tr>
+</tbody></table></div></section>
+
+<section id="bloom-api"><h2>6. Selective Bloom API詳細</h2><h3>共通設定型</h3><pre><code>enum class EmissiveSource : uint32_t {
+    Uniform = 0,
+    BaseTextureMask = 1,
+    EmissiveTexture = 2
+};
+
+struct EmissiveSettings {
+    bool enabled = false;
+    EmissiveSource source = EmissiveSource::Uniform;
+    Vector3 color = {1.0f, 1.0f, 1.0f}; // 各0..16
+    float intensity = 1.0f;             // 0..64
+    float bloomContribution = 1.0f;     // 0..1
+};</code></pre>
+<div class="callout"><strong>Sourceの意味:</strong> <code>Uniform</code>は面全体、<code>BaseTextureMask</code>はBase TextureのRGB、<code>EmissiveTexture</code>は専用Linear TextureのRGBを発光マスクにします。</div>
+<h3>Particle RendererでBloomを設定</h3><pre><code>KCE::EmissiveSettings bloom{};
+bloom.enabled = true;
+bloom.source = KCE::EmissiveSource::BaseTextureMask;
+bloom.color = {0.15f, 0.65f, 1.0f};
+bloom.intensity = 8.0f;
+bloom.bloomContribution = 1.0f;
+
+emitter-&gt;GetRenderer()-&gt;SetEmissiveSettings(bloom);</code></pre>
+<div class="table-wrap"><table><thead><tr><th>IRenderer API</th><th>範囲・動作</th></tr></thead><tbody>
+<tr><td><code>SetEmissiveEnabled(bool)</code></td><td>EmitterのBloom Mask出力を切り替えます。</td></tr>
+<tr><td><code>SetEmissiveSource(EmissiveSource)</code></td><td>無効な列挙値を拒否します。</td></tr>
+<tr><td><code>SetEmissiveColor(Vector3)</code></td><td>finite値だけ受理し、各成分を0～16へClampします。</td></tr>
+<tr><td><code>SetEmissiveIntensity(float)</code></td><td>finite値だけ受理し、0～64へClampします。</td></tr>
+<tr><td><code>SetBloomContribution(float)</code></td><td>finite値だけ受理し、0～1へClampします。</td></tr>
+<tr><td><code>SetEmissiveSettings(settings)</code></td><td>全項目をまとめて検証・設定します。NaN/Inf/無効Sourceを含む場合は変更しません。</td></tr>
+<tr><td><code>SetEmissiveTexture(path)</code></td><td>専用Emissive TextureをLinearとしてロードします。空・不正パスは専用1×1黒へフォールバックします。</td></tr>
+</tbody></table></div>
+<h3>GameObject / SpriteでBloomを設定</h3><pre><code>KCE::EmissiveSettings glow{};
+glow.enabled = true;
+glow.source = KCE::EmissiveSource::Uniform;
+glow.color = {1.0f, 0.25f, 0.05f};
+glow.intensity = 5.0f;
+glow.bloomContribution = 0.8f;
+
+object3d-&gt;SetEmissiveSettings(glow);
+sprite-&gt;SetEmissiveSettings(glow);</code></pre><p><code>Object3d</code>、<code>SkinnedObject3d</code>、<code>Sprite</code>で同じ設定型を使用します。不透明Deferred ObjectはGBuffer RT3を経由し、Forward/Particle/SpriteはBloom Mask MRTへ直接出力します。</p>
+<h3>グローバルBloom</h3><pre><code>auto* post = sceneManager-&gt;GetPostProcessManager();
+post-&gt;SetSelectiveBloomModeEnabled(true);
+
+bool bloomOn = post-&gt;IsBloomEnabled();
+bool selectiveOn = post-&gt;IsSelectiveBloomEnabled();</code></pre><p>環境変数でも切り替えられます。</p><pre><code>KCE_BLOOM_ENABLED=1
+KCE_BLOOM_MODE=SELECTIVE   # LEGACYならScene輝度抽出方式</code></pre></section>
+
+<section id="render-api"><h2>7. 描画・Render Target API</h2><h3>PostProcessManager</h3><div class="table-wrap"><table><thead><tr><th>API</th><th>説明</th></tr></thead><tbody>
+<tr><td><code>Draw(scene,output,selectiveBloomSource)</code></td><td>Selective Sourceがあればそれを横Blur→縦Blur→合成します。なければLegacy Bright Passを使用します。</td></tr>
+<tr><td><code>SetBloomRenderTargets(bright,blur0,blur1)</code></td><td>Bright PassとPing-Pong Blur RTを登録します。</td></tr>
+<tr><td><code>RenderBlurPass(input,output,horizontal)</code></td><td><code>true</code>で横、<code>false</code>で縦の13 sample Gaussian Blurを行います。</td></tr>
+<tr><td><code>Resize(width,height)</code></td><td>Viewport、Scissor、逆画面サイズ等を更新します。</td></tr>
+</tbody></table></div>
+<h3>ParticlePipelineManager</h3><p>Sprite/Mesh用27順列とRibbon用27順列、合計54 PSOを初期化時に作ります。各BlendModeにつき以下の3種類です。</p><ul><li>MRT + BloomWrite</li><li>MRT + Bloom書き込みなし</li><li>Bloom全体OFF用の単一Render Target</li></ul><pre><code>pipeline-&gt;SetSelectiveBloomOutputEnabled(selectiveOn);
+auto* pso = pipeline-&gt;GetPipelineState(blendMode, emissiveEnabled);
+auto* ribbonPso = pipeline-&gt;GetRibbonPipelineState(blendMode, emissiveEnabled);</code></pre>
+<h3>RenderTexture</h3><pre><code>bloomMask.Initialize(dx, srv, width, height,
+    DXGI_FORMAT_R16G16B16A16_FLOAT,
+    {0, 0, 0, 0});
+
+bloomMask.BeginRender();
+// Deferred / Forward / Particle mask output
+bloomMask.EndRender();
+
+// 診断Copy等、特殊用途だけ明示遷移
+bloomMask.TransitionTo(D3D12_RESOURCE_STATE_COPY_SOURCE);</code></pre><div class="warn callout">通常フレームではFrameworkが状態遷移を管理します。ゲームコードから<code>TransitionTo()</code>を乱用しないでください。</div></section>
+
+<section id="json"><h2>8. JSON保存・ロード</h2><p>Rendererの<code>emissive</code>にSelective Bloom設定を保存します。</p><pre><code>{
+  "renderer": {
+    "type": "Sprite",
+    "texture": "./Resources/circle2.png",
+    "blendMode": 1,
+    "billboard": true,
+    "emissive": {
+      "enabled": true,
+      "source": "BaseTextureMask",
+      "color": { "r": 0.15, "g": 0.65, "b": 1.0 },
+      "intensity": 8.0,
+      "bloomContribution": 1.0,
+      "texture": ""
+    }
+  }
+}</code></pre><div class="table-wrap"><table><thead><tr><th>キー</th><th>型</th><th>意味</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>bool</td><td>EmitterのBloom対象指定</td></tr><tr><td><code>source</code></td><td>string</td><td><code>Uniform</code> / <code>BaseTextureMask</code> / <code>EmissiveTexture</code></td></tr><tr><td><code>color</code></td><td>object</td><td>HDR RGB、各0～16</td></tr><tr><td><code>intensity</code></td><td>number</td><td>0～64</td></tr><tr><td><code>bloomContribution</code></td><td>number</td><td>0～1</td></tr><tr><td><code>texture</code></td><td>string</td><td>EmissiveTexture時の専用Texture。空なら黒。</td></tr></tbody></table></div><p>動作確認用: <code>application/Resources/json/particles/tests/selective_bloom_pure_gpu_test.json</code></p></section>
+
+<section id="editor"><h2>9. Particle Editorでの操作</h2><ol><li>Particle EditorでEffectをロードします。</li><li>対象Emitterを選び、<strong>Renderer</strong>を展開します。</li><li><strong>Selective Bloom</strong>でEnabledをONにします。</li><li>Source、HDR Color、Intensity、Bloom Contributionを調整します。</li><li>EmissiveTextureを使う場合は専用Textureを指定します。</li><li>保存し、再ロードして値と見た目が一致することを確認します。</li></ol><div class="callout"><strong>見えやすい初期値:</strong> Source=<code>BaseTextureMask</code>、Color=(0.15,0.65,1.0)、Intensity=8、Contribution=1。</div><p>ブラーは横方向と縦方向の2パスです。細長く見える場合は、まず元Texture、Scale X/Y、Billboard Transform、Bloom Mask形状を確認してください。</p></section>
+
+<section id="diagnostics"><h2>10. 診断・性能計測API</h2><h3>ParticleDiagnostics</h3><pre><code>auto* d = KCE::ParticleDiagnostics::GetInstance();
+d-&gt;SetEnabled(true);
+d-&gt;Reset();
+
+const auto&amp; readback = d-&gt;GetCpuReadbackMemcpyStats();
+const auto&amp; counters = d-&gt;GetRuntimeCounters();
+
+// Pure GPU試験では readback.averageBytes == 0 を確認
+d-&gt;ExportToCSV(path, preset, "GPU", "Release",
+               emitterCount, activeCount, "PASS");</code></pre><p>CPU/GPU update、Upload、Readback、Renderer update/draw recordingを個別集計し、Pure/Hybrid GPU Emitter数、Module命令数、LUT sample数、descriptor概算も記録します。</p>
+<h3>Bloom GPU timestamp</h3><pre><code>post-&gt;BeginBloomGpuFrame(bloomOn, selectiveOn);
+// Bloom Maskを生成
+post-&gt;EndBloomMaskGpuScope();
+
+const auto&amp; t = post-&gt;GetBloomGpuTimings();
+if (t.valid) {
+    // t.maskMs, sourceExtractionMs,
+    // blurHorizontalMs, blurVerticalMs, compositeMs
+}</code></pre><p>結果は前フレームFence完了後だけ読みます。Particle simulationのCPU Readbackとは別の、timestamp query診断です。</p>
+<h3>Bloom Mask診断</h3><pre><code>post-&gt;RequestBloomMaskDiagnostic(testId);
+// 描画完了箇所でFrameworkが CaptureRequestedBloomMask(mask) を呼ぶ
+const auto&amp; result = post-&gt;GetBloomMaskDiagnostic();</code></pre><p><span class="tag debug">試験専用</span>R16G16B16A16_FLOAT Maskを要求時だけCopyし、平均/最大RGB energy、非ゼロpixel数、全画素finiteを検証します。通常実行ではReadback resource copyを発生させません。</p></section>
+
+<section id="shaders"><h2>11. 追加・拡張したShaderとPSO</h2><div class="table-wrap"><table><thead><tr><th>Shader</th><th>役割</th></tr></thead><tbody>
+<tr><td><code>ParticleCompute.hlsl</code></td><td>Pure GPU Spawn/Update、module命令、event生成。</td></tr>
+<tr><td><code>ParticleSpawnPrepare.CS.hlsl</code></td><td>Spawn要求とcounter準備。</td></tr>
+<tr><td><code>ParticleConvert.CS.hlsl</code></td><td>Alive Particleの描画形式変換、異常Transform/近面対策、Indirect Arguments生成。</td></tr>
+<tr><td><code>ParticleRibbon.CS.hlsl</code></td><td>Ribbon頂点とRibbon Draw Arguments生成。</td></tr>
+<tr><td><code>Particle.PS.hlsl</code> / <code>Ribbon.PS.hlsl</code></td><td>Scene Color + Selective Bloom Mask MRT出力。</td></tr>
+<tr><td><code>ParticleSingleTarget.PS.hlsl</code> / <code>RibbonSingleTarget.PS.hlsl</code></td><td>Bloom全体OFF時の単一RT出力。</td></tr>
+<tr><td><code>GBufferPass.PS.hlsl</code></td><td>Deferred ObjectのHDR EmissiveをGBuffer RT3へ出力。</td></tr>
+<tr><td><code>LightPass.PS.hlsl</code></td><td>Deferred LightingとBloom MaskをGraphics MRTへ出力。</td></tr>
+<tr><td><code>Object3d.PS.hlsl</code> / <code>Sprite.PS.hlsl</code></td><td>Forward Object/SpriteのSelective Bloom。</td></tr>
+<tr><td><code>Object3dSingleTarget.PS.hlsl</code> / <code>SpriteNoBloom.PS.hlsl</code></td><td>単一RT安全経路。</td></tr>
+<tr><td><code>GaussianBlur.PS.hlsl</code></td><td>13 sample separable Gaussian。横1パス、縦1パス。</td></tr>
+</tbody></table></div></section>
+
+<section id="rules"><h2>12. 実装上の重要なルールと注意事項</h2><div class="grid">
+<article class="card"><h3>Readback禁止</h3><p>Pure GPU simulationではAlive CounterやParticle配列をCPUへ戻さないでください。描画数はExecuteIndirect、生存可能性は<code>MayHaveLiveParticles()</code>を使用します。</p></article>
+<article class="card"><h3>異常値防御</h3><p>CPU APIはNaN/Infを拒否し、有限値を範囲Clampします。Shader側でも非finiteを検出して0へ置換します。</p></article>
+<article class="card"><h3>Resource lifetime</h3><p>容量変更、Renderer交換、Effect破棄では、GPU Fence完了前にresourceやdescriptorを解放しません。</p></article>
+<article class="card"><h3>Emissive Texture</h3><p>色Textureとは別にLinearでロードします。未指定時は<code>emissive_black_1x1.png</code>を使用します。既存<code>black.png</code>は発光用黒として使いません。</p></article>
+<article class="card"><h3>PSOとRT数</h3><p>Bloom MRT PSOを1 RTへBindしないでください。Bloom全体OFFではSingleTarget PSOを使用します。</p></article>
+<article class="card"><h3>BlendMode</h3><p>9モードを検証します。暗色系BlendではBloomの意味が異なるため、意図しない発光を避ける場合はContributionを0にします。</p></article>
+</div></section>
+
+<section id="results"><h2>13. 現在の検証結果</h2><div class="table-wrap"><table><thead><tr><th>検証</th><th>結果</th></tr></thead><tbody>
+<tr><td>Sprite / Mesh / Ribbon、各65,536粒子</td><td class="ok">Pure GPU / ExecuteIndirect / CSV全行 PASS</td></tr>
+<tr><td>Particle CPU readback</td><td class="ok">0 bytes</td></tr>
+<tr><td>全9 BlendMode × Bloom On/Off</td><td class="ok">PASS</td></tr>
+<tr><td>Uniform / BaseTextureMask / EmissiveTexture</td><td class="ok">PASS</td></tr>
+<tr><td>Intensity 0 / 1 / 8 / 64 GPU Mask energy</td><td class="ok">0 / 0.0987 / 0.7856 / 6.3334</td></tr>
+<tr><td>空Emissive Texture / Contribution 0</td><td class="ok">Mask energy 0</td></tr>
+<tr><td>GPU Mask NaN/Inf</td><td class="ok">全画素 finite</td></tr>
+<tr><td>PSO</td><td class="ok">開始54 / 終了54 / 実行中生成0</td></tr>
+<tr><td>D3D12 validation</td><td class="ok">Warning / Error 0</td></tr>
+<tr><td>Debug / Release</td><td class="ok">Build成功</td></tr>
+<tr><td>Selective Bloom性能（1080p Release）</td><td class="ok">0.657 ms、Legacy比 +0.040 ms / +6.47%</td></tr>
+<tr><td>Bloom固定RT VRAM増分</td><td class="ok">23.730 MiB（32 MiB予算内）</td></tr>
+</tbody></table></div>
+<div class="callout"><strong>関連資料:</strong> <code>PARTICLE_IMPLEMENTATION_GUIDE.html</code>（全体利用ガイド）、<code>SELECTIVE_BLOOM_IMPLEMENTATION_PLAN.html</code>（設計判断・性能予算・テスト計画）。</div></section>
+</main></div></body></html>

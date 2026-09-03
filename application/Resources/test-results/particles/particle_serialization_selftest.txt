@@ -1,0 +1,3 @@
+PASS
+registry_modules=44
+negative_json_cases=3

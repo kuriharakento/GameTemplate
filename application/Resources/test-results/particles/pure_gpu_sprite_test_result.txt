@@ -1,0 +1,16 @@
+PASS
+json_roundtrip=PASS
+pure_gpu_path=1
+gpu_pool_capacity=65536
+indirect_draw_ready=1
+gpu_to_cpu_alive_count_readback=disabled
+runtime_pure_emitters=1
+runtime_hybrid_emitters=0
+single_runtime_effect=1
+cpu_readback_memcpy_average_bytes=0
+stress_target_minimum=50000
+embedded_resize_sequence=not_run
+sb07_resize_result=selective_bloom_resize_test.txt
+selective_bloom_pso_permutations=54
+selective_bloom_pso_prewarm_ms=64.7928
+selective_bloom_deferred_forward_mixed=0

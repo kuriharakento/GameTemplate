@@ -1,0 +1,305 @@
+2026/08/02 12:56:57 にビルドを開始しました。
+
+     1>ノード 1 上のプロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (Build ターゲット)。
+     1>ValidateSolutionConfiguration:
+         ソリューション構成 "Debug|x64" をビルドしています。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 4 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj" (4) をビルドしています (既定のターゲット)。
+     4>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 3 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj" (3) をビルドしています (既定のターゲット)。
+     3>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 2 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj" (5) をビルドしています (既定のターゲット)。
+     5>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+     3>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" を作成しています。
+     4>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" を作成しています。
+     3>InitializeBuildStatus:
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     4>InitializeBuildStatus:
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     5>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+     3>ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+     5>ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+     3>ComputeStdModulesCompileInputs:
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+     5>ComputeStdModulesCompileInputs:
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+     3>ComputeStdModulesCompileInputs:
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+     4>ClCompile:
+         すべての出力が最新のものです。
+         すべての出力が最新のものです。
+       Lib:
+         すべての出力が最新のものです。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.pdb" から "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\DirectXTex.pdb" へファイルをコピーしています。
+         DirectXTex_Desktop_2022_Win10.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\DirectXTex.lib
+     3>ClCompile:
+         すべての出力が最新のものです。
+       Lib:
+         すべての出力が最新のものです。
+         ImGui.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\ImGui.lib
+     5>ClCompile:
+         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\HostX86\x64\CL.exe /c /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\..\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\assimp\include /ZI /JMC /nologo /W3 /WX- /diagnostics:column /sdl /MP /Od /D _DEBUG /D _LIB /D USE_IMGUI /D _UNICODE /D UNICODE /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /std:c++20 /permissive- /Fo"C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\\" /Fd"C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\KentoCompoEngine.pdb" /external:W3 /Gd /TP /FC /errorReport:queue /utf-8 /FS /Zc:enumTypes- animation\Animator.cpp audio\Audio.cpp base\Camera.cpp base\D3DResourceLeakChecker.cpp base\DirectXCommon.cpp base\PathManager.cpp base\Logger.cpp base\ObjectPool.cpp base\PostProcessPass.cpp base\RenderTexture.cpp base\StringUtility.cpp base\WinApp.cpp camerawork\debug\DebugCamera.cpp camerawork\follow\FollowCamera.cpp camerawork\orbit\OrbitCameraWork.cpp camerawork\spline\Spline.cpp camerawork\spline\SplineCamera.cpp camerawork\spline\SplineData.cpp camerawork\topdown\TopDownCamera.cpp ecs\debug\EcsInspector.cpp ecs\EcsDebugViewer.cpp ecs\Registry.cpp ecs\system\CollisionSystem.cpp ecs\system\HierarchySystem.cpp ecs\system\InstancedRenderSystem.cpp ecs\system\LifetimeSystem.cpp ecs\system\MovementSystem.cpp ecs\system\Object3dSystem.cpp ecs\system\SystemManager.cpp effects\particle\editor\ParticleEditor.cpp effects\particle\gpu\GPUParticlePipeline.cpp effects\particle\gpu\GPUSimulator.cpp effects\particle\module\ModuleRuntime.cpp effects\particle\module\spawn\SubEmitterModule.cpp effects\particle\ParticleEffect.cpp effects\particle\ParticleEmitter.cpp effects\particle\diagnostics\ParticleDiagnostics.cpp effects\particle\ParticleManager.cpp effects\particle\primitive\PrimitiveGenerator.cpp effects\particle\renderer\MeshRenderer.cpp effects\particle\renderer\SpriteRenderer.cpp effects\particle\renderer\TrailRenderer.cpp effects\particle\serialization\ParticleEffectSerializer.cpp effects\postprocess\base\BasePostEffect.cpp effects\postprocess\BloomEffect.cpp effects\postprocess\CRTEffect.cpp effects\postprocess\GrayscaleEffect.cpp effects\postprocess\NoiseEffect.cpp effects\postprocess\VignetteEffect.cpp framework\Framework.cpp gameobject\base\GameObject.cpp gameobject\component\base\ICollisionComponent.cpp gameobject\component\collision\AABBColliderComponent.cpp gameobject\component\collision\CollisionAlgorithm.cpp gameobject\component\collision\CollisionManager.cpp gameobject\component\collision\CollisionUtils.cpp gameobject\component\collision\OBBColliderComponent.cpp gameobject\component\collision\RayColliderComponent.cpp gameobject\component\collision\SphereColliderComponent.cpp gameobject\manager\GameObjectManager.cpp graphics\2d\FontSprite.cpp graphics\2d\NumberSprite.cpp graphics\2d\Sprite.cpp graphics\2d\SpriteCommon.cpp graphics\3d\InstancedModelRenderer.cpp graphics\3d\Model.cpp graphics\3d\ModelCommon.cpp graphics\3d\Object3d.cpp graphics\3d\Object3dCommon.cpp graphics\3d\SkinnedModel.cpp graphics\3d\SkinnedObject3d.cpp graphics\3d\SkinningCompute.cpp graphics\3d\Skybox.cpp graphics\deferred\DeferredRenderer.cpp graphics\deferred\GBuffer.cpp graphics\deferred\GBufferPipeline.cpp graphics\deferred\LightPassPipeline.cpp graphics\shadow\ShadowMapPipeline.cpp graphics\shadow\ShadowSystem.cpp input\Input.cpp jsonEditor\JsonEditableBase.cpp jsonEditor\JsonEditorImGuiUtils.cpp jsonEditor\JsonSerialization.cpp line\Line.cpp line\LineCommon.cpp manager\editor\ConsoleLog.cpp manager\editor\DebugUIManager.cpp manager\editor\GameObjectEditor.cpp manager\editor\ImGuiManager.cpp manager\editor\JsonEditor.cpp manager\effect\ParticlePipelineManager.cpp manager\effect\PostProcessManager.cpp manager\graphics\InstancedModelPipelineManager.cpp manager\graphics\LineManager.cpp manager\graphics\ModelManager.cpp manager\graphics\ShadowMapManager.cpp manager\graphics\SkinnedModelManager.cpp manager\graphics\SkinningPipelineManager.cpp manager\graphics\TextureManager.cpp manager\scene\CameraManager.cpp manager\scene\LightManager.cpp manager\system\SrvManager.cpp math\MathUtils.cpp scene\factory\SceneFactory.cpp scene\manager\SceneManager.cpp time\TimeManager.cpp time\Timer.cpp time\TimerManager.cpp
+     3>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\Generated\obj\ImGui\Debug\ImGui.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj]
+     4>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\DirectXTex\Debug\DirectXTex.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj]
+     3>FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\unsuccessfulbuild" を削除しています。
+     4>FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\unsuccessfulbuild" を削除しています。
+     3>FinalizeBuildStatus:
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\ImGui\Debug\ImGui.tlog\ImGui.lastbuildstate" のタッチ タスクを実行しています。
+     4>FinalizeBuildStatus:
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\DirectXTex\Debug\DirectXTex.tlog\DirectXTex.lastbuildstate" のタッチ タスクを実行しています。
+     3>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\ImGui\ImGui.vcxproj" (既定のターゲット) のビルドが完了しました。
+     4>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj" (既定のターゲット) のビルドが完了しました。
+     5>ClCompile:
+         Animator.cpp
+         Audio.cpp
+         Camera.cpp
+         D3DResourceLeakChecker.cpp
+         DirectXCommon.cpp
+         PathManager.cpp
+         Logger.cpp
+         ObjectPool.cpp
+         PostProcessPass.cpp
+         RenderTexture.cpp
+         StringUtility.cpp
+         WinApp.cpp
+         DebugCamera.cpp
+         FollowCamera.cpp
+         OrbitCameraWork.cpp
+         Spline.cpp
+         SplineCamera.cpp
+         SplineData.cpp
+         TopDownCamera.cpp
+         EcsInspector.cpp
+         EcsDebugViewer.cpp
+         Registry.cpp
+         CollisionSystem.cpp
+         HierarchySystem.cpp
+         InstancedRenderSystem.cpp
+         LifetimeSystem.cpp
+         MovementSystem.cpp
+         Object3dSystem.cpp
+         SystemManager.cpp
+         ParticleEditor.cpp
+         GPUParticlePipeline.cpp
+         GPUSimulator.cpp
+         ModuleRuntime.cpp
+         SubEmitterModule.cpp
+         ParticleEffect.cpp
+         ParticleEmitter.cpp
+         ParticleDiagnostics.cpp
+         ParticleManager.cpp
+         PrimitiveGenerator.cpp
+         MeshRenderer.cpp
+         SpriteRenderer.cpp
+         TrailRenderer.cpp
+         ParticleEffectSerializer.cpp
+         BasePostEffect.cpp
+         BloomEffect.cpp
+         CRTEffect.cpp
+         GrayscaleEffect.cpp
+         NoiseEffect.cpp
+         VignetteEffect.cpp
+         Framework.cpp
+         GameObject.cpp
+         ICollisionComponent.cpp
+         AABBColliderComponent.cpp
+         CollisionAlgorithm.cpp
+         CollisionManager.cpp
+         CollisionUtils.cpp
+         OBBColliderComponent.cpp
+         RayColliderComponent.cpp
+         SphereColliderComponent.cpp
+         GameObjectManager.cpp
+         FontSprite.cpp
+         NumberSprite.cpp
+         Sprite.cpp
+         SpriteCommon.cpp
+         InstancedModelRenderer.cpp
+         Model.cpp
+         ModelCommon.cpp
+         Object3d.cpp
+         Object3dCommon.cpp
+         SkinnedModel.cpp
+         SkinnedObject3d.cpp
+         SkinningCompute.cpp
+         Skybox.cpp
+         DeferredRenderer.cpp
+         GBuffer.cpp
+         GBufferPipeline.cpp
+         LightPassPipeline.cpp
+         ShadowMapPipeline.cpp
+         ShadowSystem.cpp
+         Input.cpp
+         JsonEditableBase.cpp
+         JsonEditorImGuiUtils.cpp
+         JsonSerialization.cpp
+         Line.cpp
+         LineCommon.cpp
+         ConsoleLog.cpp
+         DebugUIManager.cpp
+         GameObjectEditor.cpp
+         ImGuiManager.cpp
+         JsonEditor.cpp
+         ParticlePipelineManager.cpp
+         PostProcessManager.cpp
+         InstancedModelPipelineManager.cpp
+         LineManager.cpp
+         ModelManager.cpp
+         ShadowMapManager.cpp
+         SkinnedModelManager.cpp
+         SkinningPipelineManager.cpp
+         TextureManager.cpp
+         CameraManager.cpp
+         LightManager.cpp
+         SrvManager.cpp
+         MathUtils.cpp
+         SceneFactory.cpp
+         SceneManager.cpp
+         TimeManager.cpp
+         Timer.cpp
+         TimerManager.cpp
+       Lib:
+         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\HostX86\x64\Lib.exe /OUT:"C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\KentoCompoEngine.lib" /NOLOGO /MACHINE:X64 C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Animator.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Audio.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Camera.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\D3DResourceLeakChecker.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\DirectXCommon.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\PathManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Logger.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ObjectPool.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\PostProcessPass.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\RenderTexture.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\StringUtility.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\WinApp.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\FollowCamera.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\OrbitCameraWork.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Spline.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SplineCamera.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SplineData.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\TopDownCamera.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\EcsInspector.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\EcsDebugViewer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Registry.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CollisionSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\HierarchySystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\InstancedRenderSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\LifetimeSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\MovementSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Object3dSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SystemManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleEditor.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GPUParticlePipeline.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GPUSimulator.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ModuleRuntime.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SubEmitterModule.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleEmitter.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleDiagnostics.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\PrimitiveGenerator.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\MeshRenderer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SpriteRenderer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\TrailRenderer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticleEffectSerializer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\BasePostEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\BloomEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CRTEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GrayscaleEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\NoiseEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\VignetteEffect.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Framework.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GameObject.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ICollisionComponent.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\AABBColliderComponent.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CollisionAlgorithm.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CollisionManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CollisionUtils.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\OBBColliderComponent.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\RayColliderComponent.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SphereColliderComponent.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GameObjectManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\FontSprite.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\NumberSprite.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Sprite.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SpriteCommon.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\InstancedModelRenderer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Model.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ModelCommon.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Object3d.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Object3dCommon.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SkinnedModel.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SkinnedObject3d.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SkinningCompute.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Skybox.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\DeferredRenderer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GBuffer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GBufferPipeline.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\LightPassPipeline.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ShadowMapPipeline.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ShadowSystem.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Input.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\JsonEditableBase.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\JsonEditorImGuiUtils.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\JsonSerialization.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Line.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\LineCommon.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ConsoleLog.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\DebugUIManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\GameObjectEditor.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ImGuiManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\JsonEditor.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ParticlePipelineManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\PostProcessManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\InstancedModelPipelineManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\LineManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ModelManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\ShadowMapManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SkinnedModelManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SkinningPipelineManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\TextureManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\CameraManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\LightManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SrvManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\MathUtils.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SceneFactory.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\SceneManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\TimeManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\Timer.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\TimerManager.obj
+         C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\DebugCamera.obj
+         KentoCompoEngine.vcxproj -> C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\outputs\Debug\KentoCompoEngine.lib
+     5>C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(2624,5): warning : リモート配置が時間がかかるか、効率的ではない可能性があります。パス 'C:\Users\k023g\source\repos\kuriharakento\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.lib.recipe' へのアクセスが拒否されました。 [C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj]
+       FinalizeBuildStatus:
+         ファイル "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\unsuccessfulbuild" を削除しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\KentoCompoEngine\Debug\KentoCompoEngine.tlog\KentoCompoEngine.lastbuildstate" のタッチ タスクを実行しています。
+     5>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\engine\KentoCompoEngine.vcxproj" (既定のターゲット) のビルドが完了しました。
+     1>プロジェクト "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\GameTemplate.sln" (1) は、ノード 1 上に "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\GameTemplate.vcxproj" (2) をビルドしています (既定のターゲット)。
+     2>PrepareForBuild:
+         構造化出力が有効になっています。コンパイラ診断の書式設定にはエラー階層が反映されます。詳細については、https://aka.ms/cpp/structured-output を参照してください。
+       InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\unsuccessfulbuild" を作成しています。
+         "C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\GameTemplate.tlog\unsuccessfulbuild" のタッチ タスクを実行しています。
+       ComputeStdModulesCompileInputs:
+         ライブラリ 'microsoft/STL' のデータを提供するライブラリ マニフェスト ファイル 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\modules.json' を読み取っています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.ixx' を追加しています。
+         このプロジェクトでビルドするライブラリ 'microsoft/STL' からモジュール ソース 'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\modules\std.compat.ixx' を追加しています。
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\HostX86\x64\CL.exe /c /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\..\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\..\engine\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\..\engine\externals\ /IC:\Users\k023g\source\repos\kuriharakento\GameTemplate\application\..\engine\externals\assimp\include /ZI /JMC /nologo /W3 /WX /diagnostics:column /sdl /MP /Od /D _DEBUG /D _WINDOWS /D USE_IMGUI /D _UNICODE /D UNICODE /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /std:c++20 /permissive- /Fo"C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\\" /Fd"C:\Users\k023g\source\repos\kuriharakento\GameTemplate\generated\obj\GameTemplate\Debug\vc145.pdb" /external:W3 /Gd /TP /FC /errorReport:queue /utf-8 /FS /Zc:enumTypes- gameobject\component\action\common\PhysicsComponent.cpp gameobject\component\action\common\StatusComponent.cpp resources\LoadGameResources.cpp MyGame.cpp scene\debug\ParticleTestScene.cpp main.cpp scene\play\title\TitleScene.cpp
+         PhysicsComponent.cpp
+         StatusComponent.cpp
+         LoadGameResources.cpp
+         MyGame.cpp
+         ParticleTestScene.cpp
+         main.cpp
+         TitleScene.cpp

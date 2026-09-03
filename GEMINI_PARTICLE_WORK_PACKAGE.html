@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Gemini GPU Particle Work Package</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--paper:#fff;--text:#202633;--muted:#657083;--line:#d9e0ea;--accent:#4263eb;--code:#eef2f7} @media(prefers-color-scheme:dark){:root{--bg:#11151c;--paper:#191f29;--text:#e8ecf3;--muted:#aeb7c6;--line:#343d4d;--accent:#91a7ff;--code:#111720}} *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif;line-height:1.72} main{width:min(1180px,calc(100% - 32px));margin:32px auto 72px;padding:clamp(24px,5vw,64px);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.08)} .meta{color:var(--muted);font-size:.9rem;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:32px} h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.2;margin-top:0} h2{border-bottom:2px solid var(--line);padding-bottom:.35em;margin-top:2.4em} h3{color:var(--accent);margin-top:2em} p,li{max-width:96ch} li+li{margin-top:.35em} table{border-collapse:collapse;width:100%;display:block;overflow:auto;margin:1.2em 0} th,td{border:1px solid var(--line);padding:.55em .75em;text-align:left;vertical-align:top} th{background:var(--code)} code{font-family:"Cascadia Code",Consolas,monospace;background:var(--code);padding:.12em .35em;border-radius:4px;overflow-wrap:anywhere} pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:18px;overflow:auto} pre code{padding:0;background:transparent} @media print{body{background:#fff}main{width:auto;margin:0;padding:0;border:0;box-shadow:none}h2,h3{break-after:avoid}table,pre{break-inside:avoid}}
+</style></head><body><main><div class="meta">Gemini handoff · generated 2026-07-31 15:30 +09:00</div><h1 id="gemini-gpu-particle">Gemini向け GPU Particle 作業分担書</h1>
+<h2 id="section">1. 分担方針</h2>
+<p>Geminiには、既存挙動を変更せず、成果物をレビュー・比較しやすい「Phase 0: 観測性と安全網」を担当してもらう。</p>
+<p>Pure GPU runtimeの中核は担当させない。特にAlive/Dead list、GPU counter、resource barrier、ExecuteIndirect、frame fence、descriptor retirement、SubEmitter/Ribbon GPU化はCodex側で実装する。これらは設計判断が相互依存し、局所的に正しそうな変更でもGPU hang、use-after-free、silent corruptionを起こし得るためである。</p>
+<h3 id="section-1">役割一覧</h3>
+<table>
+<thead>
+<tr>
+<th>領域</th>
+<th>担当</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>現行moduleのcapability棚卸し</td>
+<td>Gemini</td>
+<td>読み取り中心で、成果をコードと照合できる</td>
+</tr>
+<tr>
+<td>Particle ABI compile-time guard</td>
+<td>Gemini</td>
+<td>期待offsetを明示でき、コンパイラで検証できる</td>
+</tr>
+<tr>
+<td>benchmark effect/scene</td>
+<td>Gemini</td>
+<td>既存APIだけで作成でき、見た目と件数を確認できる</td>
+</tr>
+<tr>
+<td>CPU profiler scopeと転送量counter</td>
+<td>Gemini</td>
+<td>現行挙動を変えずbaselineを得られる</td>
+</tr>
+<tr>
+<td>lifecycle回帰テスト仕様</td>
+<td>Gemini</td>
+<td>Pure GPU移行前の期待動作を固定できる</td>
+</tr>
+<tr>
+<td>GPU timestamp query基盤</td>
+<td>Codex</td>
+<td>fence/readback/frame context設計と密接に関係する</td>
+</tr>
+<tr>
+<td>GpuEmitterRuntime</td>
+<td>Codex</td>
+<td>Pure GPUの中核</td>
+</tr>
+<tr>
+<td>Alive/Dead/Counter protocol</td>
+<td>Codex</td>
+<td>並行性と正当性の中核</td>
+</tr>
+<tr>
+<td>ExecuteIndirect/CommandSignature</td>
+<td>Codex</td>
+<td>renderer/root signature/resource stateと密接</td>
+</tr>
+<tr>
+<td>descriptor pool/deferred release</td>
+<td>Codex</td>
+<td>エンジン全体のresource lifetimeに影響</td>
+</tr>
+<tr>
+<td>module registry/compiler/asset migration</td>
+<td>Codex</td>
+<td>runtime ABIとasset互換性を決定する</td>
+</tr>
+<tr>
+<td>editorの新runtime対応</td>
+<td>共同、Codex設計後にGemini</td>
+<td>API確定前に作ると手戻りになる</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gemini">2. Geminiの作業ルール</h2>
+<p>以下をGeminiへの依頼文にそのまま含めること。</p>
+<ol>
+<li>作業開始時に <code>git status --short</code> を記録する。既存変更はユーザーの所有物として変更・削除・整形しない。</li>
+<li>専用branchまたは専用worktreeを使用する。1タスク1commitとし、commitを混ぜない。</li>
+<li>最初に <code>PARTICLE_REFACTORING_PLAN.md</code> と本書を全文読む。</li>
+<li>ファイルを変更する前に、対象APIの全call siteを <code>rg</code> で列挙する。</li>
+<li>runtimeの挙動、moduleの計算式、JSON形式、shader、root signature、resource barrierを変更しない。</li>
+<li>不明点を推測でAPI化しない。既存の仕組みが見つからない場合は、実装を止めて調査結果と候補を報告する。</li>
+<li>大規模rename、全ファイルformat、include順の一括変更をしない。</li>
+<li>warningを無効化しない。失敗するassert/testを削除・緩和して通さない。</li>
+<li>各commitに、変更ファイル、検証コマンド、検証結果、未解決事項を記載する。</li>
+<li><code>engine</code> が親repositoryからsubmoduleとして見える場合、親と<code>engine</code>内の両方のstatus/diffを報告する。</li>
+</ol>
+<h2 id="work-package-g1-module-capability-inventory">3. Work Package G1: Module Capability Inventory</h2>
+<h3 id="section-2">目的</h3>
+<p>現存する全moduleについて、CPU/GPU対応状況と実行stageを、コードから再生成・監査できる形で固定する。推測で「対応」と判定してはいけない。</p>
+<h3 id="section-3">調査対象</h3>
+<ul>
+<li><code>engine/effects/particle/module/IModule.h</code></li>
+<li><code>engine/effects/particle/module/spawn/</code></li>
+<li><code>engine/effects/particle/module/update/</code></li>
+<li><code>engine/effects/particle/gpu/GPUSimulator.cpp</code></li>
+<li><code>engine/Resources/shaders/Particle*.hlsl</code></li>
+<li><code>engine/effects/particle/editor/ParticleEditor.cpp</code></li>
+<li><code>engine/effects/particle/serialization/ParticleEffectSerializer.cpp</code></li>
+</ul>
+<h3 id="section-4">実装手順</h3>
+<ol>
+<li><code>IModule</code>派生classをすべて列挙する。</li>
+<li>各classについて次を記録する。
+<ul>
+<li>C++ class名</li>
+<li><code>GetName()</code>の永続名</li>
+<li><code>ModulePhase</code></li>
+<li>priority</li>
+<li>serializer load/save対応</li>
+<li>editor追加UI対応</li>
+<li>CPU <code>Execute()</code>実装の有無</li>
+<li><code>IsGPUSupported()</code>の値</li>
+<li><code>DispatchGPU()</code>の有無</li>
+<li>main <code>ParticleCompute.hlsl</code>内での処理有無</li>
+<li>個別compute shader/PSOの有無</li>
+<li>Sprite/Mesh/Ribbonとの関係</li>
+<li>既知のGPU semantic差</li>
+</ul>
+</li>
+<li><code>IsGPUSupported()==false</code>でもmain shaderのflag分岐で処理されるmoduleがあるため、単一条件だけでGPU対応と判断しない。</li>
+<li>結果を <code>engine/effects/particle/docs/PARTICLE_MODULE_CAPABILITY_MATRIX.md</code> に表として作成する。</li>
+<li>コード行への参照を付ける。ただし行番号だけでなくsymbol/file名も記載する。</li>
+<li>次の分類を必ず使用する。
+<ul>
+<li><code>CPU_ONLY</code></li>
+<li><code>HYBRID_MAIN_CS</code></li>
+<li><code>HYBRID_SEPARATE_CS</code></li>
+<li><code>RENDERER_CPU_DEPENDENT</code></li>
+<li><code>UNKNOWN_NEEDS_TEST</code></li>
+</ul>
+</li>
+<li>非対応moduleがGPUモードでどうなるかを明記する。「おそらく動く」は禁止する。</li>
+</ol>
+<h3 id="section-5">成果物</h3>
+<ul>
+<li>capability matrix 1ファイル</li>
+<li>module総数と分類別件数</li>
+<li>serializer/editor/runtimeの不一致一覧</li>
+<li>未確認項目一覧</li>
+</ul>
+<h3 id="section-6">完了条件</h3>
+<ul>
+<li><code>rg &quot;class .*Module&quot; engine/effects/particle/module</code> の全classが表に存在する。</li>
+<li><code>GetName()</code>の重複、serializer片方向のみ、editorのみ存在、GPU flagとDispatch不一致を明示できる。</li>
+<li>runtime codeは変更しない。</li>
+</ul>
+<h2 id="work-package-g2-particle-abi-guards">4. Work Package G2: Particle ABI Guards</h2>
+<h3 id="section-7">目的</h3>
+<p>C++ <code>Particle</code> の128-byteレイアウトが意図せず変わった場合、コンパイル時に停止させる。</p>
+<h3 id="section-8">期待レイアウト</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th style="text-align: right;">Offset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>position</code></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>velocity</code></td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr>
+<td><code>scale</code></td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td style="text-align: right;">48</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td style="text-align: right;">64</td>
+</tr>
+<tr>
+<td><code>initialColor</code></td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr>
+<td><code>age</code></td>
+<td style="text-align: right;">96</td>
+</tr>
+<tr>
+<td><code>lifetime</code></td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td><code>ribbonWidth</code></td>
+<td style="text-align: right;">104</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr>
+<td><code>ribbonId</code></td>
+<td style="text-align: right;">116</td>
+</tr>
+<tr>
+<td><code>spriteIndex</code></td>
+<td style="text-align: right;">120</td>
+</tr>
+<tr>
+<td><code>pad3</code></td>
+<td style="text-align: right;">124</td>
+</tr>
+<tr>
+<td>total size</td>
+<td style="text-align: right;">128</td>
+</tr>
+<tr>
+<td>alignment</td>
+<td style="text-align: right;">16</td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-9">実装手順</h3>
+<ol>
+<li><code>Particle.h</code>に必要最小限の<code>&lt;cstddef&gt;</code>と<code>&lt;type_traits&gt;</code>を追加する。</li>
+<li><code>Particle</code>定義直後に以下の種類のguardを追加する。
+<ul>
+<li><code>std::is_standard_layout_v&lt;Particle&gt;</code></li>
+<li><code>sizeof(Particle) == 128</code></li>
+<li><code>alignof(Particle) == 16</code></li>
+<li>上表の各<code>offsetof</code></li>
+</ul>
+</li>
+<li><code>ParticleGPU</code>についても、C++側shader includeと照合してsize/offset表を先に報告する。値を確認できない場合は推測でassertを追加しない。</li>
+<li><code>ParticleCompute.hlsl</code>、<code>ParticleConvert.CS.hlsl</code>、個別module shaderの<code>Particle</code>定義が同じfield順か監査し、差分を文書化する。</li>
+<li>このタスクではgenerated header/codegenを導入しない。既存ABIを固定するだけに留める。</li>
+</ol>
+<h3 id="section-10">禁止事項</h3>
+<ul>
+<li><code>Particle</code>のfield追加、削除、並べ替え</li>
+<li>HLSL構造体の修正</li>
+<li>pack pragmaによる強制</li>
+<li>assertを通すためのpadding変更</li>
+</ul>
+<h3 id="section-11">完了条件</h3>
+<ul>
+<li>Debug/Releaseのengine buildが成功する。</li>
+<li>期待offsetを1つ仮に変更するとcompileが失敗することを確認し、その仮変更は戻す。</li>
+<li><code>git diff</code>にABI guard以外の振る舞い変更がない。</li>
+</ul>
+<h2 id="work-package-g3-baseline-benchmark-assets">5. Work Package G3: Baseline Benchmark Assets</h2>
+<h3 id="section-12">目的</h3>
+<p>旧CPU pathと旧hybrid GPU pathを同一条件で比較できる再現可能なbenchmarkを作る。</p>
+<h3 id="section-13">シナリオ</h3>
+<p>最低限、次のケースを用意する。</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th style="text-align: right;">Emitters</th>
+<th style="text-align: right;">Target alive</th>
+<th>Renderer</th>
+<th>Modules</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1,000</td>
+<td>Sprite</td>
+<td>SpawnRate/Lifetime/Velocity</td>
+<td>小規模overhead</td>
+</tr>
+<tr>
+<td>B02</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10,000</td>
+<td>Sprite</td>
+<td>B01 + Gravity/Drag</td>
+<td>標準負荷</td>
+</tr>
+<tr>
+<td>B03</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">65,536</td>
+<td>Sprite</td>
+<td>B02</td>
+<td>現行default上限</td>
+</tr>
+<tr>
+<td>B04</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">合計65,536</td>
+<td>Sprite</td>
+<td>B02</td>
+<td>emitter dispatch overhead</td>
+</tr>
+<tr>
+<td>B05</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">合計10,000</td>
+<td>Sprite</td>
+<td>最小module</td>
+<td>descriptor/manager overhead</td>
+</tr>
+<tr>
+<td>B06</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10,000</td>
+<td>Mesh</td>
+<td>B02</td>
+<td>indexed instancing</td>
+</tr>
+<tr>
+<td>B07</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">安全な既定値</td>
+<td>Ribbon</td>
+<td>ribbon関連</td>
+<td>CPU renderer baseline</td>
+</tr>
+</tbody>
+</table>
+<p>250kは現行capacity/APIで安全に設定できることを確認できた場合だけ追加する。assertやallocation失敗が起きる構成を既定benchmarkにしない。</p>
+<h3 id="section-14">実装手順</h3>
+<ol>
+<li>既存 <code>application/scene/debug/ParticleTestScene.*</code> の起動方法と責務を調査する。</li>
+<li>既存sceneを壊さず、benchmark presetを選択できる最小追加にする。別sceneが必要なら理由を先に報告する。</li>
+<li>random seed、camera transform、texture、blend、simulation mode、duration、warm-up秒数を固定する。</li>
+<li>CPUとGPU-hybridで同一effect definitionを使う。機能非対応moduleは両者から外すか、差分として記録する。</li>
+<li>benchmark中にeditorの粒子markerを無効化する。marker走査をbaselineに混ぜない。</li>
+<li>VSync、resolution、build typeを画面またはログに表示する。</li>
+<li>各presetに期待target countとoverflow有無を表示する。</li>
+</ol>
+<h3 id="section-15">成果物</h3>
+<ul>
+<li>benchmark scene/preset code</li>
+<li>操作手順 <code>engine/effects/particle/docs/PARTICLE_BENCHMARK.md</code></li>
+<li>各presetの設定表</li>
+<li>実行できなかったcaseと理由</li>
+</ul>
+<h3 id="section-16">完了条件</h3>
+<ul>
+<li>同じpresetを再起動して同じ設定になる。</li>
+<li>CPU/GPU-hybridを明示切替できる。</li>
+<li>benchmark追加前の通常ParticleTestSceneの操作を壊さない。</li>
+<li>Release buildで最低B01〜B06が起動し、D3D12 debug errorがない。</li>
+</ul>
+<h2 id="work-package-g4-cpu-baseline-instrumentation">6. Work Package G4: CPU Baseline Instrumentation</h2>
+<h3 id="section-17">目的</h3>
+<p>GPU timestamp基盤へ踏み込まず、CPU側の処理時間と既知の転送量を測定できるようにする。</p>
+<h3 id="section-18">測定項目</h3>
+<ul>
+<li><code>ParticleManager::Update</code></li>
+<li>emitter CPU update</li>
+<li>hybrid GPU update全体</li>
+<li><code>ReadbackParticles</code>のCPU map/memcpy時間</li>
+<li><code>RemoveDeadParticles</code></li>
+<li><code>UpdateGPUSpawns</code></li>
+<li><code>UploadParticles</code>のCPU map/memcpy/command recording時間</li>
+<li>renderer <code>Update</code></li>
+<li>renderer <code>Draw</code>のCPU command recording時間</li>
+<li>frameごとのupload/readback要求bytes</li>
+<li>emitter数、CPU vector size、last-known GPU count</li>
+</ul>
+<h3 id="section-19">実装手順</h3>
+<ol>
+<li>既存profiler/timer/debug UIの有無を検索する。</li>
+<li>既存基盤がある場合だけそれを使う。似たprofilerを新設しない。</li>
+<li>基盤がない場合、実装に入らず次を報告する。
+<ul>
+<li>利用可能なTimer/DebugUI API</li>
+<li>最小instrumentation案</li>
+<li>thread safetyと集計周期</li>
+</ul>
+</li>
+<li>scopeはRAIIにし、早期returnでも閉じるようにする。</li>
+<li>sampling表示はrolling average、min/max、sample countを持つ。毎フレーム文字列allocationやログ出力を行わない。</li>
+<li>byte counterは実際の<code>copyCount * sizeof(Particle)</code>を記録する。GPU実行時間と称してCPU command recording時間を表示しない。</li>
+<li>instrumentation自体のON/OFFを用意し、Release既定では低負荷または無効にする。</li>
+</ol>
+<h3 id="section-20">禁止事項</h3>
+<ul>
+<li>timestamp query/readback heapの独自実装</li>
+<li>fence waitの追加</li>
+<li><code>ExecuteAndWait()</code>の追加</li>
+<li>command listのClose/Execute</li>
+<li>GPU同期を使った正確な時間測定</li>
+</ul>
+<h3 id="section-21">完了条件</h3>
+<ul>
+<li>表示名に<code>CPU</code>または<code>command recording</code>が明記され、GPU時間と誤認しない。</li>
+<li>instrumentation OFFで主要pathの分岐・出力が増えない、または計測可能な最小overheadである。</li>
+<li>B01〜B06の結果を同じフォーマットで保存できる。</li>
+</ul>
+<h2 id="work-package-g5-lifecycle-regression-specification">7. Work Package G5: Lifecycle Regression Specification</h2>
+<h3 id="section-22">目的</h3>
+<p>Pure GPU化で破壊しやすい既存のライフサイクル意味論を、実装前にテストケースとして固定する。</p>
+<h3 id="section-23">必須ケース</h3>
+<ul>
+<li>Play直後、Pause/Resume、Stop + Complete、Stop + Kill、Reset、Restart</li>
+<li>duration 0、Once/Infinite/Multiple、loop count境界</li>
+<li>start delay中の既存粒子更新</li>
+<li>SpawnRate、単発/反復SpawnBurstの<code>IsComplete</code></li>
+<li>最後の粒子死亡とeffect停止のタイミング</li>
+<li><code>ClearParticles</code>、simulation mode切替、max particles変更</li>
+<li>follow target移動、follow emitter、Local/World</li>
+<li>deltaTime 0、通常値、大きなspike、time scale 0</li>
+<li>effect削除とrenderer差替え</li>
+</ul>
+<h3 id="section-24">実装手順</h3>
+<ol>
+<li><code>ParticleEmitter.cpp</code>、<code>ParticleEffect.cpp</code>、<code>ParticleManager.cpp</code>のcall graphをまとめる。</li>
+<li>各ケースを Given/When/Then 形式で文書化する。</li>
+<li>現行挙動が明らかなbugまたは曖昧な場合、「期待仕様」を勝手に決めず <code>DECISION_REQUIRED</code> と記載する。</li>
+<li>自動test frameworkが既にある場合のみtest化する。新しいframework導入や外部dependency追加は行わない。</li>
+<li>GPU移行後に許容する差（例: completion通知が数frame遅延）を別欄にする。</li>
+</ol>
+<h3 id="section-25">成果物</h3>
+<ul>
+<li><code>engine/effects/particle/docs/PARTICLE_LIFECYCLE_SPEC.md</code></li>
+<li>call-site一覧</li>
+<li><code>DECISION_REQUIRED</code>一覧</li>
+<li>可能なら既存framework上のCPU regression tests</li>
+</ul>
+<h3 id="section-26">完了条件</h3>
+<ul>
+<li><code>GetParticles().empty()/size()</code>を使う全call siteが記録されている。</li>
+<li><code>IsEmitting</code>とalive particleの違いがケースに含まれる。</li>
+<li>現行挙動と新仕様案を混同していない。</li>
+</ul>
+<h2 id="gemini-1">8. Geminiに渡さない作業</h2>
+<p>以下のファイル・領域は、明示的な再割当がない限り変更禁止とする。</p>
+<ul>
+<li><code>engine/effects/particle/gpu/GPUSimulator.*</code></li>
+<li><code>engine/effects/particle/gpu/GPUParticlePipeline.*</code></li>
+<li><code>engine/Resources/shaders/Particle*.hlsl</code></li>
+<li><code>engine/base/DirectXCommon.*</code></li>
+<li><code>engine/manager/system/SrvManager.*</code></li>
+<li>renderer root signature/PSO</li>
+<li>serializerの保存形式</li>
+<li><code>SimulationMode</code> enum</li>
+<li>新 <code>GpuEmitterRuntime</code> とそのresource classes</li>
+</ul>
+<p>例外はG1の読み取り調査とG2の<code>Particle.h</code>へのassert追加だけである。</p>
+<h2 id="section-27">9. 実行順と依存関係</h2>
+<ol>
+<li><strong>G1 Capability Inventory</strong> — 最初に実施。コード変更なし。</li>
+<li><strong>G5 Lifecycle Specification</strong> — G1と並行可能。コード変更なしを基本とする。</li>
+<li><strong>G2 ABI Guards</strong> — 独立commit。</li>
+<li><strong>G3 Benchmark Assets</strong> — G1の安全なmodule集合を使う。</li>
+<li><strong>G4 CPU Instrumentation</strong> — benchmarkへ組み込み、baselineを取得する。</li>
+</ol>
+<p>G1/G5のレビューが終わる前にG3/G4をmainへ統合しない。棚卸しの誤りがbenchmark条件へ伝播するためである。</p>
+<h2 id="gemini-2">10. Geminiの最終報告テンプレート</h2>
+<pre><code class="language-text">Task ID:
+Branch / commit:
+
+Changed files:
+- ...
+
+What was implemented:
+- ...
+
+Commands run:
+- ...
+
+Results:
+- Build Debug:
+- Build Release:
+- Tests:
+- Manual benchmark:
+- D3D12 validation:
+
+Pre-existing changes preserved:
+- ...
+
+Known limitations / DECISION_REQUIRED:
+- ...
+
+Things deliberately not changed:
+- ...
+</code></pre>
+<p>「成功しました」だけの報告は受け付けない。実行したコマンド、exit code、結果、未実施項目を分けて報告させる。</p>
+<h2 id="codex">11. Codex側の担当</h2>
+<p>GeminiのG1〜G5をレビューした後、Codex側で以下を進める。</p>
+<ol>
+<li>module capability/lifecycle decisionの確定。</li>
+<li><code>GpuEmitterRuntime</code> resource modelとcounter protocol。</li>
+<li>Spawn/Update/Compact/Finalize compute passes。</li>
+<li>Sprite render build、CommandSignature、ExecuteIndirect。</li>
+<li>completion record、generation handle、async debug snapshot。</li>
+<li>descriptor budgetに基づくpool/arena選択。</li>
+<li>fence付きdeferred release。</li>
+<li>module registry/compilerとasset migration。</li>
+<li>GPU events、SubEmitter、Mesh、Ribbon。</li>
+<li>frame contextリング化と必要に応じたasync compute検討。</li>
+</ol>
+<p>Geminiの成果はそのまま無条件に採用せず、各commitを個別reviewし、capability表はコード検索、ABIはcompiler、benchmarkはcapture、計測値は測定定義と照合してから統合する。</p>
+</main></body></html>

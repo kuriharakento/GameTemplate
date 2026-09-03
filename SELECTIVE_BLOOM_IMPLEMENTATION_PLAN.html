@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KCE Selective Bloom 共通基盤 実装計画</title>
+<style>
+:root{--bg:#080d18;--panel:#111a2c;--panel2:#17233a;--text:#e9eef8;--muted:#9facbf;--line:#293853;--cyan:#65dbff;--violet:#ae91ff;--green:#5ce0a1;--yellow:#ffd166;--red:#ff7676}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 85% 0,#253b6680,transparent 35%),linear-gradient(145deg,#070b13,#0d1525 55%,#080d18);color:var(--text);font:15px/1.75 system-ui,"Yu Gothic UI","Meiryo",sans-serif}header{padding:64px max(24px,calc((100% - 1180px)/2));border-bottom:1px solid var(--line)}h1{margin:8px 0 15px;font-size:clamp(32px,5vw,55px);line-height:1.12}h2{margin:52px 0 18px;padding-bottom:9px;border-bottom:1px solid var(--line)}h3{margin-top:28px;color:#d8e5ff}.lead{max-width:900px;font-size:18px;color:#cbd7e9}.tag{display:inline-block;margin:3px;padding:4px 10px;border:1px solid #405c89;border-radius:999px;background:#15213a;color:#d3f4ff;font-size:12px}nav{position:sticky;top:0;z-index:10;padding:9px max(24px,calc((100% - 1180px)/2));overflow:auto;white-space:nowrap;background:#080d18ed;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}nav a{margin-right:20px;color:#c3d1e8;text-decoration:none}main{max-width:1180px;margin:auto;padding:22px 24px 80px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}.card{padding:18px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(150deg,var(--panel),var(--panel2));box-shadow:0 12px 34px #0003}.card h3{margin:0 0 8px}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:18px 0}.node{min-width:145px;padding:11px 14px;text-align:center;border:1px solid #405b88;border-radius:9px;background:#15223a}.arrow{font-size:21px;color:var(--cyan)}table{width:100%;border-collapse:collapse;margin:16px 0;background:#0e1728}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:#1a2945;color:#e2ebfb}code{padding:2px 5px;border-radius:4px;background:#070d18;color:#b9efff;font-family:Consolas,monospace}pre{overflow:auto;padding:16px;border:1px solid var(--line);border-radius:10px;background:#060b13;line-height:1.55}pre code{padding:0;background:none}.note{margin:15px 0;padding:13px 16px;border-left:4px solid var(--cyan);background:#111d32}.warn{border-left-color:var(--yellow)}.danger{border-left-color:var(--red)}.ok{color:var(--green)}.muted{color:var(--muted)}.phase{display:grid;grid-template-columns:75px 1fr;gap:14px;margin:13px 0;padding:16px;border:1px solid var(--line);border-radius:12px;background:#10192a}.phase-no{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#07101c;font-size:22px;font-weight:800}.check li{margin:7px 0}.file{word-break:break-all;color:#c7d7ef}footer{padding:25px;border-top:1px solid var(--line);color:var(--muted);text-align:center}@media(max-width:720px){.phase{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}table{display:block;overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+  <span class="tag">Engine Common</span><span class="tag">Selective Bloom</span><span class="tag">HDR MRT</span><span class="tag">Particle + GameObject</span>
+  <h1>Selective Bloom<br>共通基盤 実装計画</h1>
+  <p class="lead">明るさだけでBloom対象を決める現行方式を改め、指定したGPU/CPUパーティクル、GameObject、SkinnedModel、Sprite、Ribbonだけを発光させるためのエンジン共通実装計画です。</p>
+  <p class="muted">作成日: 2026-08-11 / 対象プロジェクト: GameTemplate / 文書種別: 実装前設計・受け入れ基準</p>
+</header>
+<nav><a href="#goal">目的</a><a href="#architecture">構造</a><a href="#data">共通データ</a><a href="#api">API</a><a href="#phases">工程</a><a href="#files">変更箇所</a><a href="#validation">検証</a><a href="#risk">リスク</a><a href="#done">完成条件</a></nav>
+<main>
+<section id="goal">
+<h2>1. 目的と完成像</h2>
+<div class="grid">
+  <article class="card"><h3>対象を明示的に選択</h3><p>画面上の輝度ではなく、Materialの設定によってBloom Maskへ出力するかを決定します。白い床や空などは明るくてもBloomしません。</p></article>
+  <article class="card"><h3>エンジン共通機能</h3><p>パーティクル専用フラグにはせず、GameObject、SkinnedModel、Sprite、Mesh、Ribbonが同じ<code>EmissiveSettings</code>を利用します。</p></article>
+  <article class="card"><h3>Pure GPUを維持</h3><p>GPUパーティクルのBloom属性もGPU常駐データとして扱います。粒子情報、生存数、発光値のCPUリードバックは追加しません。</p></article>
+  <article class="card"><h3>既存資産との互換性</h3><p>既存MaterialとJSONはBloom無効を既定値として読み込み、見た目を変えません。Selective Bloomは明示的に有効化した資産だけへ適用します。</p></article>
+</div>
+<div class="note"><strong>非目標:</strong> ライトとして周囲を照らすGlobal Illuminationではありません。これは画面空間の発光ぼかしです。実ライトを生成するParticle Light Rendererは別機能として扱います。</div>
+</section>
+
+<section id="architecture">
+<h2>2. 描画アーキテクチャ</h2>
+<h3>採用方式: Scene Color + Selective Bloom Mask</h3>
+<div class="flow">
+  <div class="node">GameObject<br>Particle<br>Sprite</div><div class="arrow">→</div>
+  <div class="node">MRT描画<br><small>Scene / Bloom Mask</small></div><div class="arrow">→</div>
+  <div class="node">Bloom Mask<br>Downsample</div><div class="arrow">→</div>
+  <div class="node">Gaussian Blur<br>Horizontal / Vertical</div><div class="arrow">→</div>
+  <div class="node">Scene + Bloom<br>Final Composite</div>
+</div>
+<table>
+<thead><tr><th>Render Target</th><th>用途</th><th>推奨Format</th><th>出力内容</th></tr></thead>
+<tbody>
+<tr><td>Scene Color</td><td>通常のシーン</td><td><code>R16G16B16A16_FLOAT</code>を推奨</td><td>Base Color + Emissiveの可視色</td></tr>
+<tr><td>Bloom Mask</td><td>選択対象だけの発光源</td><td><code>R16G16B16A16_FLOAT</code></td><td>非対象は黒、対象はHDR Emissive</td></tr>
+<tr><td>Blur 0 / 1</td><td>縮小BloomのPing-Pong</td><td><code>R16G16B16A16_FLOAT</code></td><td>水平・垂直ぼかし結果</td></tr>
+</tbody>
+</table>
+<div class="note warn"><strong>重要:</strong> 現在のシーンRTが<code>R8G8B8A8_UNORM_SRGB</code>のため、RGBを1.0以上へ出しても保持できません。Selective Bloom Maskは必ずHDR形式にします。Scene ColorのHDR化は推奨ですが、初期段階ではBloom MaskだけHDRでも実装可能です。</div>
+<h3>描画方式の使い分け</h3>
+<table><thead><tr><th>対象</th><th>基本方式</th><th>理由</th></tr></thead><tbody>
+<tr><td>Deferred GameObject</td><td>GBufferへEmissive/Bloom属性を追加、Light PassでBloom Mask生成</td><td>Geometry PassのMRT構成と整合し、オブジェクト再描画を避ける</td></tr>
+<tr><td>Forward GameObject / Sprite</td><td>Scene ColorとBloom MaskのMRT同時出力</td><td>透明・前方描画を1回で処理する</td></tr>
+<tr><td>Particle Sprite / Mesh / Ribbon</td><td>Forward MRT同時出力</td><td>Pure GPUのIndirect Drawを1回のまま維持する</td></tr>
+</tbody></table>
+<h3>確定仕様: Deferred GBuffer</h3>
+<p>既存GBufferにはRT3 Emissiveが存在しますが、現在は<code>R8G8B8A8_UNORM</code>です。新しいGBuffer RTは増やさず、RT3だけを<code>R16G16B16A16_FLOAT</code>へ昇格します。RGBへ<code>emissiveColor * intensity</code>、Aへ<code>bloomContribution</code>を格納します。FP16は本仕様のRGB上限64とContribution 0～1を十分な精度で保持でき、ログエンコードは使用しません。</p>
+<table><thead><tr><th>GBuffer</th><th>現行</th><th>変更後</th><th>判断</th></tr></thead><tbody>
+<tr><td>RT0 Albedo</td><td>RGBA8 UNORM</td><td>変更なし</td><td>非HDR属性</td></tr>
+<tr><td>RT1 Normal</td><td>RGB10A2 UNORM</td><td>変更なし</td><td>既存精度を維持</td></tr>
+<tr><td>RT2 Material</td><td>RGBA8 UNORM</td><td>変更なし</td><td>Roughness/AO</td></tr>
+<tr><td>RT3 Emissive</td><td>RGBA8 UNORM</td><td><code>RGBA16 FLOAT</code></td><td>HDR値を無損失で保持</td></tr>
+</tbody></table>
+<p>1920×1080でRT3の増分は約7.9 MiB（4 bytes/pixel増）です。新規GBuffer RTを1枚追加する案よりRTV/SRV数とGeometry Pass帯域を抑えます。</p>
+<h3>確定仕様: Deferred → Forwardの書き込み順序</h3>
+<ol>
+<li>Bloom Maskを黒でClearし、Scene ColorとBloom Maskを<code>RENDER_TARGET</code>へ遷移。</li>
+<li>現行のDeferred Light PassはComputeではなくGraphics Fullscreen Pixel Shaderなので、2 RTVを同時Bindし、Scene Colorと不透明物のBloom Maskを上書き出力。</li>
+<li>Scene ColorとBloom MaskをRTV状態のまま維持し、Forward GameObject、Sprite、Particleを描画。Forward側はBloom Maskへ独立Blendで合成。</li>
+<li>Forward終了後に両RTを<code>PIXEL_SHADER_RESOURCE</code>へ遷移し、Bloom MaskをDownsample/Blurへ渡す。</li>
+</ol>
+<div class="note"><strong>バリア方針:</strong> Bloom Maskは生成中にUAVへしません。Deferred/ForwardともRTV書き込みに統一するため、毎フレームのRTV↔UAV往復はありません。Blur入力へ移る時のRTV→SRV遷移だけを行います。</div>
+<h3>確定仕様: BlendMode別Bloom Mask合成</h3>
+<p>PSOは<code>IndependentBlendEnable=TRUE</code>とし、RT0は既存Blend、RT1は下表の専用Blendを使用します。シェーダーはRT1 RGBへ常に<code>emissive * saturate(alpha) * bloomContribution</code>という事前乗算値を出します。</p>
+<table><thead><tr><th>Scene Blend</th><th>RT1 Src / Dest / Op</th><th>Bloom意味論</th></tr></thead><tbody>
+<tr><td>Alpha</td><td>ONE / INV_SRC_ALPHA / ADD</td><td>透明度に従うPremultiplied Alpha</td></tr>
+<tr><td>Additive</td><td>ONE / ONE / ADD</td><td>光エネルギーを加算</td></tr>
+<tr><td>Screen / Lighten / ColorDodge</td><td>ONE / ONE / ADD</td><td>Bloom Maskでは安定した加算へ統一</td></tr>
+<tr><td>Multiply / Subtractive / Darken / ColorBurn</td><td>ONE / ONE / ADD</td><td>BloomはSceneの色演算と分離した発光エネルギー。全Material共通でEnabled=falseが既定</td></tr>
+</tbody></table>
+<p>Bloomは「周囲へ漏れる光」であり、Scene ColorのMultiply等をBloom Maskへそのまま適用しません。非発光MaterialはBlendModeに関係なく<code>enabled=false</code>とNoBloomWrite PSOによりRT1へ書きません。</p>
+<h3>Bloom無効Materialのコスト方針</h3>
+<p>Bloom機能全体がONのときはRTを2枚Bindし、Materialごとに<code>BloomWrite</code>と<code>NoBloomWrite</code>を選びます。無効Material用PSOではRT1の<code>RenderTargetWriteMask=0</code>とします。Bloom機能全体がOFFのときは、Deferred Light Pass、Forward Object、Particle、Ribbonを<code>SV_TARGET0</code>だけの単一RT PSOへ切り替え、Bloom Mask RTをBegin/Bind/Endしません。Material定数による動的分岐や黒の書き込みは行いません。</p>
+<h3>フレームバッファリングとMSAA前提</h3>
+<ul><li>現行SwapChainは2 Bufferですが、Scene/Bloom/GBufferは単一オフスクリーンRTです。<code>PostDraw()</code>が毎フレームFence完了を待つため、現状は単一RTを安全に再利用できます。</li><li>将来Fence待ちを廃止して2～3 frames-in-flightへ移行する場合、Bloom Mask、Scene Color、Blur Ping-Pong、GBufferをFrame Contextごとに複製することを必須条件とします。</li><li>現行は全RTが<code>SampleDesc.Count=1</code>でMSAAなしです。今回の実装にResolve Passは追加しません。</li><li>将来MSAAを有効化する場合はScene ColorとBloom Maskを同じSampleCountで生成し、両方を個別にResolveしてからPostProcessへ渡します。片方だけResolveする構成は禁止します。</li></ul>
+</section>
+
+<section id="data">
+<h2>3. 共通Materialデータ設計</h2>
+<pre><code>struct EmissiveSettings
+{
+    bool enabled = false;
+    EmissiveSource source = EmissiveSource::Uniform;
+    Vector3 color = { 1.0f, 1.0f, 1.0f };
+    float intensity = 1.0f;
+    float bloomContribution = 1.0f;
+};</code></pre>
+<table><thead><tr><th>値</th><th>意味</th><th>推奨範囲</th></tr></thead><tbody>
+<tr><td><code>enabled</code></td><td>Bloom Maskへの出力を許可</td><td>false / true</td></tr>
+<tr><td><code>source</code></td><td>Uniform／BaseTextureMask／EmissiveTexture</td><td>既定はUniform</td></tr>
+<tr><td><code>color</code></td><td>発光色。Base Colorと独立</td><td>各成分 0～16</td></tr>
+<tr><td><code>intensity</code></td><td>発光そのもののHDR強度</td><td>0～64</td></tr>
+<tr><td><code>bloomContribution</code></td><td>Bloom Maskへ渡す割合</td><td>0～1</td></tr>
+</tbody></table>
+<div class="note"><strong>既定値規則:</strong> 全BlendModeで<code>enabled=false</code>、<code>bloomContribution=1.0</code>に統一します。Contributionは有効化した後の強さであり、BloomのOn/Off判定には使用しません。Multiply/Subtractive/Darken/ColorBurnも既定ではBloomせず、明示的にEnabledへ変更した場合だけContribution 1.0で発光します。BlendMode別の暗黙的なContribution上書きは実装しません。</div>
+<p>CPU設定APIではNaN/Infを検出して設定を拒否し、直前の正常値を維持します。GPU側では<code>isfinite()</code>相当で検出し、異常値を0へ置換した後、RGBを<code>clamp(0, 64)</code>、Alpha/Contributionを0～1へ制限します。GPUについて「拒否」という表現は使用しません。</p>
+<h3>Emissiveテクスチャとの関係</h3>
+<p>現行実装を確認した結果、GBuffer RT3は予約されているだけで、<code>GBufferPass.PS.hlsl</code>は常に黒を書き、Light Passも宣言したEmissive Textureを使用していません。Material/Model ImporterにもEmissive Map読込は存在しないため、既存の質感付きEmissive資産はありません。Assimp外部ヘッダーの定数は実装済み機能とは見なしません。</p>
+<p>将来の空間変化を後付けにしないため、次のSourceを最初から型とJSON Schemaへ定義します。</p>
+<table><thead><tr><th>Source</th><th>Emissive計算</th><th>用途</th></tr></thead><tbody>
+<tr><td>Uniform</td><td><code>color * intensity</code></td><td>単色発光、既定</td></tr>
+<tr><td>BaseTextureMask</td><td><code>baseTexture.rgb * color * intensity</code></td><td>Particle/Spriteの形状を発光Maskに使う</td></tr>
+<tr><td>EmissiveTexture</td><td><code>emissiveTexture.rgb * color * intensity</code></td><td>GameObjectの窓・回路など部分発光</td></tr>
+</tbody></table>
+<p>専用Emissive TextureはLinear色空間で読み、Base Color Textureとは別SRVとしてMaterialへ保持します。未設定・ロード失敗時は黒へフォールバックし、不正descriptorをBindしません。最終Maskは上記RGBへAlphaと<code>bloomContribution</code>を掛けます。</p>
+<h3>JSON共通表現</h3>
+<pre><code>"emissive": {
+  "enabled": true,
+  "source": "EmissiveTexture",
+  "texture": "./Resources/textures/sign_emissive.png",
+  "color": { "r": 0.2, "g": 0.7, "b": 1.0 },
+  "intensity": 8.0,
+  "bloomContribution": 1.0
+}</code></pre>
+<p>このブロックをParticle Renderer、GameObject Material、Sprite Materialで共通利用します。存在しない旧JSONは<code>enabled=false</code>としてMigrationします。</p>
+</section>
+
+<section id="api">
+<h2>4. 公開API案</h2>
+<pre><code>// 共通Material API
+void SetEmissiveEnabled(bool enabled);
+void SetEmissiveSource(EmissiveSource source);
+bool SetEmissiveTexture(const std::string&amp; texturePath);
+void SetEmissiveColor(const Vector3&amp; color);
+void SetEmissiveIntensity(float intensity);
+void SetBloomContribution(float contribution);
+void SetEmissiveSettings(const EmissiveSettings&amp; settings);
+const EmissiveSettings&amp; GetEmissiveSettings() const;
+
+// 使用例
+object-&gt;SetEmissiveEnabled(true);
+object-&gt;SetEmissiveSource(EmissiveSource::EmissiveTexture);
+object-&gt;SetEmissiveTexture("./Resources/textures/sign_emissive.png");
+object-&gt;SetEmissiveColor({ 0.2f, 0.7f, 1.0f });
+object-&gt;SetEmissiveIntensity(8.0f);
+object-&gt;SetBloomContribution(1.0f);</code></pre>
+<p>Particle Rendererも同じ設定型を受け取ります。将来の「寿命に応じた発光」では、Renderer既定値へParticle属性の倍率を掛けます。</p>
+<pre><code>finalEmissive = rendererEmissive
+              * particleEmissiveColor
+              * particleEmissiveIntensity;</code></pre>
+</section>
+
+<section id="phases">
+<h2>5. 実装フェーズ</h2>
+<div class="note"><strong>実装・回帰試験追記:</strong> 65,536個のPure GPU Selective Bloomテスト資産を<code>application/Resources/json/particles/tests/selective_bloom_pure_gpu_test.json</code>へ追加しました。近面を跨ぐSpriteの四隅をインスタンス単位で棄却し、極端な有限TransformもConvert CSで除外します。CPU Emissive APIはNaN/Infと無効Sourceを拒否して直前値を維持し、RenderTextureのSRV index 0解放漏れと不正BlendModeのPSOフォールバックも修正済みです。通常2D Spriteを1 RT専用PSへ分離した後、正しい<code>KCE_D3D12_CAPTURE_ERRORS</code>フラグで100回Resizeと300秒連続実行を再試験し、両方ともWarning/Error 0、exit code 0でPASSしました。Release検証結果はPure GPU、Indirect Draw、readback 0、JSON round-trip、Deferred×Forward混在がPASSです。Bloom全体OFF用の単一RT順列も追加し、Particle/Ribbonは合計54 PSOを初期化時に生成します。Bloom ON/OFFの両経路を65,536粒子でD3D12検証し、Warning/Error 0を確認済みです。</div>
+<div class="phase"><div class="phase-no">1</div><div><h3>共通データ、GBuffer形式、HDR Render Target</h3><ul><li><code>EmissiveSettings</code>をgraphics共通型として追加</li><li>GBuffer RT3をRGBA8から<code>R16G16B16A16_FLOAT</code>へ昇格</li><li>Bloom Mask用<code>R16G16B16A16_FLOAT RenderTexture</code>をFrameworkで生成</li><li>HDR Format、Resize、SRV/RTV、状態遷移、descriptor失敗処理を整備</li><li>単一RT再利用は現行毎フレームFence待ちを前提とすることをコードコメントで固定</li></ul><p><strong>完了条件:</strong> HDR値64を保持し、Bloom Maskを黒クリアし、Resizeを100回行ってdescriptor/resource leakがない。</p></div></div>
+<div class="phase"><div class="phase-no">2</div><div><h3>PostProcessをSelective入力へ変更</h3><ul><li>従来のScene Color輝度抽出を既定経路から外す</li><li>Bloom MaskをDownsampleしてBlur 0/1へ渡す</li><li>Final CompositeでScene Colorへ加算</li><li>互換オプションとしてLegacy Luminance Bloomを残す場合はMode列挙で分離</li></ul><p><strong>完了条件:</strong> Scene Colorを白くしてもMaskが黒ならBloomしない。</p></div></div>
+<div class="phase"><div class="phase-no">3</div><div><h3>Particle Sprite / Mesh / Ribbon</h3><ul><li>Particle Material constant bufferへEmissive設定を追加</li><li>各Pixel Shaderを<code>SV_TARGET0/1</code>のMRT出力へ変更</li><li>Particle PSOの<code>NumRenderTargets=2</code>、Independent Blend、RT1 Blend表を実装</li><li>Bloom有無をPSO keyに含め、無効PSOではRT1 WriteMask=0</li><li>Sprite/Mesh共通Graphics PSOは9 BlendMode ×（MRT BloomWrite／MRT NoBloomWrite／単一RT）=27、Ribbon PSOも27、合計54順列をPipeline Manager初期化時に生成し、Editor操作中の遅延生成を禁止</li><li>Pure GPU compact/Indirect Drawは変更せず、描画出力だけ拡張</li><li>GPU異常値は検出後0置換・Clampし、近面clip対策を維持</li></ul><p><strong>完了条件:</strong> 全BlendMode、65,536粒子でリードバック0、Indirect Draw有効、指定EmitterだけBloomし、EditorでOn/OffしたフレームにPSO生成が発生しない。</p></div></div>
+<div class="phase"><div class="phase-no">4</div><div><h3>GameObject / SkinnedModel / Sprite</h3><ul><li>共通MaterialまたはMaterialDataへ<code>EmissiveSettings</code>を統合</li><li>Uniform、BaseTextureMask、専用EmissiveTextureを実装し、Model Importerへ専用Texture読込を追加</li><li>Geometry PassがHDR GBuffer RT3へEmissive RGB + Contributionを書き込む</li><li>Graphics Light PassをScene/Bloom Maskの2 RTV出力へ変更</li><li>Forward ObjectとSpriteはParticleと同じRT1 Blend規則で後段加算</li><li>GameObject系Bloom On/Off PSOもScene/Asset Load完了前に生成し、描画中の同期コンパイルを禁止</li><li>SkinnedModelは既存Skinning Computeには触れずMaterial出力側で対応</li></ul><p><strong>完了条件:</strong> Deferred不透明→Forward透明の順序で、重なった指定GameObjectとParticleのBloomが両方保持され、専用Emissive Textureの空間模様が維持される。</p></div></div>
+<div class="phase"><div class="phase-no">5</div><div><h3>Editor・JSON・資産移行</h3><ul><li>Material InspectorとParticle EditorへEnabled/Color/Intensity/Contributionを追加</li><li>ColorはHDR対応UIを使用し、Intensityを別Slider/Dragで編集</li><li>Particle JSON v2、Object/Material JSONへ保存・ロード</li><li>Undo/Redo、Copy/Paste、Preset、旧データMigrationを確認</li></ul><p><strong>完了条件:</strong> Editor編集→保存→再起動→ロードで同じ表示と値になる。</p></div></div>
+<div class="phase"><div class="phase-no">6</div><div><h3>最適化・診断・自動テスト</h3><ul><li>Bloom Maskの1/2または1/4解像度化を比較</li><li>Bloom無効時はMask/Blur Passを完全スキップ</li><li>GPU timestampでMask、Blur、Compositeを個別計測</li><li>全PSO順列のプリウォームをCacheなし／ありで各5回計測し、生成完了後にSceneを公開</li><li>Shader/PSO Disk Cacheをhash（shader bytecode、RT format、BlendMode、BloomWrite）単位で利用し、2回目起動を高速化</li><li>D3D12 validation、Resize、Scene切替、Effect破棄、Deferred×Forward重なりの耐久試験</li></ul><p><strong>完了条件:</strong> 描画中のPSO同期生成0件、プリウォーム増分が初回+300 ms／通常+75 ms以下、全機能テスト合格、1080p Releaseで無効時+0.20 ms/+3%以下、有効時Legacy比+1.00 ms/+10%以下、Bloom基盤追加VRAM 32 MiB以下を満たす。</p></div></div>
+</section>
+
+<section id="files">
+<h2>6. 主な変更対象</h2>
+<table><thead><tr><th>領域</th><th>対象候補</th><th>変更内容</th></tr></thead><tbody>
+<tr><td>共通型</td><td class="file">engine/base/GraphicsTypes.h または新規 graphics/material/EmissiveSettings.h</td><td>共通設定型、有限値Validation、既定値</td></tr>
+<tr><td>RT管理</td><td class="file">engine/base/RenderTexture.* / engine/framework/Framework.*</td><td>HDR Bloom Mask生成、Resize、状態遷移</td></tr>
+<tr><td>PostEffect</td><td class="file">engine/manager/effect/PostProcessManager.*</td><td>Mask入力、Blur、Final Composite、Mode管理</td></tr>
+<tr><td>Deferred</td><td class="file">engine/graphics/deferred/GBuffer.* / DeferredRenderer.*</td><td>GameObject Emissive/Bloom伝搬</td></tr>
+<tr><td>Particle PSO</td><td class="file">engine/manager/effect/ParticlePipelineManager.*</td><td>MRT PSO、HDR Format、全BlendMode</td></tr>
+<tr><td>Particle Renderer</td><td class="file">engine/effects/particle/renderer/SpriteRenderer.* / MeshRenderer.* / TrailRenderer.*</td><td>共通Emissive設定、定数Buffer、Editor API</td></tr>
+<tr><td>Shaders</td><td class="file">engine/Resources/shaders/Particle.PS.hlsl / Ribbon.PS.hlsl / Object3d.PS.hlsl 等</td><td>Scene Color + Bloom Mask出力</td></tr>
+<tr><td>Serialization</td><td class="file">engine/effects/particle/serialization/ParticleEffectSerializer.cpp</td><td>Particle Rendererのemissive JSON</td></tr>
+<tr><td>Editor</td><td class="file">engine/effects/particle/editor/ParticleEditor.* / Material Inspector</td><td>HDR Color、Intensity、Contribution UI</td></tr>
+</tbody></table>
+</section>
+
+<section id="validation">
+<h2>7. テスト計画</h2>
+<table><thead><tr><th>ID</th><th>テスト</th><th>期待結果</th></tr></thead><tbody>
+<tr><td>SB-01</td><td>白い非対象Object + 暗いBloom対象Particle</td><td>ParticleだけBloomする</td></tr>
+<tr><td>SB-02</td><td>対象GameObject + 非対象Particle</td><td>GameObjectだけBloomする</td></tr>
+<tr><td>SB-03</td><td>Sprite/Mesh/Ribbon各65,536粒子</td><td>Pure GPU、Indirect Draw、readback 0</td></tr>
+<tr><td>SB-04</td><td>Emissive Intensity 0/1/8/64</td><td>有限で単調に強くなり、NaN/Infなし</td></tr>
+<tr><td>SB-05</td><td>Bloom Contribution 0</td><td>自身は発光色でもBlurは発生しない</td></tr>
+<tr><td>SB-06</td><td>Bloom無効</td><td>既存表示と一致し、Mask/Blur GPU Passを省略</td></tr>
+<tr><td>SB-07</td><td>ウィンドウResize 100回</td><td>D3D12エラー、点滅、descriptor leakなし</td></tr>
+<tr><td>SB-08</td><td>JSON Save/Load/Round-trip</td><td>全Emissive値が一致、旧JSONもロード可能</td></tr>
+<tr><td>SB-09</td><td>Scene切替・Object/Effect破棄</td><td>GPU resource use-after-freeなし</td></tr>
+<tr><td>SB-10</td><td>Debug/Release + D3D12 validation</td><td>Warning/Error 0、Present失敗0</td></tr>
+<tr><td>SB-11</td><td>Deferred対象GameObjectとForward半透明Particleを同じ画素で重ねる</td><td>不透明MaskをForwardが消さず、定義済みRT1 Blendで両方のBloomが保持される</td></tr>
+<tr><td>SB-12</td><td>全Particle BlendMode × Bloom On/Off</td><td>RT0は既存Blendを維持し、RT1は仕様表どおり。Off時はRT1 WriteMask=0</td></tr>
+<tr><td>SB-13</td><td>SwapChain 2 Bufferで300秒連続実行</td><td>単一Bloom RTの再利用競合、点滅、状態不一致なし</td></tr>
+<tr><td>SB-14</td><td>GPUへNaN/Inf/範囲外Emissiveを注入するDebug Test</td><td>GPUで0置換・Clampされ、Bloom Maskと最終画面にNaN/Infなし</td></tr>
+<tr><td>SB-15</td><td>Uniform／BaseTextureMask／EmissiveTextureを同一モデルで比較</td><td>各Sourceの定義式どおりに空間模様が出て、Texture未設定時は黒へ安全にフォールバック</td></tr>
+<tr><td>SB-16</td><td>実行中に全BlendModeのBloom On/Offを連続切替</td><td>フレームスパイクを伴うShader/PSO生成0件、事前生成済みPSOだけを参照</td></tr>
+</tbody></table>
+<div class="note"><strong>自動マトリクス結果:</strong> <code>KCE_SELECTIVE_BLOOM_MATRIX_TEST=1</code>で全9 BlendMode × Bloom On/Off、全3 Emissive Source、Intensity 0/1/8/64、Contribution 0、有限範囲Clamp、NaN/Inf・不正enum拒否を実描画で巡回します。Bloom MaskをR16G16B16A16_FLOATのGPU出力から試験時だけReadbackして全画素finiteを確認し、空Emissive TextureとContribution 0はエネルギー0、Intensity 0/1/8/64は0／0.0987／0.7856／6.3334の単調増加でした。PSO生成数は開始54／終了54、Pure GPU、Particle CPU readback 0、D3D12 Warning/Error 0でPASSしました。B03 Sprite、B09 Mesh、B10 RibbonはいずれもReleaseで65,536粒子、Pure GPU、Indirect Draw、全CSV行PASSです。</div>
+<div class="note"><strong>Emissive Textureフォールバック修正:</strong> 既存<code>black.png</code>の実画素がRGB (50,60,57)であったため、専用の1×1 RGBA黒資産<code>emissive_black_1x1.png</code>へ全描画経路を統一しました。またDirectXTexのMip生成が1×1画像で失敗する問題を<code>TextureManager</code>で回避し、1×1は元画像を直接アップロードします。</div>
+<h3>定量性能予算</h3>
+<p>計測条件を1920×1080、Release、VSync無効の専用ベンチマーク、同一シーン300フレーム平均（初期60フレーム除外）に固定します。GPU機種差を吸収するため絶対値と既存Bloom比率の両方を使用します。</p>
+<table><thead><tr><th>項目</th><th>合格閾値</th></tr></thead><tbody>
+<tr><td>Bloom無効時の共通基盤オーバーヘッド</td><td>GPU frame +0.20 ms以下、かつBaseline比+3%以下</td></tr>
+<tr><td>Selective Bloom有効時の追加コスト</td><td>既存Legacy Bloom比+1.00 ms以下、かつGPU frame +10%以下</td></tr>
+<tr><td>Particle 65,536個のBloom対応による増分</td><td>同一Particle非Bloom比+0.35 ms以下</td></tr>
+<tr><td>一時VRAM増加（1080p）</td><td>GBuffer RT3昇格+Bloom Mask+追加一時RTの合計32 MiB以下</td></tr>
+<tr><td>CPU frame増分</td><td>PSO選択・状態管理を含め+0.10 ms以下</td></tr>
+<tr><td>PSOプリウォーム（Cacheなし初回起動）</td><td>Selective Bloom導入前Baseline比+300 ms以下</td></tr>
+<tr><td>PSOプリウォーム（Cacheあり通常起動）</td><td>Selective Bloom導入前Baseline比+75 ms以下</td></tr>
+</tbody></table>
+<p class="muted">絶対値と比率の両方を満たすことを原則とし、基準GPU名・ドライバ・解像度・計測CSVを成果物へ記録します。プリウォーム時間は同一PC・同一Buildで5回計測し、中央値を採用します。初回測定ではBloom PSO Cacheを削除し、通常起動測定では直前起動で生成したCacheを使用します。未達の場合はMask/Blur解像度、WriteMask、PSO Cache/生成順序を改善して再計測します。</p>
+<div class="note"><strong>GPU timestamp・性能ゲート結果:</strong> Maskを含むScene区間、Source Extraction、水平Blur、垂直Blur、Compositeへ10点timestamp queryを実装し、前フレームFence完了後だけReadbackします。RTX 3060 Laptop GPU、1920×1080、Release、VSync OFF、初期60フレーム除外、300サンプルの正式比較ではSelective 0.657 ms、Legacy 0.617 ms、差+0.040 ms/+6.47%で+1.00 ms/+10%予算に合格しました。Particle Material Bloom有無のMask区間差は+0.006 msで+0.35 ms予算に合格、Bloom OFF時Blurは0、固定VRAM増分23.730 MiBで32 MiB予算に合格です。導入前バイナリが無いため、Bloom無効時とCPU frameの「導入前との差」だけは未計測として明示します。</div>
+<div class="note warn"><strong>VRAM予算の境界:</strong> 32 MiBはGBuffer RT3昇格、Bloom Mask、追加一時Render Targetというレンダリング基盤側の固定増分だけを対象とします。Materialごとの専用Emissive Textureアセットはコンテンツ依存のため含めません。Emissive TextureはAlbedo/Normalと同じ別枠Texture Budget、Mip、圧縮、Streaming管理に従い、計測レポートでも「Bloom基盤RT」と「Emissive Texture Assets」を分離して報告します。</div>
+</section>
+
+<section id="risk">
+<h2>8. リスクと対策</h2>
+<div class="grid">
+<article class="card"><h3>MRT帯域増加</h3><p>GBuffer RT3をRGBA16Fへ昇格し、Bloom MaskもRGBA16Fとします。Bloom無効PSOはRT1 WriteMask=0、有効時だけ書き込みます。32 MiBとGPU時間の性能予算を超えた場合はMask解像度を下げます。</p></article>
+<article class="card"><h3>Deferred/Forward差異</h3><p>同じMaterial APIでも出力経路が異なります。共通HLSL関数でEmissive計算を一元化し、色差を防ぎます。</p></article>
+<article class="card"><h3>透明物の順序</h3><p>透明ParticleのMaskも同じAlphaを使い、背景を黒で上書きしないBlend Stateを設定します。</p></article>
+<article class="card"><h3>HDR異常値</h3><p>RGBの単純<code>saturate</code>は禁止しつつ、NaN/Inf拒否と上限Clampを必須にします。</p></article>
+<article class="card"><h3>既存Bloomの見た目変更</h3><p>Selectiveを新Modeとして導入し、移行期間だけLegacy Luminanceを選択可能にします。最終既定値はSelectiveです。</p></article>
+<article class="card"><h3>PSO不一致</h3><p>RT数・FormatがPSOと描画先で一致しないとD3D12エラーになります。PSO keyへBloom MRT構成を含め、自動検証します。</p></article>
+<article class="card"><h3>単一RTとFrames-in-flight</h3><p>現行は毎フレームFence待ちなので単一RTが安全です。待機を外す変更と同時にFrame Context別RTへ移行し、単独で非同期化しません。</p></article>
+<article class="card"><h3>将来のMSAA</h3><p>現状SampleCount=1です。MSAA導入時はScene/Maskを同じSampleCountで生成し、両方Resolveする設計レビューを必須にします。</p></article>
+<article class="card"><h3>PSO順列増加</h3><p>Material Bloom On/OffのMRT 2系統に、Bloom機能全体OFF用の単一RT系統を加えます。Pipeline Manager初期化時に全54順列を生成します。Editor切替時の同期生成は禁止し、SB-16で監視します。</p></article>
+<article class="card"><h3>Emissive Texture</h3><p>現行資産にはEmissive Map経路がありません。新規Source列挙でUniform/BaseTexture/専用Textureを分離し、専用TextureはLinear読込、失敗時は黒とします。</p></article>
+</div>
+</section>
+
+<section id="done">
+<h2>9. Definition of Done</h2>
+<ul class="check">
+<li>指定したParticle、GameObject、SkinnedModel、SpriteだけがBloomする。</li>
+<li>非対象の高輝度オブジェクトはBloomしない。</li>
+<li>Particle Sprite、Mesh、RibbonのPure GPU経路を維持し、GPU→CPUリードバックが0である。</li>
+<li>共通<code>EmissiveSettings</code>と共通JSON形式を使用している。</li>
+<li>Editorから設定し、保存・再ロードできる。</li>
+<li>Bloom無効時に不要なGPU Passを実行しない。</li>
+<li>Debug/Releaseビルド、D3D12 validation、Resize耐久、Scene切替耐久が合格する。</li>
+<li>既存資産は明示的に有効化しない限り表示が変わらない。</li>
+<li>Deferred不透明とForward半透明が同一画素で重なるSB-11に合格する。</li>
+<li>全BlendModeの既定値はEnabled=false、Contribution=1.0で統一され、BlendMode依存の暗黙上書きがない。</li>
+<li>Uniform／BaseTextureMask／EmissiveTextureが実装され、専用Emissive Textureの空間変化を保持する。</li>
+<li>全PSO順列が描画開始前に生成され、EditorでBloomを切り替えても同期生成・コンパイルが発生しない。</li>
+<li>PSOプリウォーム増分がCacheなし初回+300 ms以下、Cacheあり通常起動+75 ms以下である。</li>
+<li>1080p Release計測で、Bloom無効時+0.20 ms/+3%以下、有効時Legacy比+1.00 ms/+10%以下、追加VRAM 32 MiB以下を満たす。</li>
+<li>32 MiBはBloom基盤Render Targetだけの予算であり、Emissive Textureアセットは別枠Texture Budgetとして分離計測・報告される。</li>
+</ul>
+<div class="note"><strong>推奨着手順:</strong> 共通データ → HDR Bloom Mask → PostProcess入力変更 → Particle対応 → GameObject/Skinned/Sprite対応 → Editor/JSON → 最適化、の順で進めます。Particleだけ先行して専用実装すると、GameObject対応時にPSO・Material・JSONを作り直すため避けます。</div>
+</section>
+</main>
+<footer>KentoCompoEngine — Selective Bloom Common Rendering Plan</footer>
+</body>
+</html>

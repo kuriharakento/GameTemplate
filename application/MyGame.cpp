@@ -9,6 +9,7 @@
 #include "manager/graphics/TextureManager.h"
 #include "base/Logger.h"
 #include "effects/particle/ParticleManager.h"
+#include "manager/effect/ParticlePipelineManager.h"
 #include "externals/imgui/imgui_internal.h"
 #include "manager/editor/DebugUIManager.h"
 #include "manager/editor/ConsoleLog.h"
@@ -84,6 +85,7 @@ void MyGame::Finalize()
 {
 	// ゲームの終了処理
 	sceneManager_.reset();
+	sceneRenderTexture_.reset();
 
 	// フレームワークの終了処理
 	Framework::Finalize();
@@ -201,6 +203,14 @@ void MyGame::Draw()
 	///						ディファードレンダリング
 	///--------------------------------------------------------------
 
+	// Bloom全体が無効なフレームではBloom Mask用MRTを一切バインドしない。
+	// GPU timestampのMask区間にはGBuffer emissive生成からForward Particleまでを含める。
+	const bool bloomEnabled = postProcessManager_->IsBloomEnabled();
+	const bool selectiveBloomEnabled = postProcessManager_->IsSelectiveBloomEnabled();
+	objectCommon_->SetSelectiveBloomOutputEnabled(selectiveBloomEnabled);
+	ParticleManager::GetInstance()->GetPipelineManager()->SetSelectiveBloomOutputEnabled(selectiveBloomEnabled);
+	postProcessManager_->BeginBloomGpuFrame(bloomEnabled, selectiveBloomEnabled);
+
 	// G-Bufferパス
 	deferredRenderer_->BeginGeometryPass();
 	sceneManager_->DrawGBuffer();
@@ -208,8 +218,14 @@ void MyGame::Draw()
 
 	// ライトパス
 	renderTexture_->BeginRender();
+	if (selectiveBloomEnabled)
+	{
+		selectiveBloomRT_->BeginRender();
+	}
 	deferredRenderer_->ExecuteLightPass(
 		renderTexture_->GetRTVHandle(),
+		selectiveBloomRT_->GetRTVHandle(),
+		selectiveBloomEnabled,
 		cameraManager_.get(),
 		lightManager_.get(),
 		shadowMapManager_.get()
@@ -228,7 +244,8 @@ void MyGame::Draw()
 	// レンダーターゲットと深度バッファを設定
 	auto dsvHandle = deferredRenderer_->GetGBuffer()->GetDSVHandle();
 	auto rtvHandle = renderTexture_->GetRTVHandle();
-	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+	const D3D12_CPU_DESCRIPTOR_HANDLE forwardTargets[] = { rtvHandle, selectiveBloomRT_->GetRTVHandle() };
+	dxCommon_->GetCommandList()->OMSetRenderTargets(selectiveBloomEnabled ? 2u : 1u, forwardTargets, FALSE, &dsvHandle);
 
 	// シャドウマップリソースをバインド
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(10, lightManager_->GetShadowMatrixGPUAddress());
@@ -245,6 +262,7 @@ void MyGame::Draw()
 
 	// フォワードパス対象オブジェクトの描画
 	sceneManager_->Draw3D();
+	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
 	#ifdef _DEBUG
 	// デバッグライン描画
@@ -257,6 +275,10 @@ void MyGame::Draw()
 	skybox_->Draw();
 
 	// パーティクル描画
+	const D3D12_CPU_DESCRIPTOR_HANDLE particleTargets[] = {
+		renderTexture_->GetRTVHandle(), selectiveBloomRT_->GetRTVHandle()
+	};
+	dxCommon_->GetCommandList()->OMSetRenderTargets(selectiveBloomEnabled ? 2u : 1u, particleTargets, FALSE, &dsvHandle);
 	ParticleManager::GetInstance()->Draw();
 
 
@@ -264,6 +286,12 @@ void MyGame::Draw()
 	deferredRenderer_->GetGBuffer()->TransitionDepthToSRV();
 
 	renderTexture_->EndRender();
+	if (selectiveBloomEnabled)
+	{
+		selectiveBloomRT_->EndRender();
+		postProcessManager_->CaptureRequestedBloomMask(selectiveBloomRT_.get());
+	}
+	postProcessManager_->EndBloomMaskGpuScope();
 
 	///--------------------------------------------------------------
 	///						ポストプロセス & ImGui
@@ -271,7 +299,8 @@ void MyGame::Draw()
 
 #ifdef USE_IMGUI
 	// ポストプロセス処理（内部でBegin/EndRenderを行う）
-	postProcessManager_->Draw(renderTexture_.get(), sceneRenderTexture_.get());
+	postProcessManager_->Draw(renderTexture_.get(), sceneRenderTexture_.get(),
+		selectiveBloomEnabled ? selectiveBloomRT_.get() : nullptr);
 
 	// 2D描画（ポストプロセス後に描画することでブルームの影響を受けない）
 	// PostProcessManagerがEndRenderを呼ぶので、レンダーターゲット状態に戻す（クリアなし）
@@ -474,7 +503,8 @@ void MyGame::Draw()
 	dxCommon_->PreDraw();
 
 	// ポストプロセス処理
-	postProcessManager_->Draw(renderTexture_.get(), nullptr);
+	postProcessManager_->Draw(renderTexture_.get(), nullptr,
+		selectiveBloomEnabled ? selectiveBloomRT_.get() : nullptr);
 
 	// 2D描画（ポストプロセス後に描画することでブルームの影響を受けない）
 	Framework::Draw2DSetting();

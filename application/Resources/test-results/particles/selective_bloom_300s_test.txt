@@ -1,0 +1,4 @@
+PASS
+duration_seconds=300
+exit_code=0
+d3d12_error_bytes=0
