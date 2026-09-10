@@ -17,6 +17,7 @@
 #include "audio/Audio.h"
 
 #include "base/PathManager.h"
+#include "editor/SceneViewContext.h"
 
 namespace KCE
 {
@@ -397,6 +398,9 @@ void MyGame::Draw()
 		ImGui::DockBuilderDockWindow("Time Manager", dock_id_right);
 		ImGui::DockBuilderDockWindow("TimerManager", dock_id_right);
 
+		ImGui::DockBuilderDockWindow("Sequencer Inspector", dock_id_right);
+
+		ImGui::DockBuilderDockWindow("Sequencer", dock_id_bottom);
 		ImGui::DockBuilderDockWindow("Project", dock_id_bottom);
 		ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
 		ImGui::DockBuilderDockWindow("Audio Debug", dock_id_bottom);
@@ -420,6 +424,15 @@ void MyGame::Draw()
 	KCE::Vector2 offset = { imagePos.x - clientOrigin.x, imagePos.y - clientOrigin.y };
 	KCE::Vector2 size = { imageSize.x, imageSize.y };
 	Input::GetInstance()->SetMouseCorrection(offset, size);
+
+	// ギズモを重ねて描けるよう、シーン画像の矩形と描画カメラをエンジン側へ渡す
+	SceneViewRect sceneViewRect;
+	sceneViewRect.x = imagePos.x;
+	sceneViewRect.y = imagePos.y;
+	sceneViewRect.width = imageSize.x;
+	sceneViewRect.height = imageSize.y;
+	SceneViewContext::GetInstance()->SetViewportRect(sceneViewRect);
+	SceneViewContext::GetInstance()->SetCamera(cameraManager_->GetActiveCamera());
 
 	// 登録されたSceneエリアのデバッグUIを描画する
 	debugUIManager->DrawArea(DebugUIArea::Scene);

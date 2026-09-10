@@ -325,3 +325,7 @@ project/imgui.ini
 .gemini/
 AGENTS.md
 /WaveData
+
+# ImGui のウィンドウ配置。エディタ開発中は毎回差分が出るため追跡しない。
+# 初期レイアウトは MyGame.cpp の DockBuilder がコードで構築する。
+imgui.ini
