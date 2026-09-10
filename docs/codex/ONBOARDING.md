@@ -212,6 +212,23 @@ Framework::GetRenderPipeline()->InsertPassAfter("Forward", std::make_unique<MyPa
 - 1行目に要約、空行、本文に「何をしたか」ではなく**「なぜそうしたか」**
 - 末尾に `Co-Authored-By:` 行は不要（人間がレビューして統合する）
 
+### 既存のコミットを書き換えないこと
+
+**rebase・amend・filter-branch などで、作業ブランチを切った時点より前のコミットを作り直さないこと。**
+
+TASK-05 では Phase 0〜4 の全コミットが中身は同一のまま別ハッシュで作り直され、
+作業ブランチが統合ブランチ `feature/sequencer` の子孫でなくなった。
+そのままではマージできず、統合側で cherry-pick し直す手間が発生した。
+
+- 自分のコミットは作業ブランチの先頭に**積み足すだけ**にする
+- 作業開始時と完了時に、次のコマンドが両リポジトリで `YES` になることを確認する
+
+```bash
+git merge-base --is-ancestor feature/sequencer HEAD && echo YES || echo NO
+```
+
+- 報告書に書くコミットハッシュは、**最後にコミットした後**の値を書くこと
+
 ---
 
 ## 7. タスク完了の条件（Definition of Done）
