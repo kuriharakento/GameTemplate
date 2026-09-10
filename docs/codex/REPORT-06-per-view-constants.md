@@ -55,9 +55,11 @@ World 行列は `GameObject::Update()` が毎フレーム `renderable3d_->Update
 
 ## 残課題
 
-- **Skybox** も WVP の定数バッファを1つしか持たず、描画時の行列が
-  ビューごとに正しくならない（`graphics/3d/Skybox.cpp` 121 行）。
-  Skybox はサブビューでも描かれるため、中継映像を作る前に同じ方式へ直す必要がある
+- ~~**Skybox** も WVP の定数バッファを1つしか持たず、描画時の行列が
+  ビューごとに正しくならない~~ → TASK-07（`claude/task07-skybox-constants`）で解決。
+  `Skybox::Draw(Camera*, FrameConstantAllocator*)` を追加し、`SkyboxPass` から
+  差し替え後のアクティブカメラと割り当て器を渡すようにした。
+  割り当て器は `RenderPassContext::frameConstantAllocator` として全パスから使える
 - Sprite も同様だが、2D はサブビューで描かないので対応不要
 - サブビューを実際に使う機能はまだ無いため、「2つのビューでそれぞれ正しい行列で描かれる」ことは
   コード上の確認のみ。実動作の確認はカメラプレビューを作るタスクで行う
