@@ -2,7 +2,7 @@
 
 実装の大部分は Codex が行い、未コミットの途中の状態を Claude が引き継いで仕上げた。
 
-コミットは engine が `bdb469b`、親が `4a91330`（この engine 参照の更新と本報告を含む）。どちらも `feature/sequencer` に取り込み済み。
+コミットは engine が `40de6de`、親が `7c0b9fa`（この engine 参照の更新と本報告を含む）。どちらも `feature/sequencer` に取り込み済み。
 
 ## 変更内容
 
@@ -58,7 +58,7 @@ World 行列は `GameObject::Update()` が毎フレーム `renderable3d_->Update
 ## 残課題
 
 - ~~**Skybox** も WVP の定数バッファを1つしか持たず、描画時の行列が
-  ビューごとに正しくならない~~ → TASK-07（engine `a2ffb2c`、親 `79aa2d0`）で解決。
+  ビューごとに正しくならない~~ → TASK-07（engine `37d1853`、親 `0f73c03`）で解決。
   `Skybox::Draw(Camera*, FrameConstantAllocator*)` を追加し、`SkyboxPass` から
   差し替え後のアクティブカメラと割り当て器を渡すようにした。
   割り当て器は `RenderPassContext::frameConstantAllocator` として全パスから使える
