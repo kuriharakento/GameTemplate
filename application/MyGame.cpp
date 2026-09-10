@@ -125,162 +125,12 @@ void MyGame::Draw()
 {
 	srvManager_->PreDraw();
 
-	///--------------------------------------------------------------
-	///						シャドウマップ生成パス
-	///--------------------------------------------------------------
-
-	// カスケードシャドウ行列を計算
-	lightManager_->UpdateCascadeShadowMatrices(
-		cameraManager_->GetActiveCamera(),
-		kShadowNearPlane, kShadowFarPlane
-	);
-
-	// カスケードシャドウマップ描画（4カスケード）
-	for (uint32_t cascade = 0; cascade < 4; ++cascade) {
-		shadowMapManager_->BeginCascadeShadowPass(cascade);
-		shadowMapPipeline_->SetPipeline();
-
-		D3D12_GPU_VIRTUAL_ADDRESS cascadeMatrixAddr = lightManager_->GetCascadeLightViewProjectionGPUAddress(cascade);
-		if (cascadeMatrixAddr != 0) {
-			dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, cascadeMatrixAddr);
-			shadowMapManager_->SetCurrentShadowMatrixAddress(cascadeMatrixAddr);
-		}
-
-		sceneManager_->DrawShadow();
-		shadowMapManager_->EndShadowPass();
-	}
-
-	// スポットライトシャドウマップ描画
-	auto& spotLights = lightManager_->GetSpotLights();
-	for (auto& [name, light] : spotLights) {
-		if (!light.shadowEnabled) continue;
-
-		if (!shadowMapManager_->HasSpotLightShadowMap(name)) {
-			shadowMapManager_->CreateSpotLightShadowMap(name);
-		}
-
-		shadowMapManager_->BeginSpotLightShadowPass(name);
-		shadowMapPipeline_->SetPipeline();
-
-		D3D12_GPU_VIRTUAL_ADDRESS spotMatrixAddr = lightManager_->GetSpotLightShadowMatrixGPUAddress(name);
-		if (spotMatrixAddr != 0) {
-			dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, spotMatrixAddr);
-			shadowMapManager_->SetCurrentShadowMatrixAddress(spotMatrixAddr);
-		}
-
-		sceneManager_->DrawShadow();
-		shadowMapManager_->EndShadowPass();
-	}
-
-	// ポイントライトシャドウマップ描画（6面キューブマップ）
-	auto& pointLights = lightManager_->GetPointLights();
-	for (auto& [name, light] : pointLights) {
-		if (!light.shadowEnabled) continue;
-
-		if (!shadowMapManager_->HasPointLightShadowMap(name)) {
-			shadowMapManager_->CreatePointLightShadowMap(name);
-		}
-
-		lightManager_->UpdatePointLightShadowMatrix(name, kShadowNearPlane, light.gpuData.radius);
-
-		for (uint32_t face = 0; face < 6; ++face) {
-			shadowMapManager_->BeginPointLightShadowPass(name, face);
-			shadowMapPipeline_->SetPipeline();
-
-			D3D12_GPU_VIRTUAL_ADDRESS pointMatrixAddr = lightManager_->GetPointLightShadowMatrixGPUAddress(name, face);
-			if (pointMatrixAddr != 0) {
-				dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, pointMatrixAddr);
-				shadowMapManager_->SetCurrentShadowMatrixAddress(pointMatrixAddr);
-			}
-
-			sceneManager_->DrawShadow();
-			shadowMapManager_->EndShadowPass();
-		}
-	}
-
-	///--------------------------------------------------------------
-	///						ディファードレンダリング
-	///--------------------------------------------------------------
-
-	// G-Bufferパス
-	deferredRenderer_->BeginGeometryPass();
-	sceneManager_->DrawGBuffer();
-	deferredRenderer_->EndGeometryPass();
-
-	// ライトパス
-	renderTexture_->BeginRender();
-	deferredRenderer_->ExecuteLightPass(
-		renderTexture_->GetRTVHandle(),
-		cameraManager_.get(),
-		lightManager_.get(),
-		shadowMapManager_.get()
-	);
-
-	///--------------------------------------------------------------
-	///						フォワードレンダリング
-	///--------------------------------------------------------------
-
-	// 3D共通設定
-	Framework::Draw3DSetting();
-
-	// 深度バッファを書き込み可能状態に遷移
-	deferredRenderer_->GetGBuffer()->TransitionDepthToDepthWrite();
-
-	// レンダーターゲットと深度バッファを設定
-	auto dsvHandle = deferredRenderer_->GetGBuffer()->GetDSVHandle();
-	auto rtvHandle = renderTexture_->GetRTVHandle();
-	dxCommon_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-
-	// シャドウマップリソースをバインド
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(10, lightManager_->GetShadowMatrixGPUAddress());
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(11, lightManager_->GetCascadeShadowDataGPUAddress());
-
-	if (shadowMapManager_->GetCascadeShadowMap().isEnabled) {
-		for (uint32_t i = 0; i < ShadowMapConfig::kCascadeCount; ++i) {
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(
-				12 + i,
-				srvManager_->GetGPUDescriptorHandle(shadowMapManager_->GetCascadeShadowMap().srvIndices[i])
-			);
-		}
-	}
-
-	// フォワードパス対象オブジェクトの描画
-	sceneManager_->Draw3D();
-
-	#ifdef _DEBUG
-	// デバッグライン描画
-	lightManager_->DrawDebugLines();
-	#endif // _DEBUG
-	
-	LineManager::GetInstance()->RenderLines();
-
-	// Skybox描画
-	skybox_->Draw();
-
-	// パーティクル描画
-	ParticleManager::GetInstance()->Draw();
-
-
-	// 深度バッファをSRV状態に戻す
-	deferredRenderer_->GetGBuffer()->TransitionDepthToSRV();
-
-	renderTexture_->EndRender();
-
-	///--------------------------------------------------------------
-	///						ポストプロセス & ImGui
-	///--------------------------------------------------------------
-
+	// 描画順は engine 側の RenderPipeline に集約されている。
+	// パスを足すときは Framework::GetRenderPipeline() から差し込むこと。
 #ifdef USE_IMGUI
-	// ポストプロセス処理（内部でBegin/EndRenderを行う）
-	postProcessManager_->Draw(renderTexture_.get(), sceneRenderTexture_.get());
-
-	// 2D描画（ポストプロセス後に描画することでブルームの影響を受けない）
-	// PostProcessManagerがEndRenderを呼ぶので、レンダーターゲット状態に戻す（クリアなし）
-	sceneRenderTexture_->PreDrawForImGui();
-	Framework::Draw2DSetting();
-	sceneManager_->Draw2D();
-
-	sceneRenderTexture_->EndRender();
+	// エディタではシーンをImGuiのウィンドウに表示するため、
+	// バックバッファではなくレンダーターゲットへ出力する。
+	Framework::ExecuteRenderPipeline(sceneRenderTexture_.get());
 
 	// バックバッファのクリア
 	dxCommon_->PreDraw();
@@ -483,15 +333,9 @@ void MyGame::Draw()
 
 
 #else
-	// バックバッファのクリア
-	dxCommon_->PreDraw();
-
-	// ポストプロセス処理
-	postProcessManager_->Draw(renderTexture_.get(), nullptr);
-
-	// 2D描画（ポストプロセス後に描画することでブルームの影響を受けない）
-	Framework::Draw2DSetting();
-	sceneManager_->Draw2D();
+	// バックバッファへ直接出力する。
+	// クリアのタイミングもパイプライン内のパスが面倒を見る。
+	Framework::ExecuteRenderPipeline(nullptr);
 #endif
 
 	imguiManager_->End();
