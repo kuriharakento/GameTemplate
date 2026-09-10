@@ -47,6 +47,9 @@
     <ClCompile Include="scene\debug\ParticleTestScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
+    <ClCompile Include="scene\debug\FeatureCheckScene.cpp">
+      <Filter>scene\debug</Filter>
+    </ClCompile>
     <ClCompile Include="scene\play\title\TitleScene.cpp">
       <Filter>scene\play\title</Filter>
     </ClCompile>
@@ -66,6 +69,9 @@
       <Filter>gameobject\component\action\common</Filter>
     </ClInclude>
     <ClInclude Include="scene\debug\ParticleTestScene.h">
+      <Filter>scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\debug\FeatureCheckScene.h">
       <Filter>scene\debug</Filter>
     </ClInclude>
     <ClInclude Include="scene\play\title\TitleScene.h">
