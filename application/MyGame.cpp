@@ -197,7 +197,9 @@ void MyGame::Draw()
 
 	// 初回起動時またはレイアウトリセット要求時に初期ドッキングレイアウトを自動構築
 	static bool firstFrame = true;
-	static bool selectSequencerTab = false;
+	// 初期レイアウトの後に最初に見せるタブの数。選択タブはフォーカスに合わせて切り替わるので、1フレームに1つずつ当てる
+	constexpr int kTabFocusSteps = 2;
+	static int pendingTabFocusSteps = 0;
 	if (firstFrame)
 	{
 		firstFrame = false;
@@ -212,7 +214,8 @@ void MyGame::Draw()
 	{
 		constexpr float kBottomAreaRatio = 0.35f;
 		constexpr float kLeftAreaRatio = 0.20f;
-		constexpr float kRightAreaRatio = 0.25f;
+		// 右の列はタブが多いので、狭いとタブ名が途中で切れて見分けられない。少し広めに取る
+		constexpr float kRightAreaRatio = 0.35f;
 		constexpr float kRightBottomRatio = 0.50f;
 
 		debugUIManager->ClearLayoutResetRequest();
@@ -240,7 +243,7 @@ void MyGame::Draw()
 		dockWindows(DebugUIDockLocation::RightBottom, dock_id_right_bottom);
 		dockWindows(DebugUIDockLocation::Bottom, dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
-		selectSequencerTab = true;
+		pendingTabFocusSteps = kTabFocusSteps;
 	}
 
 	// シーンウィンドウ
@@ -285,11 +288,20 @@ void MyGame::Draw()
 		ConsoleLog::GetInstance()->Draw(&open);
 		debugUIManager->SetShowConsole(open);
 	}
-	if (selectSequencerTab)
+	if (pendingTabFocusSteps > 0)
 	{
 		// 全ウィンドウを作った後なら、ドッキング先の選択タブも確実に切り替わる。
-		ImGui::SetWindowFocus("Sequencer");
-		selectSequencerTab = false;
+		// ただし同じフレームで2回フォーカスすると後の方しか効かないので、フレームを分ける
+		if (pendingTabFocusSteps == kTabFocusSteps)
+		{
+			// 右上はオブジェクトを選んで編集する流れが多いので、GameObject Inspector を最初に見せる
+			ImGui::SetWindowFocus("GameObject Inspector");
+		}
+		else
+		{
+			ImGui::SetWindowFocus("Sequencer");
+		}
+		--pendingTabFocusSteps;
 	}
 
 
