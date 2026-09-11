@@ -7,6 +7,7 @@
 #include "gameobject/manager/GameObjectManager.h"
 #include "graphics/atmosphere/BeamRenderer.h"
 #include "graphics/atmosphere/FogRenderer.h"
+#include "graphics/2d/TextOverlay.h"
 #include "manager/graphics/LineManager.h"
 #include "manager/scene/CameraManager.h"
 #include "manager/scene/LightManager.h"
@@ -104,6 +105,29 @@ KCE::BeamRenderer* GetBeamRenderer()
 		return nullptr;
 	}
 	return KCE::SequencerEditor::GetInstance()->GetPlayer().GetBindingContext().GetBeamRenderer();
+}
+
+KCE::TextOverlay* GetTextOverlay()
+{
+	if (!KCE::SequencerEditor::HasInstance())
+	{
+		return nullptr;
+	}
+	return KCE::SequencerEditor::GetInstance()->GetPlayer().GetBindingContext().GetTextOverlay();
+}
+
+// 歌詞と会話の見本（自作の文）
+constexpr const char* kSampleLyric = "光の中で 君と歌おう";
+constexpr const char* kSampleSpeaker = "プロデューサー";
+constexpr const char* kSampleLine = "今日のステージ、最高だったよ！次も一緒にがんばろう。";
+
+void HideTextSample()
+{
+	if (auto* overlay = GetTextOverlay())
+	{
+		overlay->HideLyric();
+		overlay->HideDialogue();
+	}
 }
 } // namespace
 
@@ -285,6 +309,9 @@ void FeatureCheckScene::OnFinalize()
 {
 	RestoreAtmosphere();
 
+	// 見本の文字を他のシーンに残さない
+	HideTextSample();
+
 	// 画面より先にモニターを畳む（画面のテクスチャを戻してからサブビューを消す）
 	stageMonitor_.reset();
 
@@ -320,6 +347,15 @@ void FeatureCheckScene::CommonUpdate()
 	if (stageMonitor_)
 	{
 		stageMonitor_->Update();
+	}
+
+	if (showTextSample_)
+	{
+		if (auto* overlay = GetTextOverlay())
+		{
+			overlay->ShowLyric(kSampleLyric, 1.0f);
+			overlay->ShowDialogue(kSampleSpeaker, kSampleLine, KCE::TextSprite::kShowAll, 1.0f);
+		}
 	}
 
 	// GameObjectManager の更新はフレームワークから呼ばれないので、ここで回す
@@ -387,6 +423,13 @@ void FeatureCheckScene::DrawImGui()
 	{
 		ImGui::Checkbox("Beam", &beam->GetSettings().enabled);
 	}
+
+	ImGui::SeparatorText("Text");
+	if (ImGui::Checkbox("Text Sample", &showTextSample_) && !showTextSample_)
+	{
+		HideTextSample();
+	}
+	ImGui::TextDisabled("シーケンサの Text トラックを試すときはオフにする。");
 	ImGui::TextDisabled("細かい値は Fog / Beam / Outline / PostProcess の各デバッグUIで調整する。");
 
 	ImGui::SeparatorText("Objects");

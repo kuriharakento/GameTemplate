@@ -70,6 +70,9 @@ private:
 	// 半透明キューブのアルファ
 	float transparentAlpha_ = 0.5f;
 
+	// 歌詞と会話の見本を出すか。シーケンサの Text トラックを試すときはオフにする
+	bool showTextSample_ = true;
+
 	// 入る前の状態（抜けるときに戻す）
 	bool prevFogEnabled_ = false;
 	bool prevBeamEnabled_ = false;
