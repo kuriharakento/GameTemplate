@@ -5,6 +5,7 @@
 
 #include "camerawork/debug/DebugCamera.h"
 #include "gameobject/base/GameObject.h"
+#include "graphics/view/StageMonitor.h"
 #include "scene/interface/BaseScene.h"
 
 /**
@@ -58,6 +59,9 @@ private:
 	std::unique_ptr<KCE::GameObject> transparentFront_;
 	std::unique_ptr<KCE::GameObject> transparentBack_;
 	std::unique_ptr<KCE::GameObject> hdrCube_;
+	// 奥に置く画面。StageMonitor の映像を映す
+	std::unique_ptr<KCE::GameObject> monitorScreen_;
+	std::unique_ptr<KCE::StageMonitor> stageMonitor_;
 
 	std::unique_ptr<KCE::DebugCamera> debugCamera_;
 	// シーケンサのカメラ再生と取り合わないように、オフにできるようにしておく

@@ -49,6 +49,7 @@ void MyGame::Initialize()
 		postProcessManager_.get(),
 		skybox_.get(),
 		shadowMapManager_.get(),
+		this,
 	};
 
 	// テクスチャの読み込み

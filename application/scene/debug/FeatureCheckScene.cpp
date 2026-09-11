@@ -50,6 +50,20 @@ constexpr KCE::Vector4 kFloorColor = { 0.3f, 0.3f, 0.32f, 1.0f };
 constexpr KCE::Vector4 kShadingCubeColor = { 0.35f, 0.6f, 1.0f, 1.0f };
 constexpr float kShadingCubeOutlineStrength = 1.0f;
 
+// 奥の画面（モニター）。plane（XY 平面の 2x2）を 16:9 に伸ばす。HDR キューブを寄りで映す。
+// キューブは面ごとに UV の一部しか使わないので、映像を丸ごと貼るには向かない
+constexpr const char* kMonitorScreenModel = "plane";
+constexpr KCE::Vector3 kMonitorScreenPosition = { 0.0f, 2.4f, 9.0f };
+constexpr KCE::Vector3 kMonitorScreenScale = { 1.2f, 0.675f, 1.0f };
+// plane の表は +Z 向き。Y で半回転させて手前（カメラ側）に表を向ける。左右の反転もこれで直る
+constexpr KCE::Vector3 kMonitorScreenRotation = { 0.0f, std::numbers::pi_v<float>, 0.0f };
+constexpr KCE::Vector4 kMonitorScreenColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+constexpr uint32_t kMonitorWidth = 480;
+constexpr uint32_t kMonitorHeight = 270;
+constexpr const char* kMonitorCameraName = "FeatureCheckMonitor";
+constexpr KCE::Vector3 kMonitorCameraPosition = { 0.0f, 2.0f, -9.0f };
+constexpr KCE::Vector3 kMonitorCameraRotation = { 0.15f, 0.0f, 0.0f };
+
 // ステージ上のスポットライト。真上から床へ向けて、ビームが見えるように少し傾ける
 constexpr const char* kSpotLightNames[] = { "FeatureCheckSpot0", "FeatureCheckSpot1", "FeatureCheckSpot2" };
 constexpr KCE::Vector4 kSpotLightColors[] = {
@@ -142,6 +156,25 @@ void FeatureCheckScene::Initialize()
 		renderable->SetRenderingType(KCE::RenderingType::Forward);
 		renderable->SetEnableLighting(false);
 		renderable->SetColor(kHdrCubeColor);
+	}
+
+	// モニター。ライトを切って映像の色をそのまま出す
+	monitorScreen_ = CreateObject("FeatureCheck_Monitor", kMonitorScreenPosition, kMonitorScreenScale);
+	// モデルを差し替えると素材の設定も作り直されるので、色などより先に替える
+	monitorScreen_->SetModel(kMonitorScreenModel);
+	monitorScreen_->SetRotation(kMonitorScreenRotation);
+	if (auto* renderable = monitorScreen_->GetRenderable3d())
+	{
+		renderable->SetRenderingType(KCE::RenderingType::Forward);
+		renderable->SetEnableLighting(false);
+		renderable->SetColor(kMonitorScreenColor);
+	}
+	stageMonitor_ = std::make_unique<KCE::StageMonitor>();
+	if (stageMonitor_->Initialize(sceneManager_->GetSubViewProvider(), sceneManager_->GetCameraManager(), kMonitorCameraName, kMonitorWidth, kMonitorHeight))
+	{
+		stageMonitor_->GetCamera()->SetTranslate(kMonitorCameraPosition);
+		stageMonitor_->GetCamera()->SetRotate(kMonitorCameraRotation);
+		stageMonitor_->SetScreen(monitorScreen_.get());
 	}
 
 	SetupStageLights();
@@ -252,9 +285,12 @@ void FeatureCheckScene::OnFinalize()
 {
 	RestoreAtmosphere();
 
+	// 画面より先にモニターを畳む（画面のテクスチャを戻してからサブビューを消す）
+	stageMonitor_.reset();
+
 	// 破棄の前に登録を外す（GameObjectManager に死んだポインタを残さない）
 	auto* manager = KCE::GameObjectManager::GetInstance();
-	for (auto* object : { floor_.get(), transparentFront_.get(), transparentBack_.get(), hdrCube_.get() })
+	for (auto* object : { floor_.get(), transparentFront_.get(), transparentBack_.get(), hdrCube_.get(), monitorScreen_.get() })
 	{
 		manager->Unregister(object);
 	}
@@ -267,6 +303,7 @@ void FeatureCheckScene::OnFinalize()
 	transparentFront_.reset();
 	transparentBack_.reset();
 	hdrCube_.reset();
+	monitorScreen_.reset();
 	for (auto& cube : shadingCubes_)
 	{
 		cube.reset();
@@ -278,6 +315,11 @@ void FeatureCheckScene::CommonUpdate()
 	if (debugCamera_ && useDebugCamera_)
 	{
 		debugCamera_->Update();
+	}
+
+	if (stageMonitor_)
+	{
+		stageMonitor_->Update();
 	}
 
 	// GameObjectManager の更新はフレームワークから呼ばれないので、ここで回す
@@ -355,7 +397,7 @@ void FeatureCheckScene::DrawImGui()
 			ImGui::BulletText("%s", shadingCubes_[i]->GetName().c_str());
 		}
 	}
-	for (auto* object : { floor_.get(), transparentFront_.get(), transparentBack_.get(), hdrCube_.get() })
+	for (auto* object : { floor_.get(), transparentFront_.get(), transparentBack_.get(), hdrCube_.get(), monitorScreen_.get() })
 	{
 		if (object)
 		{
