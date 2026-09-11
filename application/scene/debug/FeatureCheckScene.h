@@ -5,6 +5,9 @@
 
 #include "camerawork/debug/DebugCamera.h"
 #include "gameobject/base/GameObject.h"
+#include "graphics/atmosphere/VolumetricLightRenderer.h"
+#include "graphics/postfx/DepthOfFieldRenderer.h"
+#include "graphics/view/PlanarReflection.h"
 #include "graphics/view/StageMonitor.h"
 #include "scene/interface/BaseScene.h"
 
@@ -48,6 +51,9 @@ private:
 	// 半透明キューブの色（アルファ）を今の設定で反映する
 	void ApplyTransparentColors();
 
+	// 床の反射・光の筋・被写界深度を入れる。元の設定は抜けるときに戻す
+	void SetupScreenQuality();
+
 	// 見た目の比較用に並べるキューブの数（トゥーン・リムを段階的に変える）
 	static constexpr size_t kShadingCubeCount = 3;
 	// ステージ用スポットライトの数
@@ -76,4 +82,7 @@ private:
 	// 入る前の状態（抜けるときに戻す）
 	bool prevFogEnabled_ = false;
 	bool prevBeamEnabled_ = false;
+	KCE::PlanarReflection::Settings prevReflection_{};
+	KCE::VolumetricLightRenderer::Settings prevVolumetric_{};
+	KCE::DepthOfFieldRenderer::Settings prevDepthOfField_{};
 };

@@ -50,6 +50,9 @@ void MyGame::Initialize()
 		skybox_.get(),
 		shadowMapManager_.get(),
 		this,
+		depthOfFieldRenderer_.get(),
+		volumetricLightRenderer_.get(),
+		planarReflection_.get(),
 	};
 
 	// テクスチャの読み込み

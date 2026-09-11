@@ -8,6 +8,9 @@
 #include "graphics/atmosphere/BeamRenderer.h"
 #include "graphics/atmosphere/FogRenderer.h"
 #include "graphics/2d/TextOverlay.h"
+#include "graphics/atmosphere/VolumetricLightRenderer.h"
+#include "graphics/postfx/DepthOfFieldRenderer.h"
+#include "graphics/view/PlanarReflection.h"
 #include "manager/graphics/LineManager.h"
 #include "manager/scene/CameraManager.h"
 #include "manager/scene/LightManager.h"
@@ -79,6 +82,12 @@ constexpr float kSpotLightDistance = 15.0f;
 // コーンの半角（ラジアン）。数式由来なのでここで角度から余弦を作る
 constexpr float kSpotLightHalfAngle = std::numbers::pi_v<float> / 8.0f;
 constexpr float kSpotLightFalloffHalfAngle = std::numbers::pi_v<float> / 10.0f;
+
+// 床の上面の高さ（キューブの半分の厚み = スケールの Y だけ中心より上）
+constexpr float kFloorTopHeight = kFloorPosition.y + kFloorScale.y;
+// 被写界深度。デバッグカメラの初期位置から比較用キューブの列までの距離にピントを合わせる
+constexpr float kDofFocusDistance = 19.0f;
+constexpr float kDofFocusRange = 10.0f;
 
 // デバッグカメラの初期位置と向き
 constexpr KCE::Vector3 kDebugCameraPosition = { 0.0f, 8.0f, -18.0f };
@@ -202,6 +211,7 @@ void FeatureCheckScene::Initialize()
 	}
 
 	SetupStageLights();
+	SetupScreenQuality();
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<KCE::DebugCamera>();
@@ -279,8 +289,46 @@ void FeatureCheckScene::ApplyTransparentColors()
 	}
 }
 
+void FeatureCheckScene::SetupScreenQuality()
+{
+	// 床を反射させる。床そのものは反射の絵に描かないレイヤーへ移す
+	floor_->SetRenderLayer(KCE::PlanarReflection::kReflectorLayer);
+	if (auto* reflection = sceneManager_->GetPlanarReflection())
+	{
+		prevReflection_ = reflection->GetSettings();
+		reflection->GetSettings().enabled = true;
+		reflection->GetSettings().planeHeight = kFloorTopHeight;
+	}
+	// 光の筋はビームを出しているライト（ここではステージのスポット3本）に出る
+	if (auto* volumetric = sceneManager_->GetVolumetricLight())
+	{
+		prevVolumetric_ = volumetric->GetSettings();
+		volumetric->GetSettings().enabled = true;
+	}
+	if (auto* depthOfField = sceneManager_->GetDepthOfField())
+	{
+		prevDepthOfField_ = depthOfField->GetSettings();
+		depthOfField->GetSettings().enabled = true;
+		depthOfField->GetSettings().focusDistance = kDofFocusDistance;
+		depthOfField->GetSettings().focusRange = kDofFocusRange;
+	}
+}
+
 void FeatureCheckScene::RestoreAtmosphere()
 {
+	if (auto* reflection = sceneManager_->GetPlanarReflection())
+	{
+		reflection->GetSettings() = prevReflection_;
+	}
+	if (auto* volumetric = sceneManager_->GetVolumetricLight())
+	{
+		volumetric->GetSettings() = prevVolumetric_;
+	}
+	if (auto* depthOfField = sceneManager_->GetDepthOfField())
+	{
+		depthOfField->GetSettings() = prevDepthOfField_;
+	}
+
 	if (auto* fog = GetFogRenderer())
 	{
 		fog->GetSettings().enabled = prevFogEnabled_;
