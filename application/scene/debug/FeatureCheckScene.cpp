@@ -40,9 +40,15 @@ constexpr KCE::Vector3 kTransparentScale = { 1.0f, 1.0f, 1.0f };
 constexpr KCE::Vector3 kTransparentFrontRgb = { 1.0f, 0.2f, 0.2f };
 constexpr KCE::Vector3 kTransparentBackRgb = { 0.2f, 0.4f, 1.0f };
 
-// 1.0 を超える色。LDR だと白で頭打ちになり、HDR ならブルームとトーンマップで差が出る
+// 1.0 を超える色。LDR だと白で頭打ちになり、HDR ならブルームとトーンマップで差が出る。
+// 緑と青まで明るくするとトーンマップ後にクリーム色になるので、赤だけ大きく超えさせてオレンジに見せる
 constexpr KCE::Vector3 kHdrCubePosition = { 0.0f, 1.0f, -5.0f };
-constexpr KCE::Vector4 kHdrCubeColor = { 6.0f, 3.0f, 1.0f, 1.0f };
+constexpr KCE::Vector4 kHdrCubeColor = { 4.0f, 0.45f, 0.05f, 1.0f };
+
+// 床とトゥーン比較用キューブの色。真っ白だと光の当たり方や塗り分けの段が見えないので色を付ける
+constexpr KCE::Vector4 kFloorColor = { 0.3f, 0.3f, 0.32f, 1.0f };
+constexpr KCE::Vector4 kShadingCubeColor = { 0.35f, 0.6f, 1.0f, 1.0f };
+constexpr float kShadingCubeOutlineStrength = 1.0f;
 
 // ステージ上のスポットライト。真上から床へ向けて、ビームが見えるように少し傾ける
 constexpr const char* kSpotLightNames[] = { "FeatureCheckSpot0", "FeatureCheckSpot1", "FeatureCheckSpot2" };
@@ -95,6 +101,7 @@ void FeatureCheckScene::Initialize()
 
 	// 床
 	floor_ = CreateObject("FeatureCheck_Floor", kFloorPosition, kFloorScale);
+	floor_->SetColor(kFloorColor);
 
 	// トゥーン・リムの比較。0 / 0.5 / 1 の3段階で並べる
 	for (size_t i = 0; i < kShadingCubeCount; ++i)
@@ -106,8 +113,11 @@ void FeatureCheckScene::Initialize()
 		const float amount = static_cast<float>(i) / static_cast<float>(kShadingCubeCount - 1);
 		if (auto* renderable = shadingCubes_[i]->GetRenderable3d())
 		{
+			renderable->SetColor(kShadingCubeColor);
 			renderable->SetToonAmount(amount);
 			renderable->SetRimStrength(amount);
+			// 輪郭線は素材ごとの強さが 0 より大きいものにだけ引かれる（既定は 0）
+			renderable->SetOutlineStrength(kShadingCubeOutlineStrength);
 		}
 	}
 
@@ -119,6 +129,8 @@ void FeatureCheckScene::Initialize()
 		if (auto* renderable = object->GetRenderable3d())
 		{
 			renderable->SetRenderQueue(KCE::RenderQueue::Transparent);
+			// ライトが当たると赤と青が薄まって重なりが分かりにくいので、色をそのまま出す
+			renderable->SetEnableLighting(false);
 		}
 	}
 	ApplyTransparentColors();
@@ -182,8 +194,10 @@ void FeatureCheckScene::SetupStageLights()
 	// フォグとビームは既定で無効なので、ここでオンにする。元の値は抜けるときに戻す
 	if (auto* fog = GetFogRenderer())
 	{
+		// 霧は画面全体を白く霞ませて、他の項目の色や陰影が見えにくくなる。
+		// 最初はオフにして、確かめるときだけパネルのチェックで入れる
 		prevFogEnabled_ = fog->GetSettings().enabled;
-		fog->GetSettings().enabled = true;
+		fog->GetSettings().enabled = false;
 	}
 	if (auto* beam = GetBeamRenderer())
 	{
