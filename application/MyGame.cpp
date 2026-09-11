@@ -142,18 +142,7 @@ void MyGame::Draw()
 	{
 		if (ImGui::BeginMenu("Window"))
 		{
-			bool showHierarchy = debugUIManager->IsShowHierarchy();
-			if (ImGui::MenuItem("Hierarchy", nullptr, &showHierarchy)) debugUIManager->SetShowHierarchy(showHierarchy);
-
-			bool showInspector = debugUIManager->IsShowInspector();
-			if (ImGui::MenuItem("Inspector", nullptr, &showInspector)) debugUIManager->SetShowInspector(showInspector);
-
-			bool showConsole = debugUIManager->IsShowConsole();
-			if (ImGui::MenuItem("Console", nullptr, &showConsole)) debugUIManager->SetShowConsole(showConsole);
-
-			bool showProject = debugUIManager->IsShowProject();
-			if (ImGui::MenuItem("Project", nullptr, &showProject)) debugUIManager->SetShowProject(showProject);
-
+			debugUIManager->DrawWindowMenu();
 			ImGui::Separator();
 			if (ImGui::BeginMenu("UI Scale"))
 			{
@@ -178,12 +167,6 @@ void MyGame::Draw()
 				debugUIManager->RequestLayoutReset();
 			}
 
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Tools"))
-		{
-			debugUIManager->DrawToolsMenu();
 			ImGui::EndMenu();
 		}
 
@@ -214,6 +197,7 @@ void MyGame::Draw()
 
 	// 初回起動時またはレイアウトリセット要求時に初期ドッキングレイアウトを自動構築
 	static bool firstFrame = true;
+	static bool selectSequencerTab = false;
 	if (firstFrame)
 	{
 		firstFrame = false;
@@ -226,6 +210,11 @@ void MyGame::Draw()
 
 	if (debugUIManager->IsLayoutResetRequested())
 	{
+		constexpr float kBottomAreaRatio = 0.35f;
+		constexpr float kLeftAreaRatio = 0.20f;
+		constexpr float kRightAreaRatio = 0.25f;
+		constexpr float kRightBottomRatio = 0.50f;
+
 		debugUIManager->ClearLayoutResetRequest();
 
 		ImGui::DockBuilderRemoveNode(dockspace_id); // 既存レイアウト削除
@@ -233,34 +222,29 @@ void MyGame::Draw()
 		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
 		ImGuiID dock_main_id = dockspace_id;
-		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, nullptr, &dock_main_id);
-		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
-		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, nullptr, &dock_main_id);
+		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, kBottomAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, kLeftAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, kRightAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, kRightBottomRatio, nullptr, &dock_id_right);
 
-		// ウィンドウのドッキング
-		ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
-		ImGui::DockBuilderDockWindow("Performance", dock_id_left);
-
+		const auto dockWindows = [debugUIManager](DebugUIDockLocation location, ImGuiID dockId)
+		{
+			for (const auto& name : debugUIManager->GetDockWindowNames(location))
+			{
+				ImGui::DockBuilderDockWindow(name.c_str(), dockId);
+			}
+		};
+		dockWindows(DebugUIDockLocation::Left, dock_id_left);
 		ImGui::DockBuilderDockWindow("Scene", dock_main_id);
-
-		ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-		ImGui::DockBuilderDockWindow("SceneManager", dock_id_right);
-		ImGui::DockBuilderDockWindow("Time Manager", dock_id_right);
-		ImGui::DockBuilderDockWindow("TimerManager", dock_id_right);
-
-		ImGui::DockBuilderDockWindow("Sequencer Inspector", dock_id_right);
-
-		ImGui::DockBuilderDockWindow("Sequencer", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Project", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Audio Debug", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("JSON Editor", dock_id_bottom);
-
+		dockWindows(DebugUIDockLocation::RightTop, dock_id_right);
+		dockWindows(DebugUIDockLocation::RightBottom, dock_id_right_bottom);
+		dockWindows(DebugUIDockLocation::Bottom, dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
+		selectSequencerTab = true;
 	}
 
 	// シーンウィンドウ
-	ImGui::Begin("Scene");
+	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 	ImGui::Image((ImTextureID)sceneRenderTexture_->GetGPUHandle().ptr, viewportSize);
 
@@ -292,45 +276,20 @@ void MyGame::Draw()
 
 	ImGui::End();
 
-	// 各種標準デバッグウィンドウの描画
-	if (debugUIManager->IsShowHierarchy())
-	{
-		bool open = debugUIManager->IsShowHierarchy();
-		if (ImGui::Begin("Hierarchy", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Hierarchy);
-		}
-		ImGui::End();
-		debugUIManager->SetShowHierarchy(open);
-	}
-
-	if (debugUIManager->IsShowInspector())
-	{
-		bool open = debugUIManager->IsShowInspector();
-		if (ImGui::Begin("Inspector", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Inspector);
-		}
-		ImGui::End();
-		debugUIManager->SetShowInspector(open);
-	}
-
-	if (debugUIManager->IsShowProject())
-	{
-		bool open = debugUIManager->IsShowProject();
-		if (ImGui::Begin("Project", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Project);
-		}
-		ImGui::End();
-		debugUIManager->SetShowProject(open);
-	}
+	// 登録UIはそれぞれ独立ウィンドウとして描く。
+	debugUIManager->Draw();
 
 	if (debugUIManager->IsShowConsole())
 	{
 		bool open = debugUIManager->IsShowConsole();
 		ConsoleLog::GetInstance()->Draw(&open);
 		debugUIManager->SetShowConsole(open);
+	}
+	if (selectSequencerTab)
+	{
+		// 全ウィンドウを作った後なら、ドッキング先の選択タブも確実に切り替わる。
+		ImGui::SetWindowFocus("Sequencer");
+		selectSequencerTab = false;
 	}
 
 
