@@ -283,6 +283,9 @@ void MyGame::Draw()
 	sceneViewRect.height = imageSize.y;
 	SceneViewContext::GetInstance()->SetViewportRect(sceneViewRect);
 	SceneViewContext::GetInstance()->SetCamera(cameraManager_->GetActiveCamera());
+	// シーン画像も ImGui のウィンドウの中なので、上にあるだけで ImGui がマウスを使っている扱いになる。
+	// 画像の上かどうかを渡しておき、Input がそこではマウスをゲームへ渡せるようにする（直前の項目はシーン画像）
+	SceneViewContext::GetInstance()->SetHovered(ImGui::IsItemHovered());
 
 	// 登録されたSceneエリアのデバッグUIを描画する
 	debugUIManager->DrawArea(DebugUIArea::Scene);
