@@ -8,6 +8,7 @@
 #include "graphics/atmosphere/BeamRenderer.h"
 #include "graphics/atmosphere/FogRenderer.h"
 #include "graphics/2d/TextOverlay.h"
+#include "graphics/text/Text3DRenderer.h"
 #include "graphics/atmosphere/VolumetricLightRenderer.h"
 #include "graphics/postfx/DepthOfFieldRenderer.h"
 #include "graphics/view/PlanarReflection.h"
@@ -130,6 +131,22 @@ constexpr const char* kSampleLyric = "光の中で 君と歌おう";
 constexpr const char* kSampleSpeaker = "プロデューサー";
 constexpr const char* kSampleLine = "今日のステージ、最高だったよ！次も一緒にがんばろう。";
 
+// 3D 空間の文字の見本（自作の文）。比較用キューブの上に浮かべる。
+// シーケンサの Text3D トラックの Target にこの名前を入れると動かせる
+constexpr const char* kStageTextName = "FeatureCheck_StageText";
+constexpr const char* kStageText = "ひかりのステージへ";
+constexpr KCE::Vector3 kStageTextPosition = { 0.0f, 3.4f, 1.0f };
+constexpr float kStageTextSize = 0.9f;
+// 1 を超える色でブルームに乗せて光らせる
+constexpr KCE::Vector4 kStageTextColor = { 2.5f, 1.6f, 0.5f, 1.0f };
+// 見本の出入り。1秒に何文字出すか、出し切ってから止めておく時間、抜けた後の間
+constexpr float kStageTextStep = 1.0f / 60.0f;
+constexpr float kStageTextCharsPerSecond = 6.0f;
+constexpr float kStageTextHoldSeconds = 1.5f;
+constexpr float kStageTextGapSeconds = 0.5f;
+// 周ごとに Fade → Drop → Spin → Pop と動き方を変える
+constexpr int kStageTextStyleCount = 4;
+
 void HideTextSample()
 {
 	if (auto* overlay = GetTextOverlay())
@@ -212,6 +229,17 @@ void FeatureCheckScene::Initialize()
 
 	SetupStageLights();
 	SetupScreenQuality();
+
+	// 3D 空間の文字。Text3DRenderer には非所有で登録する（外すのは OnFinalize）
+	stageText_ = std::make_unique<KCE::TextMesh3D>();
+	stageText_->SetText(kStageText);
+	stageText_->GetParams().position = kStageTextPosition;
+	stageText_->GetParams().size = kStageTextSize;
+	stageText_->GetParams().color = kStageTextColor;
+	if (auto* text3D = sceneManager_->GetText3D())
+	{
+		text3D->Register(kStageTextName, stageText_.get());
+	}
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<KCE::DebugCamera>();
@@ -359,6 +387,11 @@ void FeatureCheckScene::OnFinalize()
 
 	// 見本の文字を他のシーンに残さない
 	HideTextSample();
+	if (auto* text3D = sceneManager_->GetText3D())
+	{
+		text3D->Unregister(stageText_.get());
+	}
+	stageText_.reset();
 
 	// 画面より先にモニターを畳む（画面のテクスチャを戻してからサブビューを消す）
 	stageMonitor_.reset();
@@ -404,6 +437,22 @@ void FeatureCheckScene::CommonUpdate()
 			overlay->ShowLyric(kSampleLyric, 1.0f);
 			overlay->ShowDialogue(kSampleSpeaker, kSampleLine, KCE::TextSprite::kShowAll, 1.0f);
 		}
+	}
+
+	// 3D 文字の見本を、1文字ずつ出して・止めて・抜けさせる。周ごとに動き方を変える
+	if (stageText_ && animateStageText_)
+	{
+		stageTextTime_ += kStageTextStep;
+		const float charCount = static_cast<float>(stageText_->GetCharCount());
+		const float revealSeconds = charCount / kStageTextCharsPerSecond;
+		const float cycleSeconds = revealSeconds * 2.0f + kStageTextHoldSeconds + kStageTextGapSeconds;
+		const float local = std::fmod(stageTextTime_, cycleSeconds);
+		const int loop = static_cast<int>(stageTextTime_ / cycleSeconds);
+
+		KCE::TextMesh3D::Params& params = stageText_->GetParams();
+		params.style = static_cast<KCE::TextAppearStyle>(loop % kStageTextStyleCount);
+		params.reveal = local * kStageTextCharsPerSecond;
+		params.exit = (local - revealSeconds - kStageTextHoldSeconds) * kStageTextCharsPerSecond;
 	}
 
 	// GameObjectManager の更新はフレームワークから呼ばれないので、ここで回す
@@ -478,6 +527,8 @@ void FeatureCheckScene::DrawImGui()
 		HideTextSample();
 	}
 	ImGui::TextDisabled("シーケンサの Text トラックを試すときはオフにする。");
+	ImGui::Checkbox("3D Text Demo", &animateStageText_);
+	ImGui::TextDisabled("Text3D トラックで動かすときはオフにして、Target に FeatureCheck_StageText を入れる。");
 	ImGui::TextDisabled("細かい値は Fog / Beam / Outline / PostProcess の各デバッグUIで調整する。");
 
 	ImGui::SeparatorText("Objects");
