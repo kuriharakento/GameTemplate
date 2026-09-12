@@ -55,6 +55,8 @@ void MyGame::Initialize()
 		planarReflection_.get(),
 		text3DRenderer_.get(),
 	};
+	context.dxCommon = dxCommon_.get();
+	context.srvManager = srvManager_.get();
 
 	// テクスチャの読み込み
 	LoadTextures();
