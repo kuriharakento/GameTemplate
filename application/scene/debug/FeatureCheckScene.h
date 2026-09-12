@@ -7,6 +7,7 @@
 #include "gameobject/base/GameObject.h"
 #include "graphics/atmosphere/VolumetricLightRenderer.h"
 #include "graphics/postfx/DepthOfFieldRenderer.h"
+#include "graphics/text/TextMesh3D.h"
 #include "graphics/view/PlanarReflection.h"
 #include "graphics/view/StageMonitor.h"
 #include "scene/interface/BaseScene.h"
@@ -68,6 +69,12 @@ private:
 	// 奥に置く画面。StageMonitor の映像を映す
 	std::unique_ptr<KCE::GameObject> monitorScreen_;
 	std::unique_ptr<KCE::StageMonitor> stageMonitor_;
+	// 3D 空間の文字の見本。Text3DRenderer には非所有で登録している
+	std::unique_ptr<KCE::TextMesh3D> stageText_;
+	// 見本の出入りを回すための経過（フレーム数ベース。デバッグ用なので実時間には合わせない）
+	float stageTextTime_ = 0.0f;
+	// 見本を自動で出入りさせるか。シーケンサの Text3D トラックを試すときはオフにする
+	bool animateStageText_ = true;
 
 	std::unique_ptr<KCE::DebugCamera> debugCamera_;
 	// シーケンサのカメラ再生と取り合わないように、オフにできるようにしておく

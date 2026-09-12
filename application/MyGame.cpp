@@ -53,6 +53,7 @@ void MyGame::Initialize()
 		depthOfFieldRenderer_.get(),
 		volumetricLightRenderer_.get(),
 		planarReflection_.get(),
+		text3DRenderer_.get(),
 	};
 
 	// テクスチャの読み込み
