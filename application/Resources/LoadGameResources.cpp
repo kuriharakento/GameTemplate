@@ -1,4 +1,6 @@
 #include "MyGame.h"
+#include <string>
+#include <vector>
 #include <manager/graphics/TextureManager.h>
 
 ///=============================================================================
@@ -6,6 +8,7 @@
 ///=============================================================================
 
 // NOTE: エンジンでデフォルト使用するリソースもここで読み込んでいる。
+// NOTE: ファイルの展開はワーカーで並べて回す。SRV の番号はリストの並び順で振られる。
 
 void KCE::MyGame::LoadTextures()
 {
@@ -13,23 +16,26 @@ void KCE::MyGame::LoadTextures()
 	// エンジン
 	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
 	// =========================
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/black.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/red.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/testSprite.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/white1x1.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/gradationLine.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/gradation.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/circle2.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/flowerfun.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/star.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/skybox.dds", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/numbers.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/fonts/luna_atlas.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/fonts/nico_atlas.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/simplexNoise.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/flameEye.png", KCE::ResourceLifetime::Resident);
-	KCE::TextureManager::GetInstance()->LoadTexture("./Resources/lock_on.png", KCE::ResourceLifetime::Resident);
+	const std::vector<std::string> engineTextures = {
+		"./Resources/uvChecker.png",
+		"./Resources/black.png",
+		"./Resources/red.png",
+		"./Resources/testSprite.png",
+		"./Resources/white1x1.png",
+		"./Resources/gradationLine.png",
+		"./Resources/gradation.png",
+		"./Resources/circle2.png",
+		"./Resources/flowerfun.png",
+		"./Resources/star.png",
+		"./Resources/skybox.dds",
+		"./Resources/numbers.png",
+		"./Resources/fonts/luna_atlas.png",
+		"./Resources/fonts/nico_atlas.png",
+		"./Resources/simplexNoise.png",
+		"./Resources/flameEye.png",
+		"./Resources/lock_on.png",
+	};
+	KCE::TextureManager::GetInstance()->LoadTextures(engineTextures, KCE::ResourceLifetime::Resident, jobSystem_.get());
 }
 
 void KCE::MyGame::LoadModels()
@@ -38,7 +44,10 @@ void KCE::MyGame::LoadModels()
 	// エンジン
 	// MEMO: エンジンのデフォルトリソースは、エンジン側で使用するため、ユーザーが削除しないように注意すること。
 	// =========================
-	KCE::ModelManager::GetInstance()->LoadModel("cube", ".obj", KCE::ResourceLifetime::Resident);
-	KCE::ModelManager::GetInstance()->LoadModel("skydome", ".obj", KCE::ResourceLifetime::Resident);
-	KCE::ModelManager::GetInstance()->LoadModel("plane", ".gltf", KCE::ResourceLifetime::Resident);
+	const std::vector<KCE::ModelManager::ModelRequest> engineModels = {
+		{ "cube", ".obj" },
+		{ "skydome", ".obj" },
+		{ "plane", ".gltf" },
+	};
+	KCE::ModelManager::GetInstance()->LoadModels(engineModels, KCE::ResourceLifetime::Resident, jobSystem_.get());
 }

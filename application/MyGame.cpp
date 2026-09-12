@@ -33,8 +33,9 @@ void MyGame::Initialize()
 	// フレームワークの初期化
 	Framework::Initialize();
 
-	Audio::GetInstance()->Load("Cozy_rain.mp3", SoundGroup::BGM);
-	Audio::GetInstance()->PlayWave("Cozy_rain.mp3", true);
+	// BGM のデコードは重いので、テクスチャとモデルを読んでる間にワーカーで回す。
+	// 鳴らすまでメインスレッドから Audio を触らないこと
+	jobSystem_->Submit([]() { Audio::GetInstance()->Load("Cozy_rain.mp3", SoundGroup::BGM); });
 
 	// ゲーム側でウィンドウタイトルを決める
 	winApp_->SetWindowTitle(L"MyGame");
@@ -63,6 +64,10 @@ void MyGame::Initialize()
 
 	// モデルの読み込み
 	LoadModels();
+
+	// BGM のデコードが終わってから鳴らす
+	jobSystem_->WaitIdle();
+	Audio::GetInstance()->PlayWave("Cozy_rain.mp3", true);
 
 	// GPUの完了待ちをしてから中間リソースを解放
 	dxCommon_->ExecuteAndWait();
