@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="collision">
@@ -47,6 +47,9 @@
     <ClCompile Include="scene\debug\ParticleTestScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
+    <ClCompile Include="scene\debug\DebugScene.cpp">
+      <Filter>ソース ファイル\scene\debug</Filter>
+    </ClCompile>
     <ClCompile Include="scene\debug\FeatureCheckScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="scene\debug\ParticleTestScene.h">
       <Filter>scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\debug\DebugScene.h">
+      <Filter>ヘッダー ファイル\scene\debug</Filter>
     </ClInclude>
     <ClInclude Include="scene\debug\FeatureCheckScene.h">
       <Filter>scene\debug</Filter>

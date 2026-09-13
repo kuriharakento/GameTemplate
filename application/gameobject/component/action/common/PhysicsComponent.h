@@ -1,5 +1,5 @@
 #pragma once
-#include "engine/gameobject/component/base/IActionComponent.h"
+#include "engine/gameobject/component/base/Behaviour.h"
 #include "jsonEditor/JsonEditableBase.h"
 #include "math/Vector3.h"
 
@@ -8,14 +8,13 @@ namespace KCE::GameObjectComponent
 	/**
 	 * @brief キャラクターの物理挙動（移動速度と外部物理速度を分離して管理）を制御するコンポーネント
 	 */
-	class PhysicsComponent : public IActionComponent, public JsonEditableBase
+	class PhysicsComponent : public Behaviour, public JsonEditableBase
 	{
 	public:
 		/**
 		 * @brief コンストラクタ
-		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		PhysicsComponent(GameObject* owner);
+		PhysicsComponent();
 
 		/**
 		 * @brief デストラクタ
@@ -24,9 +23,8 @@ namespace KCE::GameObjectComponent
 
 		/**
 		 * @brief 毎フレームの更新処理
-		 * @param owner このコンポーネントを所有するGameObject
 		 */
-		void Update(GameObject* owner) override;
+		void Update() override;
 
 		/**
 		 * @brief 瞬間的な外力（被弾の衝撃や反射時の反動など）を加える
@@ -54,7 +52,7 @@ namespace KCE::GameObjectComponent
 		void SetVelocity(const Vector3& velocity) { externalVelocity_ = velocity; }
 
 		const Vector3& GetMovementVelocity() const { return movementVelocity_; }
-		
+
 		const Vector3& GetExternalVelocity() const { return externalVelocity_; }
 		void SetExternalVelocity(const Vector3& velocity) { externalVelocity_ = velocity; }
 
