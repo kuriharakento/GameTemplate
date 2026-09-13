@@ -306,8 +306,8 @@ void MyGame::Draw()
 		// ただし同じフレームで2回フォーカスすると後の方しか効かないので、フレームを分ける
 		if (pendingTabFocusSteps == kTabFocusSteps)
 		{
-			// 右上はオブジェクトを選んで編集する流れが多いので、GameObject Inspector を最初に見せる
-			ImGui::SetWindowFocus("GameObject Inspector");
+			// 右上は選んだ物を編集する流れが多いので、Inspector を最初に見せる
+			ImGui::SetWindowFocus("Inspector");
 		}
 		else
 		{
