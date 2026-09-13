@@ -229,6 +229,8 @@ void MyGame::Draw()
 		// 右の列はタブが多いので、狭いとタブ名が途中で切れて見分けられない。少し広めに取る
 		constexpr float kRightAreaRatio = 0.35f;
 		constexpr float kRightBottomRatio = 0.50f;
+		// 左の列の下側（シーンごとのパネル）の割合。上は Hierarchy
+		constexpr float kLeftBottomRatio = 0.45f;
 
 		debugUIManager->ClearLayoutResetRequest();
 
@@ -239,6 +241,7 @@ void MyGame::Draw()
 		ImGuiID dock_main_id = dockspace_id;
 		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, kBottomAreaRatio, nullptr, &dock_main_id);
 		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, kLeftAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_left_bottom = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, kLeftBottomRatio, nullptr, &dock_id_left);
 		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, kRightAreaRatio, nullptr, &dock_main_id);
 		ImGuiID dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, kRightBottomRatio, nullptr, &dock_id_right);
 
@@ -250,6 +253,7 @@ void MyGame::Draw()
 			}
 		};
 		dockWindows(EditorDock::Left, dock_id_left);
+		dockWindows(EditorDock::LeftBottom, dock_id_left_bottom);
 		ImGui::DockBuilderDockWindow("Scene", dock_main_id);
 		dockWindows(EditorDock::Right, dock_id_right);
 		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
