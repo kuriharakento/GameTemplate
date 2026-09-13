@@ -1,5 +1,4 @@
 #include "DebugScene.h"
-#include "audio/Audio.h"
 #include "base/Logger.h"
 #include "gameobject/base/GameObject.h"
 #include "gameobject/component/base/Behaviour.h"
@@ -40,13 +39,19 @@ private:
 class CollisionCounter final : public KCE::GameObjectComponent::Behaviour
 {
 public:
-    CollisionCounter(int* colliderCount, int* objectCount) : colliderCount_(colliderCount), objectCount_(objectCount) {}
-    void OnCollisionEnter(const KCE::GameObjectComponent::CollisionInfo&) override { ++*colliderCount_; }
-    void OnObjectCollisionEnter(const KCE::GameObjectComponent::CollisionInfo&) override { ++*objectCount_; }
+	CollisionCounter(int* colliderCount, int* objectCount, int* colliderExitCount = nullptr)
+		: colliderCount_(colliderCount), objectCount_(objectCount), colliderExitCount_(colliderExitCount) {}
+	void OnCollisionEnter(const KCE::GameObjectComponent::CollisionInfo&) override { ++*colliderCount_; }
+	void OnCollisionExit(const KCE::GameObjectComponent::CollisionInfo&) override
+	{
+		if (colliderExitCount_) ++*colliderExitCount_;
+	}
+	void OnObjectCollisionEnter(const KCE::GameObjectComponent::CollisionInfo&) override { ++*objectCount_; }
 private:
-    // DebugScene が所有し、このコンポーネントより後まで生きる。
-    int* colliderCount_ = nullptr;
-    int* objectCount_ = nullptr;
+	// DebugScene が所有し、このコンポーネントより後まで生きる。
+	int* colliderCount_ = nullptr;
+	int* objectCount_ = nullptr;
+	int* colliderExitCount_ = nullptr;
 };
 class LifecycleProbe final : public KCE::GameObjectComponent::Behaviour
 {
@@ -88,7 +93,6 @@ KCE::GameObject* DebugScene::CreateObject(const char* name, const KCE::Vector3& 
 
 void DebugScene::Initialize()
 {
-    KCE::Audio::GetInstance()->SetMasterVolume(0.0f);
     KCE::CollisionManager::GetInstance()->Initialize();
     sceneManager_->GetCameraManager()->GetActiveCamera()->SetTranslate({ 0.0f, 12.0f, -32.0f });
     sceneManager_->GetCameraManager()->GetActiveCamera()->SetRotate({ 0.25f, 0.0f, 0.0f });
@@ -109,9 +113,9 @@ void DebugScene::Initialize()
     bulletCollider->SetCollisionLayer(kMovingLayer);
 
     auto* body = CreateObject("MultiCollider", { 9.0f, 0.0f, 0.0f }, { 1.0f, 2.0f, 1.0f });
-    body->AddComponent<CollisionCounter>(&colliderEnterCount_, &objectEnterCount_);
-    auto* bodyCollider = body->AddComponent<KCE::GameObjectComponent::OBBCollider>();
-    bodyCollider->SetCollisionLayer(kMovingLayer);
+	body->AddComponent<CollisionCounter>(&colliderEnterCount_, &objectEnterCount_, &colliderExitCount_);
+	bodyCollider_ = body->AddComponent<KCE::GameObjectComponent::OBBCollider>();
+	bodyCollider_->SetCollisionLayer(kMovingLayer);
     auto* feetCollider = body->AddComponent<KCE::GameObjectComponent::SphereCollider>();
     feetCollider->SetSphere({ {}, 1.0f });
     feetCollider->SetCenter({ 0.0f, -1.5f, 0.0f });
@@ -143,6 +147,13 @@ void DebugScene::Initialize()
 void DebugScene::CommonUpdate()
 {
     ++frameCount_;
+	if (frameCount_ == 10 && bodyCollider_)
+	{
+		bodyCollider_->SetEnabled(false);
+		KCE::Logger::Log(
+			"DebugScene: disabled body collider; colliderExit=" + std::to_string(colliderExitCount_) +
+			" objectEnter=" + std::to_string(objectEnterCount_));
+	}
 	if (frameCount_ == 20 && lifecycleProbe_) lifecycleProbe_->SetEnabled(false);
 	if (frameCount_ == 30 && lifecycleProbe_) lifecycleProbe_->SetEnabled(true);
 	if (frameCount_ == 35 && lifecycleObject_)
@@ -165,7 +176,7 @@ void DebugScene::CommonUpdate()
     KCE::GameObjectManager::GetInstance()->Update();
     collisions->CheckCollisions();
     KCE::Ray ray{ { 0.0f, 0.0f, -4.0f }, { 0.0f, 0.0f, 1.0f }, 20.0f };
-    raycastHit = collisions->Raycast(ray, kRayTargetLayer, raycastHit_);
+	hasRaycastHit_ = collisions->Raycast(ray, kRayTargetLayer, raycastHit_);
 }
 void DebugScene::Draw3D()
 {
@@ -177,12 +188,13 @@ void DebugScene::DrawImGui()
 {
     ImGui::Begin("Component Lifecycle Check");
     ImGui::Text("Collider Enter: %d", colliderEnterCount_);
+	ImGui::Text("Collider Exit after disable: %d", colliderExitCount_);
 	ImGui::Text("Active collision pairs: %zu", KCE::CollisionManager::GetInstance()->GetActiveCollisionCount());
     ImGui::Text("Object Enter: %d", objectEnterCount_);
     ImGui::Text("Fast bullet hit: %d", bulletHitCount_);
     ImGui::Text("Ray collider enter: %d", rayEnterCount_);
     ImGui::Text("Spawned bullet false hit: %d", spawnedBulletFalseHitCount_);
-    ImGui::Text("Raycast: %s", raycastHit ? raycastHit_.object->GetName().c_str() : "None");
+	ImGui::Text("Raycast: %s", hasRaycastHit_ ? raycastHit_.object->GetName().c_str() : "None");
     ImGui::Text("Raycast distance: %.3f", raycastHit_.distance);
 	ImGui::Text("Lifecycle A/E/S/U/L/D/X: %d/%d/%d/%d/%d/%d/%d", awakeCount_, enableCount_, startCount_, updateCount_, lateUpdateCount_, disableCount_, destroyCount_);
     ImGui::End();

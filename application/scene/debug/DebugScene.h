@@ -20,13 +20,16 @@ private:
     std::vector<std::unique_ptr<KCE::GameObject>> objects_;
     KCE::CollisionManager::RaycastHit raycastHit_{};
     int colliderEnterCount_ = 0;
+	int colliderExitCount_ = 0;
     int objectEnterCount_ = 0;
     int bulletHitCount_ = 0;
     int rayEnterCount_ = 0;
     int spawnedBulletFalseHitCount_ = 0;
     int frameCount_ = 0;
     bool spawnedBullet_ = false;
-    bool raycastHit = false;
+	bool hasRaycastHit_ = false;
+	// objects_ が所有し、シーン終了までは有効。
+	KCE::GameObjectComponent::Collider* bodyCollider_ = nullptr;
 	int awakeCount_ = 0;
 	int enableCount_ = 0;
 	int startCount_ = 0;
