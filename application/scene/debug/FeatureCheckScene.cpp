@@ -160,7 +160,7 @@ void HideTextSample()
 void FeatureCheckScene::Initialize()
 {
 #ifdef USE_IMGUI
-	KCE::DebugUIManager::GetInstance()->RegisterDebugUI(this, "Feature Check", [this]() { this->DrawImGui(); }, KCE::DebugUIArea::Inspector);
+	KCE::DebugUIManager::GetInstance()->RegisterWindow(this, "Feature Check", [this]() { this->DrawImGui(); }, KCE::EditorDock::Left);
 #endif
 
 	// 床

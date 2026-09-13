@@ -242,18 +242,18 @@ void MyGame::Draw()
 		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, kRightAreaRatio, nullptr, &dock_main_id);
 		ImGuiID dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, kRightBottomRatio, nullptr, &dock_id_right);
 
-		const auto dockWindows = [debugUIManager](DebugUIDockLocation location, ImGuiID dockId)
+		const auto dockWindows = [debugUIManager](EditorDock location, ImGuiID dockId)
 		{
 			for (const auto& name : debugUIManager->GetDockWindowNames(location))
 			{
 				ImGui::DockBuilderDockWindow(name.c_str(), dockId);
 			}
 		};
-		dockWindows(DebugUIDockLocation::Left, dock_id_left);
+		dockWindows(EditorDock::Left, dock_id_left);
 		ImGui::DockBuilderDockWindow("Scene", dock_main_id);
-		dockWindows(DebugUIDockLocation::RightTop, dock_id_right);
-		dockWindows(DebugUIDockLocation::RightBottom, dock_id_right_bottom);
-		dockWindows(DebugUIDockLocation::Bottom, dock_id_bottom);
+		dockWindows(EditorDock::Right, dock_id_right);
+		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
+		dockWindows(EditorDock::Bottom, dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
 		pendingTabFocusSteps = kTabFocusSteps;
 	}
@@ -287,7 +287,7 @@ void MyGame::Draw()
 	SceneViewContext::GetInstance()->SetHovered(ImGui::IsItemHovered());
 
 	// 登録されたSceneエリアのデバッグUIを描画する
-	debugUIManager->DrawArea(DebugUIArea::Scene);
+	debugUIManager->DrawSceneOverlays();
 
 	ImGui::End();
 
