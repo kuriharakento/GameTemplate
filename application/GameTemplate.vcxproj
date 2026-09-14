@@ -125,6 +125,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="resources\LoadGameResources.cpp" />
     <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="scene\debug\ParticleTestScene.cpp" />
+    <ClCompile Include="scene\debug\DebugScene.cpp" />
+    <ClCompile Include="scene\debug\FeatureCheckScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scene\play\title\TitleScene.cpp" />
   </ItemGroup>
@@ -135,6 +137,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="gameobject\component\action\common\PhysicsComponent.h" />
     <ClInclude Include="gameobject\component\action\common\StatusComponent.h" />
     <ClInclude Include="scene\debug\ParticleTestScene.h" />
+    <ClInclude Include="scene\debug\DebugScene.h" />
+    <ClInclude Include="scene\debug\FeatureCheckScene.h" />
     <ClInclude Include="scene\play\title\TitleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

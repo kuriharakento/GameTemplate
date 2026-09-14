@@ -10,7 +10,7 @@ REGISTER_COMPONENT(PhysicsComponent)
 
 namespace KCE::GameObjectComponent
 {
-	PhysicsComponent::PhysicsComponent(GameObject* owner)
+	PhysicsComponent::PhysicsComponent()
 	{
 		// メンバ変数をJSONエディタ/シリアライズ用に登録
 		Register("movementVelocity", &movementVelocity_);
@@ -29,7 +29,7 @@ namespace KCE::GameObjectComponent
 	{
 	}
 
-	void PhysicsComponent::Update(GameObject* owner)
+	void PhysicsComponent::Update()
 	{
 		float dt = TimeManager::GetInstance().GetGameContext().deltaTime;
 		if (dt <= 0.0f)
@@ -67,9 +67,9 @@ namespace KCE::GameObjectComponent
 
 		// 4. 座標の更新 (自己移動速度 + 外部物理速度 を合算)
 		Vector3 finalVelocity = movementVelocity_ + externalVelocity_;
-		Vector3 currentPos = owner->GetPosition();
+		Vector3 currentPos = GetOwner()->GetPosition();
 		currentPos += finalVelocity * dt;
-		owner->SetPosition(currentPos);
+		GetOwner()->SetPosition(currentPos);
 
 		// 瞬間的な外力と接地状態をリセット
 		externalForce_ = { 0.0f, 0.0f, 0.0f };

@@ -33,8 +33,9 @@ void MyGame::Initialize()
 	// フレームワークの初期化
 	Framework::Initialize();
 
-	Audio::GetInstance()->Load("Cozy_rain.mp3", SoundGroup::BGM);
-	Audio::GetInstance()->PlayWave("Cozy_rain.mp3", true);
+	// BGM のデコードは重いので、テクスチャとモデルを読んでる間にワーカーで回す。
+	// 鳴らすまでメインスレッドから Audio を触らないこと
+	jobSystem_->Submit([]() { Audio::GetInstance()->Load("Cozy_rain.mp3", SoundGroup::BGM); });
 
 	// ゲーム側でウィンドウタイトルを決める
 	winApp_->SetWindowTitle(L"MyGame");
@@ -49,13 +50,24 @@ void MyGame::Initialize()
 		postProcessManager_.get(),
 		skybox_.get(),
 		shadowMapManager_.get(),
+		this,
+		depthOfFieldRenderer_.get(),
+		volumetricLightRenderer_.get(),
+		planarReflection_.get(),
+		text3DRenderer_.get(),
 	};
+	context.dxCommon = dxCommon_.get();
+	context.srvManager = srvManager_.get();
 
 	// テクスチャの読み込み
 	LoadTextures();
 
 	// モデルの読み込み
 	LoadModels();
+
+	// BGM のデコードが終わってから鳴らす
+	jobSystem_->WaitIdle();
+	Audio::GetInstance()->PlayWave("Cozy_rain.mp3", true);
 
 	// GPUの完了待ちをしてから中間リソースを解放
 	dxCommon_->ExecuteAndWait();
@@ -128,6 +140,34 @@ void MyGame::Draw()
 	// 描画順は engine 側の RenderPipeline に集約されている。
 	// パスを足すときは Framework::GetRenderPipeline() から差し込むこと。
 #ifdef USE_IMGUI
+	HandleGameViewToggle();
+	if (gameViewOnly_)
+	{
+		// ゲーム画面だけを出す。Release と同じくバックバッファへ直接描き、
+		// ImGui は組み立てだけ終えて描かない（どこかのウィンドウが残って出ることもない）
+		Framework::ExecuteRenderPipeline(nullptr);
+
+		// マウスとギズモの基準をウィンドウ全体に合わせる
+		POINT clientOrigin = { 0, 0 };
+		ClientToScreen(winApp_->GetHwnd(), &clientOrigin);
+		const float clientWidth = static_cast<float>(winApp_->GetClientWidth());
+		const float clientHeight = static_cast<float>(winApp_->GetClientHeight());
+		Input::GetInstance()->SetMouseCorrection({ 0.0f, 0.0f }, { clientWidth, clientHeight });
+		SceneViewRect fullRect;
+		fullRect.x = static_cast<float>(clientOrigin.x);
+		fullRect.y = static_cast<float>(clientOrigin.y);
+		fullRect.width = clientWidth;
+		fullRect.height = clientHeight;
+		SceneViewContext::GetInstance()->SetViewportRect(fullRect);
+		SceneViewContext::GetInstance()->SetCamera(cameraManager_->GetActiveCamera());
+		// ImGui のウィンドウが無いので、マウスは常にゲームへ渡す
+		SceneViewContext::GetInstance()->SetHovered(true);
+
+		imguiManager_->End();
+		dxCommon_->PostDraw();
+		return;
+	}
+
 	// エディタではシーンをImGuiのウィンドウに表示するため、
 	// バックバッファではなくレンダーターゲットへ出力する。
 	Framework::ExecuteRenderPipeline(sceneRenderTexture_.get());
@@ -140,22 +180,11 @@ void MyGame::Draw()
 
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("Window"))
+		if (ImGui::BeginMenu("表示"))
 		{
-			bool showHierarchy = debugUIManager->IsShowHierarchy();
-			if (ImGui::MenuItem("Hierarchy", nullptr, &showHierarchy)) debugUIManager->SetShowHierarchy(showHierarchy);
-
-			bool showInspector = debugUIManager->IsShowInspector();
-			if (ImGui::MenuItem("Inspector", nullptr, &showInspector)) debugUIManager->SetShowInspector(showInspector);
-
-			bool showConsole = debugUIManager->IsShowConsole();
-			if (ImGui::MenuItem("Console", nullptr, &showConsole)) debugUIManager->SetShowConsole(showConsole);
-
-			bool showProject = debugUIManager->IsShowProject();
-			if (ImGui::MenuItem("Project", nullptr, &showProject)) debugUIManager->SetShowProject(showProject);
-
+			debugUIManager->DrawWindowMenu();
 			ImGui::Separator();
-			if (ImGui::BeginMenu("UI Scale"))
+			if (ImGui::BeginMenu("UIの大きさ"))
 			{
 				float currentScale = debugUIManager->GetUIScale();
 				float scales[] = { 0.50f, 0.75f, 1.00f, 1.25f, 1.50f, 1.75f, 2.00f };
@@ -173,7 +202,7 @@ void MyGame::Draw()
 			}
 
 			ImGui::Separator();
-			if (ImGui::MenuItem("Reset Layout"))
+			if (ImGui::MenuItem("レイアウトをリセット"))
 			{
 				debugUIManager->RequestLayoutReset();
 			}
@@ -181,10 +210,10 @@ void MyGame::Draw()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Tools"))
+		// ImGui を全部消して、ゲーム画面だけを確認する。F11 でも切り替わる
+		if (ImGui::MenuItem("ゲーム画面 (F11)"))
 		{
-			debugUIManager->DrawToolsMenu();
-			ImGui::EndMenu();
+			gameViewOnly_ = true;
 		}
 
 		// メニューバー中央にエンジン名を表示
@@ -214,6 +243,9 @@ void MyGame::Draw()
 
 	// 初回起動時またはレイアウトリセット要求時に初期ドッキングレイアウトを自動構築
 	static bool firstFrame = true;
+	// 初期レイアウトの後に最初に見せるタブの数。選択タブはフォーカスに合わせて切り替わるので、1フレームに1つずつ当てる
+	constexpr int kTabFocusSteps = 2;
+	static int pendingTabFocusSteps = 0;
 	if (firstFrame)
 	{
 		firstFrame = false;
@@ -226,6 +258,11 @@ void MyGame::Draw()
 
 	if (debugUIManager->IsLayoutResetRequested())
 	{
+		constexpr float kBottomAreaRatio = 0.35f;
+		constexpr float kLeftAreaRatio = 0.20f;
+		// 右の列はタブが多いので、狭いとタブ名が途中で切れて見分けられない。少し広めに取る
+		constexpr float kRightAreaRatio = 0.35f;
+		constexpr float kRightBottomRatio = 0.50f;
 		debugUIManager->ClearLayoutResetRequest();
 
 		ImGui::DockBuilderRemoveNode(dockspace_id); // 既存レイアウト削除
@@ -233,35 +270,49 @@ void MyGame::Draw()
 		ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
 		ImGuiID dock_main_id = dockspace_id;
-		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, nullptr, &dock_main_id);
-		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
-		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, nullptr, &dock_main_id);
+		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, kBottomAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, kLeftAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, kRightAreaRatio, nullptr, &dock_main_id);
+		ImGuiID dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, kRightBottomRatio, nullptr, &dock_id_right);
 
-		// ウィンドウのドッキング
-		ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
-		ImGui::DockBuilderDockWindow("Performance", dock_id_left);
-
-		ImGui::DockBuilderDockWindow("Scene", dock_main_id);
-
-		ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-		ImGui::DockBuilderDockWindow("SceneManager", dock_id_right);
-		ImGui::DockBuilderDockWindow("Time Manager", dock_id_right);
-		ImGui::DockBuilderDockWindow("TimerManager", dock_id_right);
-
-		ImGui::DockBuilderDockWindow("Sequencer Inspector", dock_id_right);
-
-		ImGui::DockBuilderDockWindow("Sequencer", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Project", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("Audio Debug", dock_id_bottom);
-		ImGui::DockBuilderDockWindow("JSON Editor", dock_id_bottom);
-
+		const auto dockWindows = [debugUIManager](EditorDock location, ImGuiID dockId)
+		{
+			for (const auto& name : debugUIManager->GetDockWindowNames(location))
+			{
+				ImGui::DockBuilderDockWindow(name.c_str(), dockId);
+			}
+		};
+		dockWindows(EditorDock::Left, dock_id_left);
+		ImGui::DockBuilderDockWindow("Scene###Scene", dock_main_id);
+		dockWindows(EditorDock::Right, dock_id_right);
+		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
+		dockWindows(EditorDock::Bottom, dock_id_bottom);
+		// Console は ConsoleLog が自分で描いていて登録一覧に入らないので、ここで下の段に入れる
+		ImGui::DockBuilderDockWindow("###Console", dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
+		pendingTabFocusSteps = kTabFocusSteps;
 	}
 
 	// シーンウィンドウ
-	ImGui::Begin("Scene");
-	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+	ImGui::Begin("Scene###Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	// ゲーム画面の縦横比を保ったまま、パネルに収まる一番大きい大きさで真ん中に貼る。
+	// シーンはウィンドウと同じ大きさのテクスチャに描いているので、パネルの形に引き伸ばすと絵がゆがむ
+	const ImVec2 available = ImGui::GetContentRegionAvail();
+	const float textureAspect = static_cast<float>(winApp_->GetClientWidth()) / (std::max)(static_cast<float>(winApp_->GetClientHeight()), 1.0f);
+	ImVec2 viewportSize = available;
+	if (available.x > 0.0f && available.y > 0.0f)
+	{
+		if (available.x / available.y > textureAspect)
+		{
+			viewportSize.x = available.y * textureAspect;
+		}
+		else
+		{
+			viewportSize.y = available.x / textureAspect;
+		}
+		const ImVec2 cursor = ImGui::GetCursorPos();
+		ImGui::SetCursorPos(ImVec2(cursor.x + (available.x - viewportSize.x) * 0.5f, cursor.y + (available.y - viewportSize.y) * 0.5f));
+	}
 	ImGui::Image((ImTextureID)sceneRenderTexture_->GetGPUHandle().ptr, viewportSize);
 
 	// シーンウィンドウの描画領域に合わせてマウス入力を補正する
@@ -283,51 +334,38 @@ void MyGame::Draw()
 	sceneViewRect.height = imageSize.y;
 	SceneViewContext::GetInstance()->SetViewportRect(sceneViewRect);
 	SceneViewContext::GetInstance()->SetCamera(cameraManager_->GetActiveCamera());
+	// シーン画像も ImGui のウィンドウの中なので、上にあるだけで ImGui がマウスを使っている扱いになる。
+	// 画像の上かどうかを渡しておき、Input がそこではマウスをゲームへ渡せるようにする（直前の項目はシーン画像）
+	SceneViewContext::GetInstance()->SetHovered(ImGui::IsItemHovered());
 
 	// 登録されたSceneエリアのデバッグUIを描画する
-	debugUIManager->DrawArea(DebugUIArea::Scene);
+	debugUIManager->DrawSceneOverlays();
 
 	ImGui::End();
 
-	// 各種標準デバッグウィンドウの描画
-	if (debugUIManager->IsShowHierarchy())
-	{
-		bool open = debugUIManager->IsShowHierarchy();
-		if (ImGui::Begin("Hierarchy", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Hierarchy);
-		}
-		ImGui::End();
-		debugUIManager->SetShowHierarchy(open);
-	}
-
-	if (debugUIManager->IsShowInspector())
-	{
-		bool open = debugUIManager->IsShowInspector();
-		if (ImGui::Begin("Inspector", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Inspector);
-		}
-		ImGui::End();
-		debugUIManager->SetShowInspector(open);
-	}
-
-	if (debugUIManager->IsShowProject())
-	{
-		bool open = debugUIManager->IsShowProject();
-		if (ImGui::Begin("Project", &open))
-		{
-			debugUIManager->DrawArea(DebugUIArea::Project);
-		}
-		ImGui::End();
-		debugUIManager->SetShowProject(open);
-	}
+	// 登録UIはそれぞれ独立ウィンドウとして描く。
+	debugUIManager->Draw();
 
 	if (debugUIManager->IsShowConsole())
 	{
 		bool open = debugUIManager->IsShowConsole();
 		ConsoleLog::GetInstance()->Draw(&open);
 		debugUIManager->SetShowConsole(open);
+	}
+	if (pendingTabFocusSteps > 0)
+	{
+		// 全ウィンドウを作った後なら、ドッキング先の選択タブも確実に切り替わる。
+		// ただし同じフレームで2回フォーカスすると後の方しか効かないので、フレームを分ける
+		if (pendingTabFocusSteps == kTabFocusSteps)
+		{
+			// 右上は選んだ物を編集する流れが多いので、Inspector を最初に見せる
+			ImGui::SetWindowFocus("###Inspector");
+		}
+		else
+		{
+			ImGui::SetWindowFocus("###Sequencer");
+		}
+		--pendingTabFocusSteps;
 	}
 
 
@@ -342,4 +380,19 @@ void MyGame::Draw()
 	imguiManager_->Draw();
 	dxCommon_->PostDraw();
 }
+
+#ifdef USE_IMGUI
+void MyGame::HandleGameViewToggle()
+{
+	// 文字を打っている間は取らない。ほかのショートカットとそろえる
+	if (ImGui::GetIO().WantTextInput)
+	{
+		return;
+	}
+	if (ImGui::IsKeyPressed(ImGuiKey_F11, false))
+	{
+		gameViewOnly_ = !gameViewOnly_;
+	}
+}
+#endif
 } // namespace KCE
