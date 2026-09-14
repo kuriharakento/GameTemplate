@@ -71,7 +71,8 @@ public:
 		done_ = true;
 		++*count_;
 		disableTarget_->SetEnabled(false);
-		removeTarget_->RemoveComponent(typeid(KCE::GameObjectComponent::AABBCollider).name());
+		// AddComponent<T> は Factory の正規名で登録するので、同じ名前で外す
+		removeTarget_->RemoveComponent(KCE::GameObjectComponent::ComponentFactory::GetInstance()->GetTypeName(typeid(KCE::GameObjectComponent::AABBCollider)));
 	}
 private:
 	// どれも DebugScene が所有し、このコンポーネントより長く生きる。
@@ -178,15 +179,15 @@ void DebugScene::Initialize()
     auto* obb = CreateObject("RayOBB", targetPositions[2], { 1.0f, 1.0f, 1.0f });
     obb->SetRotation({ 0.0f, 0.5f, 0.0f });
     obb->AddComponent<KCE::GameObjectComponent::OBBCollider>()->SetCollisionLayer(kRayTargetLayer);
-	for (const auto& position : targetPositions)
+    for (const auto& position : targetPositions)
     {
         auto* rayObject = CreateObject("Ray", { position.x, 0.0f, -4.0f }, { 0.1f, 0.1f, 0.1f });
         auto* ray = rayObject->AddComponent<KCE::GameObjectComponent::RayCollider>();
         rayObject->AddComponent<CollisionCounter>(&rayEnterCount_, &rayEnterCount_);
         ray->SetLength(20.0f);
         ray->SetCollisionLayer(kMovingLayer);
-		ray->SetCollisionMask(kRayTargetLayer);
-	}
+        ray->SetCollisionMask(kRayTargetLayer);
+    }
 
 	// 体と足元の2判定を保存し、同じプレハブから独立した2体を作る
 	auto* prefabSource = CreateObject("PrefabSource", { 0.0f, 100.0f, 0.0f }, { 1.0f, 2.0f, 1.0f });
