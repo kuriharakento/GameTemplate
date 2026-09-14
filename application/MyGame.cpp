@@ -295,7 +295,24 @@ void MyGame::Draw()
 
 	// シーンウィンドウ
 	ImGui::Begin("Scene###Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+	// ゲーム画面の縦横比を保ったまま、パネルに収まる一番大きい大きさで真ん中に貼る。
+	// シーンはウィンドウと同じ大きさのテクスチャに描いているので、パネルの形に引き伸ばすと絵がゆがむ
+	const ImVec2 available = ImGui::GetContentRegionAvail();
+	const float textureAspect = static_cast<float>(winApp_->GetClientWidth()) / (std::max)(static_cast<float>(winApp_->GetClientHeight()), 1.0f);
+	ImVec2 viewportSize = available;
+	if (available.x > 0.0f && available.y > 0.0f)
+	{
+		if (available.x / available.y > textureAspect)
+		{
+			viewportSize.x = available.y * textureAspect;
+		}
+		else
+		{
+			viewportSize.y = available.x / textureAspect;
+		}
+		const ImVec2 cursor = ImGui::GetCursorPos();
+		ImGui::SetCursorPos(ImVec2(cursor.x + (available.x - viewportSize.x) * 0.5f, cursor.y + (available.y - viewportSize.y) * 0.5f));
+	}
 	ImGui::Image((ImTextureID)sceneRenderTexture_->GetGPUHandle().ptr, viewportSize);
 
 	// シーンウィンドウの描画領域に合わせてマウス入力を補正する
