@@ -46,4 +46,12 @@ private:
 	// objects_ が所有し、35フレーム目に削除するまでは有効。
 	KCE::GameObjectComponent::Component* lifecycleProbe_ = nullptr;
 	KCE::GameObject* lifecycleObject_ = nullptr;
+	// GameObjectManager が所有し、OnFinalizeで登録解除する
+	KCE::GameObject* prefabInstanceA_ = nullptr;
+	KCE::GameObject* prefabInstanceB_ = nullptr;
+	int prefabEnterCountA_ = 0;
+	int prefabEnterCountB_ = 0;
+	bool prefabSaved_ = false;
+	bool prefabComponentsRestored_ = false;
+	bool prefabGuidsDiffer_ = false;
 };

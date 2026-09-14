@@ -22,6 +22,8 @@ namespace
 constexpr uint32_t kMovingLayer = 1u << 0;
 constexpr uint32_t kRayTargetLayer = 1u << 1;
 constexpr float kBulletTravelDistance = 30.0f;
+constexpr char kDebugPrefabPath[] = "debug_multi_collider.json";
+constexpr size_t kDebugPrefabColliderCount = 2;
 
 class FastBullet final : public KCE::GameObjectComponent::Behaviour
 {
@@ -176,15 +178,45 @@ void DebugScene::Initialize()
     auto* obb = CreateObject("RayOBB", targetPositions[2], { 1.0f, 1.0f, 1.0f });
     obb->SetRotation({ 0.0f, 0.5f, 0.0f });
     obb->AddComponent<KCE::GameObjectComponent::OBBCollider>()->SetCollisionLayer(kRayTargetLayer);
-    for (const auto& position : targetPositions)
+	for (const auto& position : targetPositions)
     {
         auto* rayObject = CreateObject("Ray", { position.x, 0.0f, -4.0f }, { 0.1f, 0.1f, 0.1f });
         auto* ray = rayObject->AddComponent<KCE::GameObjectComponent::RayCollider>();
         rayObject->AddComponent<CollisionCounter>(&rayEnterCount_, &rayEnterCount_);
         ray->SetLength(20.0f);
         ray->SetCollisionLayer(kMovingLayer);
-        ray->SetCollisionMask(kRayTargetLayer);
-    }
+		ray->SetCollisionMask(kRayTargetLayer);
+	}
+
+	// 体と足元の2判定を保存し、同じプレハブから独立した2体を作る
+	auto* prefabSource = CreateObject("PrefabSource", { 0.0f, 100.0f, 0.0f }, { 1.0f, 2.0f, 1.0f });
+	prefabSource->AddComponent<KCE::GameObjectComponent::OBBCollider>()->SetCollisionLayer(kMovingLayer);
+	auto* prefabFeet = prefabSource->AddComponent<KCE::GameObjectComponent::SphereCollider>();
+	prefabFeet->SetSphere({ {}, 1.0f });
+	prefabFeet->SetCenter({ 0.0f, -1.5f, 0.0f });
+	prefabFeet->SetCollisionLayer(kMovingLayer);
+	prefabSaved_ = prefabSource->SavePrefab(kDebugPrefabPath);
+	if (prefabSaved_)
+	{
+		KCE::Transform transformA;
+		transformA.translate = { 14.0f, 0.0f, 0.0f };
+		KCE::Transform transformB;
+		transformB.translate = { 18.0f, 0.0f, 0.0f };
+		prefabInstanceA_ = KCE::GameObjectManager::GetInstance()->Instantiate(kDebugPrefabPath, transformA);
+		prefabInstanceB_ = KCE::GameObjectManager::GetInstance()->Instantiate(kDebugPrefabPath, transformB);
+	}
+	if (prefabInstanceA_ && prefabInstanceB_)
+	{
+		prefabInstanceA_->AddComponent<CollisionCounter>(&prefabEnterCountA_, &prefabEnterCountA_);
+		prefabInstanceB_->AddComponent<CollisionCounter>(&prefabEnterCountB_, &prefabEnterCountB_);
+		prefabComponentsRestored_ = prefabInstanceA_->GetComponents().size() >= kDebugPrefabColliderCount &&
+			prefabInstanceB_->GetComponents().size() >= kDebugPrefabColliderCount;
+		prefabGuidsDiffer_ = prefabInstanceA_->GetGuid() != prefabInstanceB_->GetGuid();
+		auto* targetA = CreateObject("PrefabTargetA", { 14.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+		targetA->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+		auto* targetB = CreateObject("PrefabTargetB", { 18.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+		targetB->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+	}
 }
 
 void DebugScene::CommonUpdate()
@@ -251,9 +283,17 @@ void DebugScene::DrawImGui()
 	ImGui::Text("Raycast: %s", hasRaycastHit_ ? raycastHit_.object->GetName().c_str() : "None");
     ImGui::Text("Raycast distance: %.3f", raycastHit_.distance);
 	ImGui::Text("Lifecycle A/E/S/U/L/D/X: %d/%d/%d/%d/%d/%d/%d", awakeCount_, enableCount_, startCount_, updateCount_, lateUpdateCount_, disableCount_, destroyCount_);
+	ImGui::SeparatorText("Prefab Check");
+	ImGui::Text("Saved / components / GUIDs differ: %s / %s / %s", prefabSaved_ ? "OK" : "NG",
+		prefabComponentsRestored_ ? "OK" : "NG", prefabGuidsDiffer_ ? "OK" : "NG");
+	ImGui::Text("Instance collision enter A / B: %d / %d", prefabEnterCountA_, prefabEnterCountB_);
     ImGui::End();
 }
 void DebugScene::OnFinalize()
 {
+	if (prefabInstanceA_) KCE::GameObjectManager::GetInstance()->Unregister(prefabInstanceA_);
+	if (prefabInstanceB_) KCE::GameObjectManager::GetInstance()->Unregister(prefabInstanceB_);
+	prefabInstanceA_ = nullptr;
+	prefabInstanceB_ = nullptr;
     objects_.clear();
 }
