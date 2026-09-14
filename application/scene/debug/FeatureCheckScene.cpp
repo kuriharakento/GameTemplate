@@ -160,7 +160,7 @@ void HideTextSample()
 void FeatureCheckScene::Initialize()
 {
 #ifdef USE_IMGUI
-	KCE::DebugUIManager::GetInstance()->RegisterHierarchySection(this, "Feature Check", [this]() { this->DrawImGui(); });
+	KCE::DebugUIManager::GetInstance()->RegisterHierarchySection(this, "機能チェック", [this]() { this->DrawImGui(); });
 #endif
 
 	// 床
@@ -493,7 +493,7 @@ void FeatureCheckScene::DrawImGui()
 	ImGui::TextWrapped("シーケンサで動かすときは、Timeline の Preview Object で FeatureCheck_* を選ぶ。");
 	ImGui::TextWrapped("カメラトラックを再生するときは、下のデバッグカメラをオフにする。");
 
-	if (ImGui::Checkbox("Debug Camera", &useDebugCamera_) && debugCamera_)
+	if (ImGui::Checkbox("デバッグカメラ", &useDebugCamera_) && debugCamera_)
 	{
 		if (useDebugCamera_)
 		{
@@ -505,24 +505,24 @@ void FeatureCheckScene::DrawImGui()
 		}
 	}
 
-	ImGui::SeparatorText("Transparent");
-	if (ImGui::SliderFloat("Alpha", &transparentAlpha_, 0.0f, 1.0f))
+	ImGui::SeparatorText("半透明");
+	if (ImGui::SliderFloat("不透明度", &transparentAlpha_, 0.0f, 1.0f))
 	{
 		ApplyTransparentColors();
 	}
 
-	ImGui::SeparatorText("Atmosphere");
+	ImGui::SeparatorText("大気");
 	if (auto* fog = GetFogRenderer())
 	{
-		ImGui::Checkbox("Fog", &fog->GetSettings().enabled);
+		ImGui::Checkbox("フォグ", &fog->GetSettings().enabled);
 	}
 	if (auto* beam = GetBeamRenderer())
 	{
-		ImGui::Checkbox("Beam", &beam->GetSettings().enabled);
+		ImGui::Checkbox("ビーム", &beam->GetSettings().enabled);
 	}
 
-	ImGui::SeparatorText("Text");
-	if (ImGui::Checkbox("Text Sample", &showTextSample_) && !showTextSample_)
+	ImGui::SeparatorText("文字");
+	if (ImGui::Checkbox("文字のサンプル", &showTextSample_) && !showTextSample_)
 	{
 		HideTextSample();
 	}
@@ -531,7 +531,7 @@ void FeatureCheckScene::DrawImGui()
 	ImGui::TextDisabled("Text3D トラックで動かすときはオフにして、Target に FeatureCheck_StageText を入れる。");
 	ImGui::TextDisabled("細かい値は Fog / Beam / Outline / PostProcess の各デバッグUIで調整する。");
 
-	ImGui::SeparatorText("Objects");
+	ImGui::SeparatorText("オブジェクト");
 	for (size_t i = 0; i < kShadingCubeCount; ++i)
 	{
 		if (shadingCubes_[i])

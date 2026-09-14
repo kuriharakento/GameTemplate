@@ -180,11 +180,11 @@ void MyGame::Draw()
 
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("Window"))
+		if (ImGui::BeginMenu("表示"))
 		{
 			debugUIManager->DrawWindowMenu();
 			ImGui::Separator();
-			if (ImGui::BeginMenu("UI Scale"))
+			if (ImGui::BeginMenu("UIの大きさ"))
 			{
 				float currentScale = debugUIManager->GetUIScale();
 				float scales[] = { 0.50f, 0.75f, 1.00f, 1.25f, 1.50f, 1.75f, 2.00f };
@@ -202,7 +202,7 @@ void MyGame::Draw()
 			}
 
 			ImGui::Separator();
-			if (ImGui::MenuItem("Reset Layout"))
+			if (ImGui::MenuItem("レイアウトをリセット"))
 			{
 				debugUIManager->RequestLayoutReset();
 			}
@@ -283,18 +283,18 @@ void MyGame::Draw()
 			}
 		};
 		dockWindows(EditorDock::Left, dock_id_left);
-		ImGui::DockBuilderDockWindow("Scene", dock_main_id);
+		ImGui::DockBuilderDockWindow("シーン###Scene", dock_main_id);
 		dockWindows(EditorDock::Right, dock_id_right);
 		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
 		dockWindows(EditorDock::Bottom, dock_id_bottom);
 		// Console は ConsoleLog が自分で描いていて登録一覧に入らないので、ここで下の段に入れる
-		ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
+		ImGui::DockBuilderDockWindow("###Console", dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
 		pendingTabFocusSteps = kTabFocusSteps;
 	}
 
 	// シーンウィンドウ
-	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("シーン###Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 	ImGui::Image((ImTextureID)sceneRenderTexture_->GetGPUHandle().ptr, viewportSize);
 
@@ -342,11 +342,11 @@ void MyGame::Draw()
 		if (pendingTabFocusSteps == kTabFocusSteps)
 		{
 			// 右上は選んだ物を編集する流れが多いので、Inspector を最初に見せる
-			ImGui::SetWindowFocus("Inspector");
+			ImGui::SetWindowFocus("###Inspector");
 		}
 		else
 		{
-			ImGui::SetWindowFocus("Sequencer");
+			ImGui::SetWindowFocus("###Sequencer");
 		}
 		--pendingTabFocusSteps;
 	}
