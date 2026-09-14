@@ -159,3 +159,51 @@ void Unregister(void* owner);
 ## 8. 未決事項
 
 - 今のところ無し。実装中に出てきたらここに足す
+
+---
+
+## 9. 追加の整理（1〜4 の後）
+
+1〜4 は取り込み済み（engine `919288a` / 親 `50d7c7c`）。残った個別ウィンドウと、Settings に混ざっていた「1つずつの物の編集」を分け直す。
+
+### 9.1 方針（ユーザーと合意済み）
+
+- **別ウィンドウのまま残す**: Sequencer、Cutscene、Particle Editor、JSON Editor（横に広い作業画面や、ファイル単位の道具なので）
+- **Settings** は「シーン全体・エンジン全体の設定」だけにする
+- **1つずつの物の編集** は Hierarchy に並べて、選ぶと Inspector に出す形にする
+- Projects ウィンドウは作らない
+
+### 9.2 作業項目
+
+| # | 対象 | 今 | 移し先 |
+|---|---|---|---|
+| 1 | 3D Text（`Text3DRenderer`） | Settings / Rendering / 3D Text | Hierarchy の見出し「3D Text」＋ Inspector。Settings のページは消す |
+| 2 | FontSprite | インスタンスごとに `"Font Sprite: <名前>"` の別ウィンドウ | Hierarchy の見出し「Font Sprites」＋ Inspector。別ウィンドウはやめる |
+| 3 | Particle Manager のエフェクトごとの部分 | Settings / Effects / Particle Manager の「Effects」ツリー（再生・リセット・エミッター詳細） | Hierarchy の見出し「Effects」＋ Inspector。合計の粒数・エミッター数・SRV 使用量は Settings に残す |
+| 4 | Light Beams のライトごとの部分 | Settings / Rendering / Light Beams の「スポットライトごとの有効／無効」（`beamEnabled_` / `beamScale_`） | スポットライトの Inspector（`LightManager::DrawInspectorImGui` の Spot の中）に「Beam」欄として出す。全体設定（Intensity など）は Settings に残す |
+| 5 | Render Pipeline、Shader Hot Reload、CollisionManager Colliders | 別ウィンドウ（Bottom） | Settings。Render Pipeline は `Rendering`、残り2つは `Debug` 分類を新しく作って入れる |
+| 6 | SceneManager、Feature Check、Title Scene | 別ウィンドウ（LeftBottom） | Hierarchy の見出し（`RegisterHierarchySection`）。見出しは GameObjects / Lights / Cameras の後に並ぶ |
+
+### 9.3 実装メモ
+
+- **選択の種類を足す**: `SelectionKind` に `Text3D`、`FontSprite`、`ParticleEffect` を足す。どれも `SelectionItem::name` で指す（ポインタでは持たない。ライト・カメラと同じ理由）
+  - Particle のエフェクト名が重複しうるかを先に確認する。重複しうるなら、名前＋同名内の番号など、破棄されても壊れない指し方にして、理由をコメントに残す
+- **FontSprite は複数インスタンス**なので、`RegisterInspector` は種類ごとに1つという今の仕組みに合わない。次のどちらかで実装する（安全側を推奨）
+  - 安全側: FontSprite に「生きているインスタンスの一覧」（非所有ポインタ。コンストラクタで足してデストラクタで消す）を static で持ち、Hierarchy の見出しと Inspector はクラスで1回だけ登録する（最初のインスタンスで登録、最後の破棄で `Unregister`）
+  - 攻め側: `DebugUIManager` 側で同じ種類の Inspector を複数持てるようにして、`name` で担当を選ぶ
+- **Text3D** は `Text3DRenderer` が `meshes_` を名前で持っているので、それで引く。Hierarchy は名前の `Selectable` の一覧、Inspector は今の `DrawImGui` の1件分の中身をそのまま使う
+- **Particle** は、今の `DrawImGui` の「Effects」ツリーの1件分を Inspector に移す。直接追加されたエミッター（`emitters_`）の詳細が今あるなら、それも Hierarchy の同じ見出しに並べる
+- **Light Beams** の Inspector 側は `LightManager` から `BeamRenderer` を直接知らないようにする。`BeamRenderer` に「スポットライト1つ分の Beam 欄を描く」関数を用意し、LightManager の Spot の Inspector から呼ぶか、`DebugUIManager` に「種類ごとの Inspector の追加欄」を足すかを、既存の依存の向きを見て決める（決めた理由をコミットメッセージに書く）
+- **LeftBottom の置き場所**は使う物が無くなるので、`EditorDock::LeftBottom` と `MyGame.cpp` の左の列の上下分割（`kLeftBottomRatio`）を消す。imgui.ini の古い行は読み飛ばす（今の `area=` と同じ扱い）
+- `RegisterSettingsPage` の `Debug` 分類は、木で `System` の後に並ぶようにする（並びは登録順で決まるので、登録順を確認する）
+- 各仕組みの `DrawImGui()` の中身は、分けるのに必要な分だけ動かす。書き直さない
+
+### 9.4 進め方
+
+- 作業ブランチ: `feature/editor-ui-cleanup`（engine と親の両方）。`git worktree add` で別ディレクトリに作る。`engine/externals/DirectXTex/Shaders/Compiled/*.inc`（14個）を新しいワークツリーにコピーしてからビルドする
+- 9.2 の 1〜6 を **止まらずに順番に全部やる**。項目ごとに:
+  1. Debug|x64 でビルド（終了コード 0 を確認）
+  2. engine → 親の順でコミット（親はサブモジュール参照の更新だけ、または親側の変更と一緒に）
+- 全部終わったら Release|x64 もビルドする（`USE_IMGUI` が無い構成で通るか）
+- 起動確認はしなくてよい（Claude が後でやる）。見た目の確認はユーザーがやる
+- `feature/sequencer` への取り込みと push はしない
