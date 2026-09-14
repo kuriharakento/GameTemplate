@@ -1,0 +1,149 @@
+{
+    "version": 1,
+    "meta": {
+        "name": "Live Sample",
+        "duration": 16.0,
+        "bpm": 120.0,
+        "offset": 0.0,
+        "audioClip": ""
+    },
+    "bindings": [
+        { "role": "MainCam", "type": "Camera", "description": "シーケンスが動かすカメラ" },
+        { "role": "Spot1", "type": "Light", "description": "中央のスポットライト。FeatureCheckSpot1 を割り当てる" }
+    ],
+    "markers": [
+        { "time": 4.0, "name": "サビ" },
+        { "time": 12.0, "name": "アウトロ" }
+    ],
+    "tracks": [
+        {
+            "type": "Camera",
+            "name": "Stage Camera",
+            "binding": "MainCam",
+            "muted": false,
+            "position": [
+                { "time": 0.0,  "value": [0.0, 6.0, -16.0], "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 4.0,  "value": [0.0, 3.5, -8.0],  "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0,  "value": [-7.0, 4.0, -5.0], "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 12.0, "value": [0.0, 3.0, -3.0],  "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 16.0, "value": [0.0, 8.0, -18.0], "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "rotation": [
+                { "time": 0.0,  "value": [0.0711, 0.0, 0.0, 0.9975],        "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 4.0,  "value": [0.0167, 0.0, 0.0, 0.9999],        "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0,  "value": [0.0393, 0.4174, -0.0181, 0.9077], "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 12.0, "value": [-0.0499, 0.0, 0.0, 0.9988],       "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 16.0, "value": [0.1741, 0.0, 0.0, 0.9847],        "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "fov": []
+        },
+        {
+            "type": "Text3D",
+            "name": "Stage Title",
+            "binding": "",
+            "muted": false,
+            "target": "FeatureCheck_StageText",
+            "text": "ひかりのステージへ",
+            "style": "Drop",
+            "position": [],
+            "rotation": [],
+            "scale": [
+                { "time": 4.0,  "value": 1.0,  "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 4.25, "value": 1.25, "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 4.5,  "value": 1.0,  "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 6.0,  "value": 1.0,  "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 6.25, "value": 1.25, "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 6.5,  "value": 1.0,  "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "color": [
+                { "time": 4.0, "value": [2.5, 1.6, 0.5, 1.0], "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 6.0, "value": [0.6, 1.8, 3.0, 1.0], "interp": "bezier", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0, "value": [2.5, 1.6, 0.5, 1.0], "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "reveal": [
+                { "time": 2.0, "value": 0.0, "interp": "linear",   "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 4.0, "value": 9.0, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "exit": [
+                { "time": 10.0, "value": 0.0, "interp": "linear",   "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 12.0, "value": 9.0, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ]
+        },
+        {
+            "type": "Text",
+            "name": "Lyrics",
+            "binding": "",
+            "muted": false,
+            "kind": "Lyric",
+            "charsPerSecond": 12.0,
+            "entries": [
+                { "start": 1.0, "duration": 3.0, "speaker": "", "text": "光の中で 君と歌おう" },
+                { "start": 5.0, "duration": 3.0, "speaker": "", "text": "きらめくステージへ 走り出そう" },
+                { "start": 9.0, "duration": 3.0, "speaker": "", "text": "この声よ 空まで届け" }
+            ]
+        },
+        {
+            "type": "Text",
+            "name": "Dialogue",
+            "binding": "",
+            "muted": false,
+            "kind": "Dialogue",
+            "charsPerSecond": 20.0,
+            "entries": [
+                { "start": 13.0, "duration": 3.0, "speaker": "プロデューサー", "text": "おつかれさま！最高のライブだったよ。" }
+            ]
+        },
+        {
+            "type": "Light",
+            "name": "Blackout",
+            "binding": "",
+            "muted": false,
+            "kind": "Directional",
+            "color": [],
+            "intensity": [
+                { "time": 0.0,  "value": 1.0,  "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 2.0,  "value": 0.25, "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 13.0, "value": 0.25, "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 16.0, "value": 1.0,  "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "coneAngle": [],
+            "radius": [],
+            "beam": []
+        },
+        {
+            "type": "Light",
+            "name": "Center Spot",
+            "binding": "Spot1",
+            "muted": false,
+            "kind": "Spot",
+            "color": [
+                { "time": 8.0,  "value": [0.3, 1.0, 0.3, 1.0], "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 10.0, "value": [1.0, 0.8, 0.3, 1.0], "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "intensity": [
+                { "time": 4.0, "value": 6.0,  "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 4.5, "value": 14.0, "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 5.0, "value": 6.0,  "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 5.5, "value": 14.0, "interp": "bezier", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 6.0, "value": 6.0,  "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "coneAngle": [],
+            "radius": [],
+            "beam": [
+                { "time": 2.0, "value": 0.2, "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 4.0, "value": 1.5, "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0, "value": 1.0, "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ]
+        },
+        {
+            "type": "Event",
+            "name": "Cues",
+            "binding": "",
+            "muted": false,
+            "events": [
+                { "time": 4.0,  "name": "Chorus",  "fireOnSkip": false },
+                { "time": 16.0, "name": "LiveEnd", "fireOnSkip": true }
+            ]
+        }
+    ]
+}

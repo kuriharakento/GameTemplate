@@ -329,3 +329,5 @@ AGENTS.md
 # ImGui のウィンドウ配置。エディタ開発中は毎回差分が出るため追跡しない。
 # 初期レイアウトは MyGame.cpp の DockBuilder がコードで構築する。
 imgui.ini
+# DebugScene を開くたびに書き出す確認用のプレハブ
+application/Resources/json/prefab/debug_multi_collider.json
