@@ -11,6 +11,7 @@
 #include "graphics/view/PlanarReflection.h"
 #include "graphics/view/StageMonitor.h"
 #include "scene/interface/BaseScene.h"
+#include "stage/StageManager.h"
 
 /**
  * @brief 描画とシーケンサの新機能を1画面でまとめて目視確認するためのデバッグシーン。
@@ -71,6 +72,8 @@ private:
 	std::unique_ptr<KCE::StageMonitor> stageMonitor_;
 	// 3D 空間の文字の見本。Text3DRenderer には非所有で登録している
 	std::unique_ptr<KCE::TextMesh3D> stageText_;
+	// ステージ由来の物を所有し、Text3DRenderer より先に登録解除する
+	std::unique_ptr<KCE::StageManager> stageManager_;
 	// 見本の出入りを回すための経過（フレーム数ベース。デバッグ用なので実時間には合わせない）
 	float stageTextTime_ = 0.0f;
 	// 見本を自動で出入りさせるか。シーケンサの Text3D トラックを試すときはオフにする

@@ -240,6 +240,12 @@ void FeatureCheckScene::Initialize()
 	{
 		text3D->Register(kStageTextName, stageText_.get());
 	}
+	stageManager_ = std::make_unique<KCE::StageManager>();
+	stageManager_->Initialize("feature_check", sceneManager_->GetText3D(), sceneManager_->GetCameraManager());
+	if (KCE::SequencerEditor::HasInstance())
+	{
+		KCE::SequencerEditor::GetInstance()->SetStageSaveCallback([this]() { return stageManager_ && stageManager_->SaveToFile(); });
+	}
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<KCE::DebugCamera>();
@@ -387,6 +393,12 @@ void FeatureCheckScene::OnFinalize()
 
 	// 見本の文字を他のシーンに残さない
 	HideTextSample();
+	if (KCE::SequencerEditor::HasInstance())
+	{
+		KCE::SequencerEditor::GetInstance()->SetStageSaveCallback({});
+	}
+	// ステージの文字を先に登録解除してから、コード直書きの見本を片付ける
+	stageManager_.reset();
 	if (auto* text3D = sceneManager_->GetText3D())
 	{
 		text3D->Unregister(stageText_.get());
