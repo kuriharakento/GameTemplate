@@ -283,7 +283,7 @@ void MyGame::Draw()
 			}
 		};
 		dockWindows(EditorDock::Left, dock_id_left);
-		ImGui::DockBuilderDockWindow("シーン###Scene", dock_main_id);
+		ImGui::DockBuilderDockWindow("Scene###Scene", dock_main_id);
 		dockWindows(EditorDock::Right, dock_id_right);
 		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
 		dockWindows(EditorDock::Bottom, dock_id_bottom);
@@ -294,7 +294,7 @@ void MyGame::Draw()
 	}
 
 	// シーンウィンドウ
-	ImGui::Begin("シーン###Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("Scene###Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 	ImGui::Image((ImTextureID)sceneRenderTexture_->GetGPUHandle().ptr, viewportSize);
 
