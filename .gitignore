@@ -331,3 +331,6 @@ AGENTS.md
 imgui.ini
 # DebugScene を開くたびに書き出す確認用のプレハブ
 application/Resources/json/prefab/debug_multi_collider.json
+# 作業管理用のメモと計画書は手元にだけ置く
+/docs/
+/*_PLAN.md
