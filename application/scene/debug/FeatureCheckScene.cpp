@@ -241,7 +241,8 @@ void FeatureCheckScene::Initialize()
 		text3D->Register(kStageTextName, stageText_.get());
 	}
 	stageManager_ = std::make_unique<KCE::StageManager>();
-	stageManager_->Initialize("feature_check", sceneManager_->GetText3D(), sceneManager_->GetCameraManager());
+	stageManager_->Initialize("feature_check", sceneManager_->GetText3D(), sceneManager_->GetCameraManager(),
+		sceneManager_->GetSubViewProvider(), sceneManager_->GetObject3dCommon(), sceneManager_->GetLightManager());
 	if (KCE::SequencerEditor::HasInstance())
 	{
 		KCE::SequencerEditor::GetInstance()->SetStageSaveCallback([this]() { return stageManager_ && stageManager_->SaveToFile(); });
@@ -440,6 +441,10 @@ void FeatureCheckScene::CommonUpdate()
 	if (stageMonitor_)
 	{
 		stageMonitor_->Update();
+	}
+	if (stageManager_)
+	{
+		stageManager_->Update();
 	}
 
 	if (showTextSample_)
