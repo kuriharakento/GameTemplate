@@ -53,6 +53,31 @@ private:
 	int* objectCount_ = nullptr;
 	int* colliderExitCount_ = nullptr;
 };
+constexpr int kExitSourceMoveFrame = 40;
+constexpr int kExitCheckFrame = 42;
+constexpr float kExitSourceAwayHeight = 50.0f;
+
+class ExitReaction final : public KCE::GameObjectComponent::Behaviour
+{
+public:
+	ExitReaction(KCE::GameObjectComponent::Collider* disableTarget, KCE::GameObject* removeTarget, int* count)
+		: disableTarget_(disableTarget), removeTarget_(removeTarget), count_(count) {}
+	void OnCollisionExit(const KCE::GameObjectComponent::CollisionInfo&) override
+	{
+		// 1回だけ。触れている最中の別の判定を、無効化とその場の削除の両方で外す
+		if (done_) return;
+		done_ = true;
+		++*count_;
+		disableTarget_->SetEnabled(false);
+		removeTarget_->RemoveComponent(typeid(KCE::GameObjectComponent::AABBCollider).name());
+	}
+private:
+	// どれも DebugScene が所有し、このコンポーネントより長く生きる。
+	KCE::GameObjectComponent::Collider* disableTarget_ = nullptr;
+	KCE::GameObject* removeTarget_ = nullptr;
+	int* count_ = nullptr;
+	bool done_ = false;
+};
 class LifecycleProbe final : public KCE::GameObjectComponent::Behaviour
 {
 public:
@@ -125,6 +150,24 @@ void DebugScene::Initialize()
     auto* spawnPathObstacle = CreateObject("SpawnPathObstacle", { 10.0f, 1.0f, 2.5f }, { 1.0f, 1.0f, 1.0f });
     spawnPathObstacle->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
 
+	// 離れた通知の中で別の判定を外す確認。ExitSource が離れた瞬間に、VictimA を無効化し、VictimB の判定を消す
+	auto* victimA = CreateObject("ExitVictimA", { -24.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	auto* victimACollider = victimA->AddComponent<KCE::GameObjectComponent::AABBCollider>();
+	victimACollider->SetCollisionLayer(kMovingLayer);
+	auto* victimAPartner = CreateObject("ExitVictimAPartner", { -24.0f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	victimAPartner->AddComponent<CollisionCounter>(&exitVictimEnterCount_, &exitVictimEnterCount_, &victimExitCount_);
+	victimAPartner->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+	auto* victimB = CreateObject("ExitVictimB", { -28.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	victimB->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+	auto* victimBPartner = CreateObject("ExitVictimBPartner", { -28.0f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	victimBPartner->AddComponent<CollisionCounter>(&exitVictimEnterCount_, &exitVictimEnterCount_, &victimExitCount_);
+	victimBPartner->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+	exitSource_ = CreateObject("ExitSource", { -20.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	exitSource_->AddComponent<ExitReaction>(victimACollider, victimB, &exitReactionCount_);
+	exitSource_->AddComponent<KCE::GameObjectComponent::SphereCollider>()->SetCollisionLayer(kMovingLayer);
+	auto* exitAnchor = CreateObject("ExitAnchor", { -20.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	exitAnchor->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kMovingLayer);
+
     const KCE::Vector3 targetPositions[] = { { -8.0f, 0.0f, 10.0f }, { 0.0f, 0.0f, 10.0f }, { 8.0f, 0.0f, 10.0f } };
     auto* box = CreateObject("RayAABB", targetPositions[0], { 1.0f, 1.0f, 1.0f });
     box->AddComponent<KCE::GameObjectComponent::AABBCollider>()->SetCollisionLayer(kRayTargetLayer);
@@ -161,6 +204,16 @@ void DebugScene::CommonUpdate()
 		lifecycleObject_->RemoveComponent("LifecycleProbe");
 		lifecycleProbe_ = nullptr;
 	}
+	if (frameCount_ == kExitSourceMoveFrame && exitSource_)
+	{
+		exitSource_->SetPosition({ -20.0f, kExitSourceAwayHeight, 0.0f });
+	}
+	if (frameCount_ == kExitCheckFrame)
+	{
+		KCE::Logger::Log(
+			"DebugScene: exit reaction=" + std::to_string(exitReactionCount_) +
+			" victimExit=" + std::to_string(victimExitCount_));
+	}
     if (!spawnedBullet_ && frameCount_ >= 30)
     {
         auto* bullet = CreateObject("SpawnedBullet", { 20.0f, 1.0f, 5.0f }, { 0.25f, 0.25f, 0.25f });
@@ -192,6 +245,7 @@ void DebugScene::DrawImGui()
 	ImGui::Text("Active collision pairs: %zu", KCE::CollisionManager::GetInstance()->GetActiveCollisionCount());
     ImGui::Text("Object Enter: %d", objectEnterCount_);
     ImGui::Text("Fast bullet hit: %d", bulletHitCount_);
+	ImGui::Text("Exit reaction / victim exit: %d / %d", exitReactionCount_, victimExitCount_);
     ImGui::Text("Ray collider enter: %d", rayEnterCount_);
     ImGui::Text("Spawned bullet false hit: %d", spawnedBulletFalseHitCount_);
 	ImGui::Text("Raycast: %s", hasRaycastHit_ ? raycastHit_.object->GetName().c_str() : "None");

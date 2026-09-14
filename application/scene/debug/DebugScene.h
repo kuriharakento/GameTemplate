@@ -30,6 +30,12 @@ private:
 	bool hasRaycastHit_ = false;
 	// objects_ が所有し、シーン終了までは有効。
 	KCE::GameObjectComponent::Collider* bodyCollider_ = nullptr;
+	// 離れた通知の中で別の判定を外したときの回数。victimExitCount_ は相手側が受けた Exit
+	int exitReactionCount_ = 0;
+	int victimExitCount_ = 0;
+	int exitVictimEnterCount_ = 0;
+	// objects_ が所有し、シーン終了までは有効。
+	KCE::GameObject* exitSource_ = nullptr;
 	int awakeCount_ = 0;
 	int enableCount_ = 0;
 	int startCount_ = 0;
