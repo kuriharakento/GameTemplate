@@ -38,6 +38,11 @@ private:
 	//  メンバ関数
 	// =========================
 
+#ifdef USE_IMGUI
+	/** @brief F11 で、ゲーム画面だけの表示とエディタを切り替える */
+	void HandleGameViewToggle();
+#endif
+
 	//テクスチャの読み込み
 	void LoadTextures();
 	//モデルの読み込み
@@ -47,6 +52,10 @@ private:
 private:
 	// シーン描画用レンダーテクスチャ（ポストプロセス後）
 	std::unique_ptr<RenderTexture> sceneRenderTexture_;
+#ifdef USE_IMGUI
+	// ImGui を全部消して、ゲーム画面だけをウィンドウいっぱいに出しているか
+	bool gameViewOnly_ = false;
+#endif
 };
 } // namespace KCE
 

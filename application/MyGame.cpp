@@ -140,6 +140,34 @@ void MyGame::Draw()
 	// 描画順は engine 側の RenderPipeline に集約されている。
 	// パスを足すときは Framework::GetRenderPipeline() から差し込むこと。
 #ifdef USE_IMGUI
+	HandleGameViewToggle();
+	if (gameViewOnly_)
+	{
+		// ゲーム画面だけを出す。Release と同じくバックバッファへ直接描き、
+		// ImGui は組み立てだけ終えて描かない（どこかのウィンドウが残って出ることもない）
+		Framework::ExecuteRenderPipeline(nullptr);
+
+		// マウスとギズモの基準をウィンドウ全体に合わせる
+		POINT clientOrigin = { 0, 0 };
+		ClientToScreen(winApp_->GetHwnd(), &clientOrigin);
+		const float clientWidth = static_cast<float>(winApp_->GetClientWidth());
+		const float clientHeight = static_cast<float>(winApp_->GetClientHeight());
+		Input::GetInstance()->SetMouseCorrection({ 0.0f, 0.0f }, { clientWidth, clientHeight });
+		SceneViewRect fullRect;
+		fullRect.x = static_cast<float>(clientOrigin.x);
+		fullRect.y = static_cast<float>(clientOrigin.y);
+		fullRect.width = clientWidth;
+		fullRect.height = clientHeight;
+		SceneViewContext::GetInstance()->SetViewportRect(fullRect);
+		SceneViewContext::GetInstance()->SetCamera(cameraManager_->GetActiveCamera());
+		// ImGui のウィンドウが無いので、マウスは常にゲームへ渡す
+		SceneViewContext::GetInstance()->SetHovered(true);
+
+		imguiManager_->End();
+		dxCommon_->PostDraw();
+		return;
+	}
+
 	// エディタではシーンをImGuiのウィンドウに表示するため、
 	// バックバッファではなくレンダーターゲットへ出力する。
 	Framework::ExecuteRenderPipeline(sceneRenderTexture_.get());
@@ -180,6 +208,12 @@ void MyGame::Draw()
 			}
 
 			ImGui::EndMenu();
+		}
+
+		// ImGui を全部消して、ゲーム画面だけを確認する。F11 でも切り替わる
+		if (ImGui::MenuItem("ゲーム画面 (F11)"))
+		{
+			gameViewOnly_ = true;
 		}
 
 		// メニューバー中央にエンジン名を表示
@@ -327,4 +361,19 @@ void MyGame::Draw()
 	imguiManager_->Draw();
 	dxCommon_->PostDraw();
 }
+
+#ifdef USE_IMGUI
+void MyGame::HandleGameViewToggle()
+{
+	// 文字を打っている間は取らない。ほかのショートカットとそろえる
+	if (ImGui::GetIO().WantTextInput)
+	{
+		return;
+	}
+	if (ImGui::IsKeyPressed(ImGuiKey_F11, false))
+	{
+		gameViewOnly_ = !gameViewOnly_;
+	}
+}
+#endif
 } // namespace KCE
