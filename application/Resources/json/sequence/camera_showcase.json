@@ -1,0 +1,60 @@
+{
+    "version": 1,
+    "meta": { "name": "Camera Showcase", "duration": 16.0, "bpm": 120.0, "offset": 0.0, "audioClip": "" },
+    "bindings": [ { "role": "MainCam", "type": "Camera", "description": "" } ],
+    "markers": [
+        { "time": 0.0,  "name": "A 拍の揺れ" },
+        { "time": 4.0,  "name": "B 横移動+ロール" },
+        { "time": 8.0,  "name": "C 手持ち(寄り)" },
+        { "time": 12.0, "name": "D 全部入り" }
+    ],
+    "tracks": [
+        {
+            "type": "Camera",
+            "name": "Showcase Camera",
+            "binding": "MainCam",
+            "muted": false,
+            "position": [
+                { "time": 0.0,   "value": [0.0, 5.0, -14.0],  "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 4.0,   "value": [-9.0, 4.0, -10.0], "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 7.98,  "value": [9.0, 4.0, -10.0],  "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0,   "value": [0.0, 3.5, -5.0],   "interp": "linear",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 11.98, "value": [0.6, 3.7, -4.4],   "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 12.0,  "value": [0.0, 7.0, -18.0],  "interp": "bezier",   "bezier": [0.2, 0.0, 0.1, 1.0] },
+                { "time": 15.5,  "value": [0.0, 3.0, -7.0],   "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "rotation": [],
+            "fov": [
+                { "time": 0.0, "value": 0.8, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "aimRoleA": "",
+            "aimRoleB": "",
+            "aimOffset": [
+                { "time": 0.0, "value": [0.0, 3.4, 1.0], "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "aimBlend": [],
+            "roll": [
+                { "time": 0.0,  "value": 0.0,   "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 4.0,  "value": 0.0,   "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 6.0,  "value": 14.0,  "interp": "bezier",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 7.98, "value": -8.0,  "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 8.0,  "value": 0.0,   "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 12.0, "value": -6.0,  "interp": "linear",   "bezier": [0.42, 0.0, 0.58, 1.0] },
+                { "time": 16.0, "value": 6.0,   "interp": "constant", "bezier": [0.42, 0.0, 0.58, 1.0] }
+            ],
+            "beatShake": [
+                { "time": 0.0,  "value": 8.0,  "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 4.0,  "value": 0.0,  "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 12.0, "value": 12.0, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "beatDivision": "beat",
+            "beatShakeDecay": 0.15,
+            "handheld": [
+                { "time": 0.0,  "value": 0.0, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 8.0,  "value": 3.0, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] },
+                { "time": 12.0, "value": 1.5, "interp": "constant", "bezier": [0.25, 0.0, 0.75, 1.0] }
+            ],
+            "handheldFrequency": 0.5
+        }
+    ]
+}
