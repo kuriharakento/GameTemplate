@@ -192,6 +192,15 @@ Unity に合わせて `Component` の語尾を取る（`SphereColliderComponent`
 
 ---
 
+### 5.3 実装メモ（プレハブ作業で使う）
+
+- 今ある `GameObject::SaveJson` / `LoadJson`（`GameObject.cpp:632` 付近）は、コンポーネントを「種類名 → 中身」のオブジェクトで持つ。同じ種類を2つ持てないので、プレハブは 5.1 の配列の形にする。`SaveJson` / `LoadJson` の形式は変えない（既存データを壊さない）
+- 種類名からの生成は `ComponentFactory::Create(typeName, owner)` を使う。`fields` の読み書きは各コンポーネントの `JsonEditableBase::Serialize` / `Deserialize`（`REGISTER_MEMBER` の値）を使う
+- モデル名はプレハブに入れる。モデルを持たないオブジェクトは `"model"` を省く
+- `Instantiate` は、読み込めない種類名や壊れた JSON を見たらログを出して `nullptr` を返す。途中まで作ったオブジェクトは残さない
+- 確認は DebugScene で行う: 体と足元の2判定を持つオブジェクトをプレハブに保存 → 2個生成 → 両方で衝突通知が出ること、GUID が別々なこと
+- 衝突の Exit 中の登録解除（`CollisionManager`）は Claude が別に直すので触らない
+
 ## 6. 進め方
 
 区切りごとに、ビルド（Debug|x64）→ 動作確認（衝突まわりは DebugScene、それ以外は FeatureCheck）→ engine → 親の順でコミット。
