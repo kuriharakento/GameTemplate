@@ -23,7 +23,7 @@ REGISTER_SCENE(TitleScene);
 void TitleScene::Initialize()
 {
 #ifdef USE_IMGUI
-	KCE::DebugUIManager::GetInstance()->RegisterHierarchySection(this, "Title Scene", [this]() { this->DrawImGui(); });
+	KCE::DebugUIManager::GetInstance()->RegisterHierarchySection(this, "タイトル", [this]() { this->DrawImGui(); });
 #endif
 
 	KCE::Object3dCommon* objCommon = sceneManager_->GetObject3dCommon();
