@@ -217,3 +217,39 @@ Unity に合わせて `Component` の語尾を取る（`SphereColliderComponent`
 ## 7. 未決事項
 
 - 今のところ無し。実装中に出てきたらここに足す
+
+---
+
+## 8. シーケンサとの連携（B / C）
+
+1〜2 は取り込み済み（engine `a4dde62` 以降 / `feature/sequencer`）。A（GameObject にシーケンスを持たせてゲームから再生）は CutsceneManager で足りているのでやらない。
+
+### 8.1 B: GameObject から直接トラックを作る
+
+- **置き場所**: GameObject の Inspector の下に「Sequencer」欄を足す。`SequencerEditor` が `DebugUIManager::RegisterInspector(this, SelectionKind::GameObject, ...)` で登録する（同じ種類の Inspector は登録順に続けて描く仕組みが既にある。BeamRenderer がスポットライトの欄を足しているのと同じ形）。GameObjectEditor 側からシーケンサを知らないようにするため
+- **ボタン**:
+  - 「Transform トラックを作る」: Transform トラックを追加し、役の名前をオブジェクト名にして、プレビュー用の割り当て（`previewObjectBindings_`、GUID で持つ）もこのオブジェクトにする。同じ役名がすでに別のオブジェクトに割り当てられていたら、名前に番号を足して重ならないようにする
+  - 「Component トラックを作る」: 8.2 のトラックを同じ手順で作る（コンポーネントと項目は Inspector で選ぶ）
+  - 「カメラの注目点 A にする」「B にする」: 選択中（無ければ最初）のカメラトラックの Aim Role A / B に役を入れ、プレビュー割り当ても済ませる。カメラトラックが無ければボタンを無効にして理由を出す
+- **Undo**: トラックの追加は今の `AddTrack` と同じく `SequenceStructureCommand`。注目点の設定は `TrackEditCommand`。追加と割り当てを1回の Undo で戻せるよう、`CommandHistory` のトランザクションでまとめる
+- 作ったトラックを選択して、Sequencer でそのまま編集を続けられるようにする
+
+### 8.2 C: コンポーネントの値をトラックで動かす
+
+- **新しいトラック** `ComponentTrack`（種別名 `"Component"`、`TrackType` に `Component` を足す。JSON は文字列で保存しているので末尾に足せば既存データは壊れない）
+  - 設定: 役（GameObject）、コンポーネントの種類名（Factory の正規名。`GameObject::GetComponentTypeNames()` と同じ名前）、項目名（`JsonEditableBase` に登録された名前）
+  - チャンネル: 項目の値の型に合わせて1本。数値 → `FloatCurve`、`{x,y,z}` → `Vector3Curve`、`{x,y,z,w}`（色）→ `Vector4Curve`。それ以外の型は選べないようにする
+  - もう1本「Enabled」チャンネル（`FloatCurve`、0.5 以上でオン）で、コンポーネントのオン・オフを動かす。キーの補間は既定で Constant にする
+- **Evaluate**: 役から GameObject を引き、種類名でコンポーネントを探し、`JsonEditableBase::SetValue(項目名, 値)` で書く。キーの無いチャンネルには触らない。ITrack の純関数契約を守る（前フレームの値を土台にしない）
+  - 毎フレーム JSON を作るので確保が起きる。前に書いた値と同じなら書かない（書く値の結果は変わらないので純関数のまま）など、無駄な書き込みを減らす工夫を入れる。気になる規模なら後で測る
+- **CaptureState / RestoreState**: 書き換える前の項目の値（JSON）と Enabled を退避して戻す
+- **RecordKey**: 今の値をキーとして打つ（`Serialize()` から項目を読む）
+- **Inspector**: 役・コンポーネント・項目を選ぶコンボ。コンポーネントと項目の一覧は、役にプレビュー割り当て中のオブジェクトから作る。割り当てが無ければ文字で入力できるようにする
+- 追加するファイル（`sequencer/track/ComponentTrack.h/.cpp`）は engine の .vcxproj と .filters の両方に入れ、`TrackFactory` に登録する
+
+### 8.3 進め方
+
+- 作業ブランチ: `feature/gameobject-sequencer`（engine と親の両方）。`git worktree add` で別ディレクトリに作り、`engine/externals/DirectXTex/Shaders/Compiled/*.inc`（14個）をコピーしてからビルドする
+- B → C の順に、止まらずに全部やる。区切りごとに Debug|x64 でビルド（終了コード 0）→ engine → 親の順でコミット。最後に Release|x64 もビルドする
+- 確認用に FeatureCheck か DebugScene へ最小の確認を足してよい（例: Component トラックでライトの強さや色を動かす）。起動確認と見た目の確認は Claude とユーザーがやる
+- `CollisionManager` は触らない
