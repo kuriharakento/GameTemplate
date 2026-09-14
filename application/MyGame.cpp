@@ -287,6 +287,8 @@ void MyGame::Draw()
 		dockWindows(EditorDock::Right, dock_id_right);
 		dockWindows(EditorDock::RightBottom, dock_id_right_bottom);
 		dockWindows(EditorDock::Bottom, dock_id_bottom);
+		// Console は ConsoleLog が自分で描いていて登録一覧に入らないので、ここで下の段に入れる
+		ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
 		ImGui::DockBuilderFinish(dockspace_id);
 		pendingTabFocusSteps = kTabFocusSteps;
 	}
