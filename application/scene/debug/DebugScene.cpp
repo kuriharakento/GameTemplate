@@ -121,7 +121,7 @@ KCE::GameObject* DebugScene::CreateObject(const char* name, const KCE::Vector3& 
 
 void DebugScene::Initialize()
 {
-    KCE::CollisionManager::GetInstance()->Initialize();
+    KCE::GameObjectCollisionManager::GetInstance()->Initialize();
     sceneManager_->GetCameraManager()->GetActiveCamera()->SetTranslate({ 0.0f, 12.0f, -32.0f });
     sceneManager_->GetCameraManager()->GetActiveCamera()->SetRotate({ 0.25f, 0.0f, 0.0f });
 	lifecycleObject_ = CreateObject("LifecycleProbe", { 0.0f, -6.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
@@ -257,7 +257,7 @@ void DebugScene::CommonUpdate()
         collider->SetCollisionLayer(kMovingLayer);
         spawnedBullet_ = true;
     }
-    auto* collisions = KCE::CollisionManager::GetInstance();
+    auto* collisions = KCE::GameObjectCollisionManager::GetInstance();
     collisions->UpdatePreviousPositions();
     KCE::GameObjectManager::GetInstance()->Update();
     collisions->CheckCollisions();
@@ -275,7 +275,7 @@ void DebugScene::DrawImGui()
     ImGui::Begin("Component Lifecycle Check");
     ImGui::Text("Collider Enter: %d", colliderEnterCount_);
 	ImGui::Text("Collider Exit after disable: %d", colliderExitCount_);
-	ImGui::Text("Active collision pairs: %zu", KCE::CollisionManager::GetInstance()->GetActiveCollisionCount());
+	ImGui::Text("Active collision pairs: %zu", KCE::GameObjectCollisionManager::GetInstance()->GetActiveCollisionCount());
     ImGui::Text("Object Enter: %d", objectEnterCount_);
     ImGui::Text("Fast bullet hit: %d", bulletHitCount_);
 	ImGui::Text("Exit reaction / victim exit: %d / %d", exitReactionCount_, victimExitCount_);
