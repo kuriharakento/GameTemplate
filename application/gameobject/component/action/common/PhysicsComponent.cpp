@@ -31,7 +31,8 @@ namespace KCE::GameObjectComponent
 
 	void PhysicsComponent::Update()
 	{
-		float dt = TimeManager::GetInstance().GetGameContext().deltaTime;
+		// 持ち主の GameObject の時計で進める（敵だけ止める、などのため）
+		float dt = GetDeltaTime();
 		if (dt <= 0.0f)
 		{
 			return;

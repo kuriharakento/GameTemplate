@@ -27,7 +27,8 @@ namespace KCE::GameObjectComponent
 		// 被弾後の無敵タイマーを減算
 		if (invincibleTimer_ > 0.0f)
 		{
-			float dt = TimeManager::GetInstance().GetGameContext().deltaTime;
+			// 持ち主の GameObject の時計で減らす
+			float dt = GetDeltaTime();
 			invincibleTimer_ -= dt;
 			if (invincibleTimer_ < 0.0f)
 			{
