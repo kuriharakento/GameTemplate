@@ -1,0 +1,25 @@
+{
+    "bindings": [
+        {
+            "description": "シーケンスが動かすカメラ",
+            "role": "MainCam",
+            "type": "Camera"
+        }
+    ],
+    "editor": {
+        "previewBindings": {
+            "lights": {},
+            "objects": {}
+        }
+    },
+    "markers": [],
+    "meta": {
+        "audioClip": "",
+        "bpm": 0.0,
+        "duration": 0.0,
+        "name": "New Sequence",
+        "offset": 0.0
+    },
+    "tracks": [],
+    "version": 1
+}
