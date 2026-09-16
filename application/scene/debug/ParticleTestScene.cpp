@@ -21,20 +21,15 @@ REGISTER_SCENE(ParticleTestScene);
 
 void ParticleTestScene::Initialize()
 {
-	// カメラの設定
-	sceneManager_->GetCameraManager()->GetActiveCamera()->SetTranslate({ 0.0f, 5.0f, 20.0f });
-	sceneManager_->GetCameraManager()->GetActiveCamera()->SetRotate({ 0.0f, 0.0f, 0.0f });
+	// カメラの設定。視点はエンジンのデバッグカメラ（Scene の上で右ドラッグ + WASD）で動かす
+	sceneManager_->GetCameraManager()->GetActiveCamera()->SetTranslate({ 0.0f, 8.0f, -30.0f });
+	sceneManager_->GetCameraManager()->GetActiveCamera()->SetRotate({ 0.2f, 0.0f, 0.0f });
 
 	// ディレクショナルライトの調整（斜め下向き）
 	KCE::DirectionalLight dirLight = sceneManager_->GetLightManager()->GetDirectionalLight();
 	dirLight.direction = kLightDirection;
 	dirLight.intensity = kLightIntensity;
 	sceneManager_->GetLightManager()->SetDirectionalLight(dirLight);
-
-	// デバッグカメラの初期化
-	debugCamera_ = std::make_unique<KCE::DebugCamera>();
-	debugCamera_->Initialize(sceneManager_->GetCameraManager()->GetActiveCamera());
-	debugCamera_->Start({ 0.0f, 8.0f, -30.0f }, { 0.2f, 0.0f, 0.0f });
 
 	// パーティクルエディタの初期化
 	particleEditor_ = std::make_unique<KCE::ParticleEditor>();
@@ -75,11 +70,6 @@ void ParticleTestScene::OnFinalize()
 
 void ParticleTestScene::CommonUpdate()
 {
-	if (debugCamera_)
-	{
-		debugCamera_->Update();
-	}
-
 	// エディタの更新（ImGui描画）
 	if (particleEditor_)
 	{

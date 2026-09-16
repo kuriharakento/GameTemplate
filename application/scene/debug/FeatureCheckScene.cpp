@@ -249,10 +249,12 @@ void FeatureCheckScene::Initialize()
 		KCE::SequencerEditor::GetInstance()->SetStageSaveCallback([this]() { return stageManager_ && stageManager_->SaveToFile(); });
 	}
 
-	// デバッグカメラ
-	debugCamera_ = std::make_unique<KCE::DebugCamera>();
-	debugCamera_->Initialize(sceneManager_->GetCameraManager()->GetActiveCamera());
-	debugCamera_->Start(kDebugCameraPosition, kDebugCameraRotation);
+	// 見渡せる位置から始める。視点はエンジンのデバッグカメラ（Scene の上で右ドラッグ + WASD）で動かす
+	if (KCE::Camera* camera = sceneManager_->GetCameraManager()->GetActiveCamera())
+	{
+		camera->SetTranslate(kDebugCameraPosition);
+		camera->SetRotate(kDebugCameraRotation);
+	}
 }
 
 std::unique_ptr<KCE::GameObject> FeatureCheckScene::CreateObject(const std::string& name, const KCE::Vector3& position, const KCE::Vector3& scale)
@@ -447,11 +449,6 @@ void FeatureCheckScene::OnFinalize()
 
 void FeatureCheckScene::CommonUpdate()
 {
-	if (debugCamera_ && useDebugCamera_)
-	{
-		debugCamera_->Update();
-	}
-
 	if (stageMonitor_)
 	{
 		stageMonitor_->Update();
@@ -522,19 +519,6 @@ void FeatureCheckScene::DrawImGui()
 {
 #ifdef USE_IMGUI
 	ImGui::TextWrapped("シーケンサで動かすときは、Timeline の Preview Object で FeatureCheck_* を選ぶ。");
-	ImGui::TextWrapped("カメラトラックを再生するときは、下のデバッグカメラをオフにする。");
-
-	if (ImGui::Checkbox("デバッグカメラ", &useDebugCamera_) && debugCamera_)
-	{
-		if (useDebugCamera_)
-		{
-			debugCamera_->Start(kDebugCameraPosition, kDebugCameraRotation);
-		}
-		else
-		{
-			debugCamera_->Stop();
-		}
-	}
 
 	ImGui::SeparatorText("半透明");
 	if (ImGui::SliderFloat("不透明度", &transparentAlpha_, 0.0f, 1.0f))
