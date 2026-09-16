@@ -30,6 +30,8 @@ public:
 	void DrawGBuffer() override;
 	void DrawShadow() override;
 	void DrawImGui() override;
+	// ステージ（3D 文字・カメラ・モニター）を保存していなければ、シーンの切り替え前に確認を出す
+	bool HasUnsavedChanges() const override { return stageManager_ && stageManager_->IsDirty(); }
 
 protected:
 	void OnFinalize() override;
