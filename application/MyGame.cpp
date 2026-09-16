@@ -208,6 +208,9 @@ void MyGame::Draw()
 			ImGui::EndMenu();
 		}
 
+		// エンジンやシーンが登録したメニュー（「シーン」など）と、その確認の小窓
+		debugUIManager->DrawMainMenus();
+
 		// ImGui を全部消して、ゲーム画面だけを確認する。F11 でも切り替わる
 		if (ImGui::MenuItem("ゲーム画面 (F11)"))
 		{
