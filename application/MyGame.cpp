@@ -106,17 +106,28 @@ void MyGame::Finalize()
 
 void MyGame::Update()
 {
+	renderProfiler_->BeginCpuFrame(
+		dxCommon_->GetExecutePresentMilliseconds(),
+		dxCommon_->GetGpuWaitMilliseconds(),
+		dxCommon_->GetFpsWaitMilliseconds(),
+		dxCommon_->HasCpuTiming());
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::Update);
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::FrameworkUpdate);
 	// フレームワークの更新処理
 	Framework::Update();
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::FrameworkUpdate);
 
 	// パフォーマンス情報の表示
 	Framework::ShowPerformanceInfo();
 
 	// ゲームの更新処理
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::SceneUpdate);
 	sceneManager_->Update();
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::SceneUpdate);
 
 	// パーティクルマネージャーの更新
 	ParticleManager::GetInstance()->Update(cameraManager_.get());
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::Update);
 }
 
 void MyGame::OnResize(uint32_t width, uint32_t height)
@@ -143,7 +154,9 @@ void MyGame::Draw()
 	{
 		// ゲーム画面だけを出す。Release と同じくバックバッファへ直接描き、
 		// ImGui は組み立てだけ終えて描かない（どこかのウィンドウが残って出ることもない）
+		renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::RenderCommands);
 		Framework::ExecuteRenderPipeline(nullptr);
+		renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::RenderCommands);
 
 		// マウスとギズモの基準をウィンドウ全体に合わせる
 		POINT clientOrigin = { 0, 0 };
@@ -161,19 +174,25 @@ void MyGame::Draw()
 		// ImGui のウィンドウが無いので、マウスは常にゲームへ渡す
 		SceneViewContext::GetInstance()->SetHovered(true);
 
+		renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::ImGui);
 		imguiManager_->End();
+		renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::ImGui);
+		dxCommon_->SetCpuTimingEnabled(renderProfiler_->IsEnabled());
 		dxCommon_->PostDraw();
 		return;
 	}
 
 	// エディタではシーンをImGuiのウィンドウに表示するため、
 	// バックバッファではなくレンダーターゲットへ出力する。
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::RenderCommands);
 	Framework::ExecuteRenderPipeline(sceneRenderTexture_.get());
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::RenderCommands);
 
 	// バックバッファのクリア
 	dxCommon_->PreDraw();
 
 	// メインメニューバー
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::ImGui);
 	DebugUIManager* debugUIManager = DebugUIManager::GetInstance();
 
 	if (ImGui::BeginMainMenuBar())
@@ -374,11 +393,15 @@ void MyGame::Draw()
 #else
 	// バックバッファへ直接出力する。
 	// クリアのタイミングもパイプライン内のパスが面倒を見る。
+	renderProfiler_->BeginCpuSection(RenderProfiler::CpuSection::RenderCommands);
 	Framework::ExecuteRenderPipeline(nullptr);
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::RenderCommands);
 #endif
 
 	imguiManager_->End();
 	imguiManager_->Draw();
+	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::ImGui);
+	dxCommon_->SetCpuTimingEnabled(renderProfiler_->IsEnabled());
 	dxCommon_->PostDraw();
 }
 
