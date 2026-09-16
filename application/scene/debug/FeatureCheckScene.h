@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 
-#include "camerawork/debug/DebugCamera.h"
 #include "gameobject/base/GameObject.h"
 #include "graphics/atmosphere/VolumetricLightRenderer.h"
 #include "graphics/postfx/DepthOfFieldRenderer.h"
@@ -80,10 +79,6 @@ private:
 	float stageTextTime_ = 0.0f;
 	// 見本を自動で出入りさせるか。シーケンサの Text3D トラックを試すときはオフにする
 	bool animateStageText_ = true;
-
-	std::unique_ptr<KCE::DebugCamera> debugCamera_;
-	// シーケンサのカメラ再生と取り合わないように、オフにできるようにしておく
-	bool useDebugCamera_ = true;
 
 	// 半透明キューブのアルファ
 	float transparentAlpha_ = 0.5f;
