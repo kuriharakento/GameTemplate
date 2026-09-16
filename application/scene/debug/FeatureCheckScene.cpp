@@ -13,6 +13,7 @@
 #include "graphics/postfx/DepthOfFieldRenderer.h"
 #include "graphics/view/PlanarReflection.h"
 #include "manager/graphics/LineManager.h"
+#include "manager/graphics/ShadowMapManager.h"
 #include "manager/scene/CameraManager.h"
 #include "manager/scene/LightManager.h"
 #include "math/VectorColorCodes.h"
@@ -408,6 +409,19 @@ void FeatureCheckScene::OnFinalize()
 
 	// 画面より先にモニターを畳む（画面のテクスチャを戻してからサブビューを消す）
 	stageMonitor_.reset();
+
+	// このシーンで足したスポットライトとその影を外す。残すと他のシーンでも当たり続ける
+	for (const char* name : kSpotLightNames)
+	{
+		if (auto* lightManager = sceneManager_->GetLightManager())
+		{
+			lightManager->RemoveSpotLight(name);
+		}
+		if (auto* shadowMapManager = sceneManager_->GetShadowMapManager())
+		{
+			shadowMapManager->RemoveSpotLightShadowMap(name);
+		}
+	}
 
 	// 破棄の前に登録を外す（GameObjectManager に死んだポインタを残さない）
 	auto* manager = KCE::GameObjectManager::GetInstance();
