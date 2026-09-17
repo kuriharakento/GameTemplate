@@ -3,6 +3,7 @@
 #include <cmath>
 #include <numbers>
 
+#include "base/Camera.h"
 #include "engine/scene/factory/SceneFactory.h"
 #include "gameobject/manager/GameObjectManager.h"
 #include "graphics/atmosphere/BeamRenderer.h"
@@ -16,6 +17,7 @@
 #include "manager/graphics/ShadowMapManager.h"
 #include "manager/scene/CameraManager.h"
 #include "manager/scene/LightManager.h"
+#include "math/Frustum.h"
 #include "math/VectorColorCodes.h"
 #include "scene/manager/SceneManager.h"
 #include "sequencer/editor/SequencerEditor.h"
@@ -451,6 +453,16 @@ void FeatureCheckScene::CommonUpdate()
 {
 	if (stageMonitor_)
 	{
+		KCE::Camera* primaryCamera = sceneManager_->GetCameraManager()->GetPrimaryCamera();
+		if (primaryCamera)
+		{
+			const KCE::Frustum frustum = KCE::Frustum::FromViewProjection(primaryCamera->GetViewProjectionMatrix());
+			stageMonitor_->SetViewVisible(stageMonitor_->IsScreenVisible(frustum));
+		}
+		else
+		{
+			stageMonitor_->SetViewVisible(true);
+		}
 		stageMonitor_->Update();
 	}
 	if (stageManager_)
