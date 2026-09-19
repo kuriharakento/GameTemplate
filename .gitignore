@@ -334,3 +334,6 @@ application/Resources/json/prefab/debug_multi_collider.json
 # 作業管理用のメモと計画書は手元にだけ置く
 /docs/
 /*_PLAN.md
+
+# 計測シーンの書き出し（コミットしない）
+crowd_bench.log

@@ -50,6 +50,9 @@
     <ClCompile Include="scene\debug\DebugScene.cpp">
       <Filter>ソース ファイル\scene\debug</Filter>
     </ClCompile>
+    <ClCompile Include="scene\debug\CrowdBenchScene.cpp">
+      <Filter>scene\debug</Filter>
+    </ClCompile>
     <ClCompile Include="scene\debug\FeatureCheckScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="scene\debug\DebugScene.h">
       <Filter>ヘッダー ファイル\scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\debug\CrowdBenchScene.h">
+      <Filter>scene\debug</Filter>
     </ClInclude>
     <ClInclude Include="scene\debug\FeatureCheckScene.h">
       <Filter>scene\debug</Filter>
