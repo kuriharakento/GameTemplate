@@ -17,7 +17,7 @@
       <UniqueIdentifier>{53C6C3B6-B541-9B75-5C99-ACB29017302B}</UniqueIdentifier>
     </Filter>
     <Filter Include="input">
-      <UniqueIdentifier>{3F1B6A52-8C4D-4E27-9A61-2D7E5B0C9F13}</UniqueIdentifier>
+      <UniqueIdentifier>{0A1B3CA4-3AA5-900C-8810-C06AB1FF3967}</UniqueIdentifier>
     </Filter>
     <Filter Include="resources">
       <UniqueIdentifier>{C758B555-82EF-6E0E-00E5-993B9E55D93B}</UniqueIdentifier>
@@ -50,13 +50,13 @@
     <ClCompile Include="resources\LoadGameResources.cpp">
       <Filter>resources</Filter>
     </ClCompile>
-    <ClCompile Include="scene\debug\ParticleTestScene.cpp">
+    <ClCompile Include="scene\debug\DebugScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
-    <ClCompile Include="scene\debug\DebugScene.cpp">
-      <Filter>ソース ファイル\scene\debug</Filter>
-    </ClCompile>
     <ClCompile Include="scene\debug\LiveEditScene.cpp">
+      <Filter>scene\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\debug\ParticleTestScene.cpp">
       <Filter>scene\debug</Filter>
     </ClCompile>
     <ClCompile Include="scene\play\title\TitleScene.cpp">
@@ -80,13 +80,13 @@
     <ClInclude Include="input\GameInput.h">
       <Filter>input</Filter>
     </ClInclude>
-    <ClInclude Include="scene\debug\ParticleTestScene.h">
+    <ClInclude Include="scene\debug\DebugScene.h">
       <Filter>scene\debug</Filter>
     </ClInclude>
-    <ClInclude Include="scene\debug\DebugScene.h">
-      <Filter>ヘッダー ファイル\scene\debug</Filter>
-    </ClInclude>
     <ClInclude Include="scene\debug\LiveEditScene.h">
+      <Filter>scene\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\debug\ParticleTestScene.h">
       <Filter>scene\debug</Filter>
     </ClInclude>
     <ClInclude Include="scene\play\title\TitleScene.h">
