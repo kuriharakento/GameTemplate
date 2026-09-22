@@ -14,6 +14,7 @@
 #include "manager/editor/ConsoleLog.h"
 #include "manager/graphics/LineManager.h"
 #include "input/Input.h"
+#include "input/GameInput.h"
 #include "audio/Audio.h"
 
 #include "base/PathManager.h"
@@ -71,6 +72,9 @@ void MyGame::Initialize()
 	dxCommon_->ExecuteAndWait();
 	TextureManager::GetInstance()->ClearIntermediateResources();
 
+	// アクション入力の初期化。シーンの初期化でロックを掛けられるよう先にやる
+	GameInput::GetInstance()->Initialize();
+
 	// ゲームの初期化処理
 	sceneManager_->Initialize(context);
 
@@ -96,6 +100,9 @@ void MyGame::Finalize()
 	// ゲームの終了処理
 	sceneManager_.reset();
 
+	// DebugUIManager が消える前に、アクション入力のデバッグ表示を外す
+	GameInput::GetInstance()->Finalize();
+
 	// フレームワークの終了処理
 	Framework::Finalize();
 }
@@ -116,6 +123,9 @@ void MyGame::Update()
 	// フレームワークの更新処理
 	Framework::Update();
 	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::FrameworkUpdate);
+
+	// KCE::Input の更新後に、アクションの状態を作る
+	GameInput::GetInstance()->Update();
 
 	// パフォーマンス情報の表示
 	Framework::ShowPerformanceInfo();

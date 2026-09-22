@@ -123,24 +123,24 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="gameobject\component\action\common\PhysicsComponent.cpp" />
     <ClCompile Include="gameobject\component\action\common\StatusComponent.cpp" />
     <ClCompile Include="resources\LoadGameResources.cpp" />
+    <ClCompile Include="input\GameInput.cpp" />
     <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="scene\debug\ParticleTestScene.cpp" />
     <ClCompile Include="scene\debug\DebugScene.cpp" />
-    <ClCompile Include="scene\debug\CrowdBenchScene.cpp" />
-    <ClCompile Include="scene\debug\FeatureCheckScene.cpp" />
+    <ClCompile Include="scene\debug\LiveEditScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scene\play\title\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gameobject\GameObjectTag.h" />
+    <ClInclude Include="input\GameInput.h" />
     <ClInclude Include="MyGame.h" />
     <ClInclude Include="collision\CollisionLayer.h" />
     <ClInclude Include="gameobject\component\action\common\PhysicsComponent.h" />
     <ClInclude Include="gameobject\component\action\common\StatusComponent.h" />
     <ClInclude Include="scene\debug\ParticleTestScene.h" />
     <ClInclude Include="scene\debug\DebugScene.h" />
-    <ClInclude Include="scene\debug\CrowdBenchScene.h" />
-    <ClInclude Include="scene\debug\FeatureCheckScene.h" />
+    <ClInclude Include="scene\debug\LiveEditScene.h" />
     <ClInclude Include="scene\play\title\TitleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -19,7 +19,7 @@
  * - キューブは GameObjectManager に登録するので、シーケンサの Preview Object で選べる
  * - ライトやフォグの設定はシーンを抜けるときに元へ戻す（他のシーンに残さない）
  */
-class FeatureCheckScene : public KCE::BaseScene
+class LiveEditScene : public KCE::BaseScene
 {
 public:
 	void Initialize() override;

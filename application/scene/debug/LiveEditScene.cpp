@@ -1,4 +1,4 @@
-#include "FeatureCheckScene.h"
+#include "LiveEditScene.h"
 
 #include <cmath>
 #include <numbers>
@@ -27,7 +27,7 @@
 #include "manager/editor/DebugUIManager.h"
 #endif
 
-REGISTER_SCENE(FeatureCheckScene);
+REGISTER_SCENE(LiveEditScene);
 
 namespace
 {
@@ -160,7 +160,7 @@ void HideTextSample()
 }
 } // namespace
 
-void FeatureCheckScene::Initialize()
+void LiveEditScene::Initialize()
 {
 #ifdef USE_IMGUI
 	KCE::DebugUIManager::GetInstance()->RegisterHierarchySection(this, "機能チェック", [this]() { this->DrawImGui(); });
@@ -259,7 +259,7 @@ void FeatureCheckScene::Initialize()
 	}
 }
 
-std::unique_ptr<KCE::GameObject> FeatureCheckScene::CreateObject(const std::string& name, const KCE::Vector3& position, const KCE::Vector3& scale)
+std::unique_ptr<KCE::GameObject> LiveEditScene::CreateObject(const std::string& name, const KCE::Vector3& position, const KCE::Vector3& scale)
 {
 	auto object = std::make_unique<KCE::GameObject>("FeatureCheck");
 	object->Initialize(sceneManager_->GetObject3dCommon(), sceneManager_->GetLightManager());
@@ -272,7 +272,7 @@ std::unique_ptr<KCE::GameObject> FeatureCheckScene::CreateObject(const std::stri
 	return object;
 }
 
-void FeatureCheckScene::SetupStageLights()
+void LiveEditScene::SetupStageLights()
 {
 	KCE::LightManager* lightManager = sceneManager_->GetLightManager();
 	if (!lightManager)
@@ -317,7 +317,7 @@ void FeatureCheckScene::SetupStageLights()
 	}
 }
 
-void FeatureCheckScene::ApplyTransparentColors()
+void LiveEditScene::ApplyTransparentColors()
 {
 	if (transparentFront_)
 	{
@@ -329,7 +329,7 @@ void FeatureCheckScene::ApplyTransparentColors()
 	}
 }
 
-void FeatureCheckScene::SetupScreenQuality()
+void LiveEditScene::SetupScreenQuality()
 {
 	// 床を反射させる。床そのものは反射の絵に描かないレイヤーへ移す
 	floor_->SetRenderLayer(KCE::PlanarReflection::kReflectorLayer);
@@ -354,7 +354,7 @@ void FeatureCheckScene::SetupScreenQuality()
 	}
 }
 
-void FeatureCheckScene::RestoreAtmosphere()
+void LiveEditScene::RestoreAtmosphere()
 {
 	if (auto* reflection = sceneManager_->GetPlanarReflection())
 	{
@@ -393,7 +393,7 @@ void FeatureCheckScene::RestoreAtmosphere()
 	}
 }
 
-void FeatureCheckScene::OnFinalize()
+void LiveEditScene::OnFinalize()
 {
 	RestoreAtmosphere();
 
@@ -449,7 +449,7 @@ void FeatureCheckScene::OnFinalize()
 	}
 }
 
-void FeatureCheckScene::CommonUpdate()
+void LiveEditScene::CommonUpdate()
 {
 	if (stageMonitor_)
 	{
@@ -499,7 +499,7 @@ void FeatureCheckScene::CommonUpdate()
 	KCE::GameObjectManager::GetInstance()->Update();
 }
 
-void FeatureCheckScene::Draw3D()
+void LiveEditScene::Draw3D()
 {
 	BaseScene::Draw3D();
 
@@ -509,7 +509,7 @@ void FeatureCheckScene::Draw3D()
 	KCE::GameObjectManager::GetInstance()->Draw3D(sceneManager_->GetCameraManager());
 }
 
-void FeatureCheckScene::DrawGBuffer()
+void LiveEditScene::DrawGBuffer()
 {
 	BaseScene::DrawGBuffer();
 
@@ -517,17 +517,17 @@ void FeatureCheckScene::DrawGBuffer()
 	KCE::GameObjectManager::GetInstance()->DrawGBuffer(sceneManager_->GetCameraManager());
 }
 
-void FeatureCheckScene::DrawShadow()
+void LiveEditScene::DrawShadow()
 {
 	BaseScene::DrawShadow();
 	KCE::GameObjectManager::GetInstance()->DrawShadow();
 }
 
-void FeatureCheckScene::Draw2D()
+void LiveEditScene::Draw2D()
 {
 }
 
-void FeatureCheckScene::DrawImGui()
+void LiveEditScene::DrawImGui()
 {
 #ifdef USE_IMGUI
 	ImGui::TextWrapped("シーケンサで動かすときは、Timeline の Preview Object で FeatureCheck_* を選ぶ。");
