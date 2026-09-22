@@ -17,7 +17,7 @@ constexpr DWORD kGamepadIndex = 0;
 constexpr const char* kActionNames[] = { "MoveForward", "MoveBack", "MoveLeft", "MoveRight", "Jump", "Attack", "Pause" };
 static_assert(std::size(kActionNames) == static_cast<size_t>(GameAction::Count), "アクション名の数が合わない");
 
-constexpr const char* kLockNames[] = { "Intro", "Pause" };
+constexpr const char* kLockNames[] = { "Intro", "Pause", "DebugCamera" };
 static_assert(std::size(kLockNames) == static_cast<size_t>(InputLockReason::Count), "ロック名の数が合わない");
 
 size_t ToIndex(GameAction action)

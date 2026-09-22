@@ -37,9 +37,6 @@ void MyGame::Initialize()
 	// テクスチャとモデルを読んでる間にワーカーで回す。
 	jobSystem_->Submit([]() {});
 
-	// ゲーム側でウィンドウタイトルを決める
-	winApp_->SetWindowTitle(L"MyGame");
-
 	// シーンコンテキストの作成
 	SceneContext context;
 	context = {
@@ -95,6 +92,14 @@ void MyGame::Initialize()
 	);
 }
 
+GameConfig MyGame::CreateGameConfig() const
+{
+	GameConfig config;
+	config.windowTitle = L"MyGame";
+	config.startSceneName = "TitleScene";
+	return config;
+}
+
 void MyGame::Finalize()
 {
 	// ゲームの終了処理
@@ -123,6 +128,16 @@ void MyGame::Update()
 	// フレームワークの更新処理
 	Framework::Update();
 	renderProfiler_->EndCpuSection(RenderProfiler::CpuSection::FrameworkUpdate);
+
+	// デバッグカメラで見回している間は、同じキーでプレイヤーが動かないようにする
+	if (IsDebugCameraEnabled())
+	{
+		GameInput::GetInstance()->Lock(InputLockReason::DebugCamera);
+	}
+	else
+	{
+		GameInput::GetInstance()->Unlock(InputLockReason::DebugCamera);
+	}
 
 	// KCE::Input の更新後に、アクションの状態を作る
 	GameInput::GetInstance()->Update();
@@ -244,6 +259,13 @@ void MyGame::Draw()
 		if (ImGui::MenuItem("ゲーム画面 (F11)"))
 		{
 			gameViewOnly_ = true;
+		}
+
+		// デバッグカメラのオン・オフ。F9 でも切り替わる
+		const bool debugCameraEnabled = IsDebugCameraEnabled();
+		if (ImGui::MenuItem(debugCameraEnabled ? "デバッグカメラ: ON (F9)###DebugCamera" : "デバッグカメラ: OFF (F9)###DebugCamera"))
+		{
+			debugCamera_->SetEnabled(!debugCameraEnabled);
 		}
 
 		// メニューバー中央にエンジン名を表示

@@ -34,6 +34,7 @@ enum class InputLockReason
 {
 	Intro, // スタート演出
 	Pause, // ポーズメニュー
+	DebugCamera, // デバッグカメラで飛び回っている間
 	Count
 };
 
