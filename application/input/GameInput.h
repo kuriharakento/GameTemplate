@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include "math/Vector2.h"
 
 namespace KCE
 {
@@ -45,9 +46,20 @@ struct InputBinding
 {
 	enum class Device
 	{
-		Keyboard, // code は DIK_*
-		Gamepad,  // code は XINPUT_GAMEPAD_*
-		Mouse     // code はボタン番号（0:左、1:中、2:右）
+		Keyboard,           // code は DIK_*
+		Gamepad,            // code は XINPUT_GAMEPAD_*
+		Mouse,              // code はボタン番号（0:左、1:中、2:右）
+		GamepadStickPlus,   // code は GamepadAxis。スティックがプラス方向へ倒された時に押下扱い
+		GamepadStickMinus   // code は GamepadAxis。スティックがマイナス方向へ倒された時に押下扱い
+	};
+
+	// GamepadStickPlus/Minus で使うスティック軸
+	enum class GamepadAxis : uint32_t
+	{
+		LeftStickX,
+		LeftStickY,
+		RightStickX,
+		RightStickY
 	};
 
 	Device device;
@@ -143,6 +155,28 @@ public:
 	 * @param reason 外す理由
 	 */
 	void Unlock(InputLockReason reason);
+
+	/**
+	 * @brief 移動方向をアナログで取得する。
+	 *
+	 * 左スティックの入力をそのまま返し、スティックが無入力（デッドゾーン内）のときは
+	 * MoveForward/Back/Left/Right のデジタル入力から (-1,0,1) の値を組み立てて返す。
+	 * ロック中は (0,0) になる。
+	 * @return x: 右方向プラス、y: 前方向プラス。斜め入力は正規化される
+	 */
+	KCE::Vector2 GetMoveVector() const;
+
+	/**
+	 * @brief ゲームパッドの振動を設定する。
+	 * @param leftMotor 低周波（左）モーターの強さ（0〜65535）
+	 * @param rightMotor 高周波（右）モーターの強さ（0〜65535）
+	 */
+	void SetVibration(uint16_t leftMotor, uint16_t rightMotor);
+
+	/**
+	 * @brief ゲームパッドの振動を止める。
+	 */
+	void StopVibration();
 
 	/**
 	 * @brief どれかの理由でロックされているか。

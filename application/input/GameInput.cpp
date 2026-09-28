@@ -1,4 +1,5 @@
 #include "GameInput.h"
+#include <cmath>
 #include <iterator>
 #include "input/Input.h"
 #ifdef USE_IMGUI
@@ -12,6 +13,29 @@ namespace
 {
 // 見るゲームパッドの番号。今は1人プレイ前提
 constexpr DWORD kGamepadIndex = 0;
+
+// スティックをデジタル入力（押した/押していない）として扱うためのしきい値
+constexpr float kStickDigitalThreshold = 0.5f;
+
+// GetMoveVector でスティックの入力を無視してキーボード入力を使うしきい値（デッドゾーンより少し大きめ）
+constexpr float kStickAnalogDeadZone = 0.2f;
+
+float GetStickAxisValue(InputBinding::GamepadAxis axis)
+{
+	const Input* input = Input::GetInstance();
+	switch (axis)
+	{
+	case InputBinding::GamepadAxis::LeftStickX:
+		return input->GetLeftStick(kGamepadIndex).x;
+	case InputBinding::GamepadAxis::LeftStickY:
+		return input->GetLeftStick(kGamepadIndex).y;
+	case InputBinding::GamepadAxis::RightStickX:
+		return input->GetRightStick(kGamepadIndex).x;
+	case InputBinding::GamepadAxis::RightStickY:
+		return input->GetRightStick(kGamepadIndex).y;
+	}
+	return 0.0f;
+}
 
 // デバッグ表示用の名前。enum の並びと合わせる
 constexpr const char* kActionNames[] = { "MoveForward", "MoveBack", "MoveLeft", "MoveRight", "Jump", "Attack", "Pause" };
@@ -85,21 +109,27 @@ void GameInput::SetDefaultBindings()
 	using Device = InputBinding::Device;
 	constexpr uint32_t kMouseLeft = 0;
 
+	using Axis = InputBinding::GamepadAxis;
+
 	AddBinding(GameAction::MoveForward, { Device::Keyboard, DIK_W });
 	AddBinding(GameAction::MoveForward, { Device::Keyboard, DIK_UP });
 	AddBinding(GameAction::MoveForward, { Device::Gamepad, XINPUT_GAMEPAD_DPAD_UP });
+	AddBinding(GameAction::MoveForward, { Device::GamepadStickPlus, static_cast<uint32_t>(Axis::LeftStickY) });
 
 	AddBinding(GameAction::MoveBack, { Device::Keyboard, DIK_S });
 	AddBinding(GameAction::MoveBack, { Device::Keyboard, DIK_DOWN });
 	AddBinding(GameAction::MoveBack, { Device::Gamepad, XINPUT_GAMEPAD_DPAD_DOWN });
+	AddBinding(GameAction::MoveBack, { Device::GamepadStickMinus, static_cast<uint32_t>(Axis::LeftStickY) });
 
 	AddBinding(GameAction::MoveLeft, { Device::Keyboard, DIK_A });
 	AddBinding(GameAction::MoveLeft, { Device::Keyboard, DIK_LEFT });
 	AddBinding(GameAction::MoveLeft, { Device::Gamepad, XINPUT_GAMEPAD_DPAD_LEFT });
+	AddBinding(GameAction::MoveLeft, { Device::GamepadStickMinus, static_cast<uint32_t>(Axis::LeftStickX) });
 
 	AddBinding(GameAction::MoveRight, { Device::Keyboard, DIK_D });
 	AddBinding(GameAction::MoveRight, { Device::Keyboard, DIK_RIGHT });
 	AddBinding(GameAction::MoveRight, { Device::Gamepad, XINPUT_GAMEPAD_DPAD_RIGHT });
+	AddBinding(GameAction::MoveRight, { Device::GamepadStickPlus, static_cast<uint32_t>(Axis::LeftStickX) });
 
 	AddBinding(GameAction::Jump, { Device::Keyboard, DIK_SPACE });
 	AddBinding(GameAction::Jump, { Device::Gamepad, XINPUT_GAMEPAD_A });
@@ -230,6 +260,47 @@ bool GameInput::IsReleased(GameAction action) const
 	return !current_[i] && previous_[i];
 }
 
+KCE::Vector2 GameInput::GetMoveVector() const
+{
+	if (IsBlocked(GameAction::MoveForward))
+	{
+		return KCE::Vector2{ 0.0f, 0.0f };
+	}
+
+	// スティックに入力があればそちらを優先（アナログの強弱をそのまま使う）
+	const KCE::Vector2 stick = Input::GetInstance()->GetLeftStick(kGamepadIndex);
+	if (std::fabs(stick.x) > kStickAnalogDeadZone || std::fabs(stick.y) > kStickAnalogDeadZone)
+	{
+		return stick;
+	}
+
+	// スティック入力が無ければキーボード/D-Padのデジタル入力から組み立てる
+	KCE::Vector2 move{
+		(IsPressed(GameAction::MoveRight) ? 1.0f : 0.0f) - (IsPressed(GameAction::MoveLeft) ? 1.0f : 0.0f),
+		(IsPressed(GameAction::MoveForward) ? 1.0f : 0.0f) - (IsPressed(GameAction::MoveBack) ? 1.0f : 0.0f)
+	};
+
+	// 斜め移動が速くならないよう正規化
+	const float lengthSq = move.x * move.x + move.y * move.y;
+	if (lengthSq > 1.0f)
+	{
+		const float length = std::sqrt(lengthSq);
+		move.x /= length;
+		move.y /= length;
+	}
+	return move;
+}
+
+void GameInput::SetVibration(uint16_t leftMotor, uint16_t rightMotor)
+{
+	Input::GetInstance()->SetVibration(kGamepadIndex, leftMotor, rightMotor);
+}
+
+void GameInput::StopVibration()
+{
+	Input::GetInstance()->SetVibration(kGamepadIndex, 0, 0);
+}
+
 void GameInput::Lock(InputLockReason reason)
 {
 	lockMask_ |= ToBit(reason);
@@ -261,6 +332,12 @@ bool GameInput::ReadRawPressed(GameAction action) const
 			break;
 		case InputBinding::Device::Mouse:
 			pressed = input->IsMouseButtonPressed(static_cast<int>(binding.code));
+			break;
+		case InputBinding::Device::GamepadStickPlus:
+			pressed = GetStickAxisValue(static_cast<InputBinding::GamepadAxis>(binding.code)) >= kStickDigitalThreshold;
+			break;
+		case InputBinding::Device::GamepadStickMinus:
+			pressed = GetStickAxisValue(static_cast<InputBinding::GamepadAxis>(binding.code)) <= -kStickDigitalThreshold;
 			break;
 		}
 		if (pressed)
