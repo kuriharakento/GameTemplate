@@ -7,9 +7,6 @@ on:
       - master
   workflow_dispatch:
 
-env:
-  SOLUTION_FILE_PATH: GameTemplate.sln
-
 jobs:
   build:
     strategy:
@@ -27,6 +24,14 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Resolve project name
+        shell: pwsh
+        run: |
+          # テンプレートから作ったリポジトリでも動くように、名前をファイルから取得する
+          $sln = Get-ChildItem -Path . -Filter *.sln | Select-Object -First 1
+          "SOLUTION_FILE_PATH=$($sln.Name)" >> $env:GITHUB_ENV
+          "PROJECT_NAME=$($sln.BaseName)" >> $env:GITHUB_ENV
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -115,7 +120,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
           status: ${{ job.status }}
-          title: "GitHub Actions: GameTemplate ${{ matrix.configuration }}Build"
+          title: "GitHub Actions: ${{ github.event.repository.name }} ${{ matrix.configuration }}Build"
 
   filter-fix:
     needs: build
@@ -136,6 +141,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Resolve project name
+        shell: pwsh
+        run: |
+          # テンプレートから作ったリポジトリでも動くように、名前をファイルから取得する
+          $sln = Get-ChildItem -Path . -Filter *.sln | Select-Object -First 1
+          "SOLUTION_FILE_PATH=$($sln.Name)" >> $env:GITHUB_ENV
+          "PROJECT_NAME=$($sln.BaseName)" >> $env:GITHUB_ENV
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -143,7 +156,7 @@ jobs:
 
       - name: Run UpdateFilters
         shell: pwsh
-        run: python UpdateFilters.py application/GameTemplate.vcxproj
+        run: python UpdateFilters.py application/$env:PROJECT_NAME.vcxproj
 
       - name: Commit updated filters
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
@@ -152,7 +165,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          git add -- application/GameTemplate.vcxproj.filters
+          git add -- application/$env:PROJECT_NAME.vcxproj.filters
           if (git diff --cached --quiet) {
             Write-Host "No filter changes."
             exit 0
@@ -168,7 +181,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
         shell: pwsh
         run: |
-          git diff --exit-code -- application/GameTemplate.vcxproj.filters
+          git diff --exit-code -- application/$env:PROJECT_NAME.vcxproj.filters
           $diffExitCode = $LASTEXITCODE
           if ($diffExitCode -ne 0) {
             Write-Error "Filters are out of date and cannot be updated automatically for this run."
