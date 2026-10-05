@@ -35,7 +35,8 @@ void ParticleTestScene::Initialize()
 	particleEditor_ = std::make_unique<KCE::ParticleEditor>();
 	particleEditor_->Initialize(
 		KCE::ParticleManager::GetInstance()->GetDxCommon(),
-		KCE::ParticleManager::GetInstance()->GetSrvManager()
+		KCE::ParticleManager::GetInstance()->GetSrvManager(),
+		sceneManager_->GetPostProcessManager()
 	);
 	particleEditor_->SetVisible(true);  // 最初から表示
 
